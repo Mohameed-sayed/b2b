@@ -1,0 +1,14 @@
+{
+  "B2B4W": [
+    {
+      "id": "c588c01b-c23f-4b30-b25e-ac064916a0ba",
+      "roomCode": "B2B4W",
+      "participantId": "p-ahmed-1",
+      "participantName": "Ahmed Instructor",
+      "team": "Team Alpha",
+      "text": "I will clarify requirements before committing blindly.",
+      "category": "clarify",
+      "createdAt": 1790018711879
+    }
+  ]
+}

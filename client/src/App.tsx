@@ -1,0 +1,154 @@
+import React, { useState, useEffect } from 'react';
+import { FacilitatorView } from './components/facilitator/FacilitatorView';
+import { ParticipantView } from './components/participant/ParticipantView';
+import { AdminEditor } from './components/admin/AdminEditor';
+import { socketService } from './services/socket';
+import { Monitor, Smartphone, Settings, Wifi, WifiOff } from 'lucide-react';
+
+type AppMode = 'host' | 'participant' | 'admin';
+
+export const App: React.FC = () => {
+  const [mode, setMode] = useState<AppMode>('host');
+  const [joinCode, setJoinCode] = useState<string>('');
+  const [isConnected, setIsConnected] = useState<boolean>(false);
+
+  // Parse path or hash on load and popstate
+  useEffect(() => {
+    const parseRoute = () => {
+      const path = window.location.pathname.toLowerCase();
+      const hash = window.location.hash.toLowerCase();
+
+      // Check if URL has /join/:code or #/join/:code
+      const joinMatch = path.match(/\/join\/([a-z0-9]+)/) || hash.match(/#\/join\/([a-z0-9]+)/);
+      if (joinMatch) {
+        setMode('participant');
+        setJoinCode(joinMatch[1].toUpperCase());
+        return;
+      }
+
+      if (path.startsWith('/join') || hash.startsWith('#/join') || path.startsWith('/play') || hash.startsWith('#/play')) {
+        setMode('participant');
+        return;
+      }
+
+      if (path.startsWith('/admin') || hash.startsWith('#/admin')) {
+        setMode('admin');
+        return;
+      }
+
+      if (path.startsWith('/host') || hash.startsWith('#/host')) {
+        setMode('host');
+        return;
+      }
+
+      // Default to host mode
+      setMode('host');
+    };
+
+    parseRoute();
+    window.addEventListener('popstate', parseRoute);
+    window.addEventListener('hashchange', parseRoute);
+
+    return () => {
+      window.removeEventListener('popstate', parseRoute);
+      window.removeEventListener('hashchange', parseRoute);
+    };
+  }, []);
+
+  // Monitor socket connection status
+  useEffect(() => {
+    const socket = socketService.connect();
+
+    const handleConnect = () => setIsConnected(true);
+    const handleDisconnect = () => setIsConnected(false);
+
+    if (socket.connected) {
+      setIsConnected(true);
+    }
+
+    socket.on('connect', handleConnect);
+    socket.on('disconnect', handleDisconnect);
+    socket.on('connect_error', handleDisconnect);
+
+    return () => {
+      socket.off('connect', handleConnect);
+      socket.off('disconnect', handleDisconnect);
+      socket.off('connect_error', handleDisconnect);
+    };
+  }, []);
+
+  const switchMode = (newMode: AppMode) => {
+    setMode(newMode);
+    if (newMode === 'host') {
+      window.history.pushState({}, '', '/');
+    } else if (newMode === 'participant') {
+      window.history.pushState({}, '', joinCode ? `/join/${joinCode}` : '/join');
+    } else if (newMode === 'admin') {
+      window.history.pushState({}, '', '/admin');
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-orange-500 selection:text-white">
+      {/* Top Floating App Bar: View Switcher & Live Connection Status */}
+      <nav className="fixed top-3 right-4 z-50 flex items-center gap-2 bg-slate-900/90 backdrop-blur-md border border-slate-800 p-1.5 rounded-2xl shadow-2xl text-xs">
+        {/* Connection Status indicator */}
+        <div
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl font-mono text-[11px] font-bold ${isConnected ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-400 bg-slate-800'}`}
+          title={isConnected ? 'Connected to live workshop server' : 'Running in local preview mode'}
+        >
+          {isConnected ? (
+            <>
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="hidden sm:inline">LIVE SYNC</span>
+            </>
+          ) : (
+            <>
+              <span className="w-2 h-2 rounded-full bg-amber-400" />
+              <span className="hidden sm:inline">PREVIEW</span>
+            </>
+          )}
+        </div>
+
+        {/* Host Mode Button */}
+        <button
+          onClick={() => switchMode('host')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'host' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+          title="Facilitator screen-share view"
+        >
+          <Monitor className="w-3.5 h-3.5" />
+          <span className="hidden md:inline">Host Screen</span>
+        </button>
+
+        {/* Participant Mode Button */}
+        <button
+          onClick={() => switchMode('participant')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'participant' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+          title="Mobile participant web view"
+        >
+          <Smartphone className="w-3.5 h-3.5" />
+          <span className="hidden md:inline">Player Screen</span>
+        </button>
+
+        {/* Admin Mode Button */}
+        <button
+          onClick={() => switchMode('admin')}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'admin' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+          title="Workshop content editor"
+        >
+          <Settings className="w-3.5 h-3.5" />
+          <span className="hidden md:inline">Content Admin</span>
+        </button>
+      </nav>
+
+      {/* Main View Router */}
+      <main>
+        {mode === 'host' && <FacilitatorView initialRoomCode={joinCode} />}
+        {mode === 'participant' && <ParticipantView initialCode={joinCode} />}
+        {mode === 'admin' && <AdminEditor onBackToHost={() => switchMode('host')} />}
+      </main>
+    </div>
+  );
+};
+
+export default App;
