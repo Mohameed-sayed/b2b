@@ -382,15 +382,69 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
         setStatus('question');
       }
 
+    } else {
+      // Go back to lobby to select the next game
+      setStatus('lobby');
       const socket = socketService.getSocket();
       if (socket.connected) {
         socket.emit('game:next-question', { code: roomCode });
       }
-    } else {
-      // Go back to lobby to select the next game
-      setStatus('lobby');
     }
   };
+
+  const handleEndWorkshop = useCallback(() => {
+    if (window.confirm('Are you sure you want to end this workshop? This will clear the room, reset all participant sessions, and return to a fresh lobby.')) {
+      const socket = socketService.getSocket();
+      if (socket.connected && roomCode) {
+        socket.emit('room:end', { code: roomCode });
+      }
+      socketService.clearHostSession();
+      setStatus('lobby');
+      setParticipants([]);
+      setReflections([]);
+      setRevealStats([]);
+      setCurrentQuestionIndex(0);
+      setAnsweredCount(0);
+
+      const newCode = generateRandomCode();
+      setRoomCode(newCode);
+      socket.emit('room:create', { code: newCode, gameId: selectedGameId, teamMode }, (res: any) => {
+        if (res && res.code) {
+          setRoomCode(res.code);
+          if (res.hostToken) {
+            socketService.saveHostSession(res.code, res.hostToken);
+          }
+        }
+      });
+    }
+  }, [roomCode, selectedGameId, teamMode]);
+
+  const handleResetRoom = useCallback(() => {
+    if (window.confirm('Start a fresh session with a new room code? Current participants will need to re-join.')) {
+      const socket = socketService.getSocket();
+      if (socket.connected && roomCode) {
+        socket.emit('room:end', { code: roomCode });
+      }
+      socketService.clearHostSession();
+      setStatus('lobby');
+      setParticipants([]);
+      setReflections([]);
+      setRevealStats([]);
+      setCurrentQuestionIndex(0);
+      setAnsweredCount(0);
+
+      const newCode = generateRandomCode();
+      setRoomCode(newCode);
+      socket.emit('room:create', { code: newCode, gameId: selectedGameId, teamMode }, (res: any) => {
+        if (res && res.code) {
+          setRoomCode(res.code);
+          if (res.hostToken) {
+            socketService.saveHostSession(res.code, res.hostToken);
+          }
+        }
+      });
+    }
+  }, [roomCode, selectedGameId, teamMode]);
 
   const handleAdjustPoints = (targetId: string, isTeam: boolean, delta: number) => {
     sound.playPop();
@@ -462,6 +516,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
           onSelectGame={handleSelectGame}
           onStartGame={handleStartGame}
           onToggleTeamMode={handleToggleTeamMode}
+          onResetRoom={handleResetRoom}
         />
       )}
 
@@ -477,7 +532,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
       {status === 'reflection-wall' && (
         <ReflectionWallView
           reflections={reflections}
-          onEndWorkshop={() => setStatus('lobby')}
+          onEndWorkshop={handleEndWorkshop}
         />
       )}
 
@@ -550,6 +605,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
           onRevealAnswer={status === 'question' || status === 'escape-room' || (status as string) === 'question_active' ? handleRevealAnswer : undefined}
           onShowLeaderboard={status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief' ? handleShowLeaderboard : undefined}
           onNextQuestion={status === 'leaderboard' || (status as string) === 'completed' ? handleNextQuestion : undefined}
+          onEndWorkshop={handleEndWorkshop}
           isLastQuestion={isLastQuestion}
         />
       )}

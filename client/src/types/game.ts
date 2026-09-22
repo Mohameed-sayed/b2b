@@ -194,6 +194,7 @@ export interface ServerToClientEvents {
   'distribution:update': (data: unknown) => void;
   'game:started': (data: { roomCode: string; state: string; currentQuestionIndex: number; totalQuestions: number }) => void;
   'game:completed': (data: { leaderboards: { individual: Participant[]; team: unknown[] }; message: string }) => void;
+  'room:ended': (data: { message?: string }) => void;
   'host:room_created': (data: { success: boolean; code: string; roomCode: string; hostToken: string; room: Room }) => void;
   'host:sync': (data: { success: boolean; room: Room }) => void;
   'host:question_active': (data: { question: Question; questionIndex: number; totalQuestions: number; timeLimit: number; distribution: unknown }) => void;
@@ -203,6 +204,8 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   'room:create': (data: { code?: string; gameId?: string; teamMode?: boolean; mode?: string }, callback?: (res: { success: boolean; code: string; roomCode: string; hostToken: string; room: Room }) => void) => void;
   'host:create_room': (data: { code?: string; gameId?: string; teamMode?: boolean; mode?: string }, callback?: (res: { success: boolean; code: string; roomCode: string; hostToken: string; room: Room }) => void) => void;
+  'room:end': (data: { code: string; roomCode?: string }, callback?: (res: { success: boolean }) => void) => void;
+  'host:end_workshop': (data: { code: string; roomCode?: string }, callback?: (res: { success: boolean }) => void) => void;
   'room:join': (data: { code?: string; roomCode?: string; name: string; avatar?: string; team?: string; participantId?: string }, callback?: (res: { success: boolean; participant?: Participant; room?: Room; error?: string; message?: string }) => void) => void;
   'participant:join': (data: { code?: string; roomCode?: string; name: string; avatar?: string; team?: string; participantId?: string }, callback?: (res: { success: boolean; participant?: Participant; room?: Room; error?: string; message?: string }) => void) => void;
   'room:reconnect': (data: { code?: string; roomCode?: string; participantId: string }, callback?: (res: { success: boolean; participant?: Participant; room?: Room; currentQuestion?: Question | null; questionIndex?: number; totalQuestions?: number; timeRemaining?: number; error?: string }) => void) => void;

@@ -216,6 +216,13 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
       setTimeRemaining(data.timeLimit ?? 30);
       setIsPaused(false);
       setSelectedAnswer('');
+      setResultData({
+        isCorrect: false,
+        pointsAwarded: 0,
+        totalScore: participantRef.current?.score ?? 0,
+        streak: 0,
+        explanation: '',
+      });
       setSubState('question');
     };
 
@@ -225,15 +232,12 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
     };
 
     // ── Answer revealed: host clicked REVEAL ───────────────────
-    // Server sends BOTH 'question:revealed' and 'participant:score-updated'
-    // We merge them: score-updated carries isCorrect + points, revealed carries explanation
+    // Server sends BOTH 'participant:score-updated' and 'question:revealed'
     const onQuestionRevealed = (data: any) => {
-      // Only update explanation; let score-updated handle isCorrect/points
       setResultData(prev => ({
         ...prev,
         explanation: data.explanation ?? prev.explanation,
       }));
-      // Only transition if we're still on 'answered' (i.e. score hasn't arrived yet)
       setSubState(prev => (prev === 'answered' || prev === 'question') ? 'result' : prev);
     };
 
@@ -244,11 +248,11 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
       if (data.participantId && myId && data.participantId !== myId) return;
 
       setResultData({
-        isCorrect: data.isCorrect,
-        pointsAwarded: data.pointsAwarded,
-        totalScore: data.totalScore,
-        streak: data.streak,
-        explanation: data.explanation,
+        isCorrect: !!data.isCorrect,
+        pointsAwarded: data.pointsAwarded ?? 0,
+        totalScore: data.totalScore ?? 0,
+        streak: data.streak ?? 0,
+        explanation: data.explanation ?? '',
       });
       setParticipant(prev => prev ? { ...prev, score: data.totalScore, streak: data.streak } : prev);
       setSubState('result');
@@ -272,6 +276,13 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
         setTimeRemaining(data.question.timeLimit ?? 90);
       }
       setSelectedAnswer('');
+      setResultData({
+        isCorrect: false,
+        pointsAwarded: 0,
+        totalScore: participantRef.current?.score ?? 0,
+        streak: 0,
+        explanation: '',
+      });
       setSubState('question');
     };
 
@@ -281,6 +292,14 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
         setAllParticipants(data.leaderboards.individual);
       }
       setSubState('leaderboard');
+    };
+
+    // ── Room ended by host ─────────────────────────────────────
+    const onRoomEnded = (data: any) => {
+      socketService.clearParticipantSession();
+      setErrorMessage(data?.message || 'Workshop has ended. Thank you for participating!');
+      setParticipant(null);
+      setSubState('join');
     };
 
     // ── Errors ────────────────────────────────────────────────
@@ -299,6 +318,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
     socket.on('leaderboard:updated', onLeaderboardUpdated);
     socket.on('reflection:active', onReflectionActive);
     socket.on('game:completed', onGameCompleted);
+    socket.on('room:ended', onRoomEnded);
     socket.on('room:error', onRoomError);
     socket.on('error', onRoomError);
 
@@ -314,6 +334,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
       socket.off('leaderboard:updated', onLeaderboardUpdated);
       socket.off('reflection:active', onReflectionActive);
       socket.off('game:completed', onGameCompleted);
+      socket.off('room:ended', onRoomEnded);
       socket.off('room:error', onRoomError);
       socket.off('error', onRoomError);
     };
@@ -501,6 +522,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
 
       {subState === 'question' && currentQuestion && (
         <ParticipantQuestion
+          key={currentQuestion.id}
           question={currentQuestion}
           questionIndex={questionIndex}
           totalQuestions={totalQuestions}
@@ -517,6 +539,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
 
       {subState === 'result' && (
         <ParticipantResult
+          key={currentQuestion?.id || questionIndex}
           isCorrect={resultData.isCorrect}
           pointsAwarded={resultData.pointsAwarded}
           totalScore={resultData.totalScore}

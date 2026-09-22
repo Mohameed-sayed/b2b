@@ -3,7 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Game, Participant } from '../../types/game';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
-import { Users, Play, Copy, Check, Sparkles, BookOpen, Layers } from 'lucide-react';
+import { Users, Play, Copy, Check, Sparkles, BookOpen, Layers, RotateCcw } from 'lucide-react';
 
 interface LobbyViewProps {
   roomCode: string;
@@ -15,6 +15,7 @@ interface LobbyViewProps {
   onSelectGame: (gameId: string) => void;
   onStartGame: () => void;
   onToggleTeamMode: () => void;
+  onResetRoom?: () => void;
 }
 
 export const LobbyView: React.FC<LobbyViewProps> = ({
@@ -27,6 +28,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   onSelectGame,
   onStartGame,
   onToggleTeamMode,
+  onResetRoom,
 }) => {
   const [copied, setCopied] = useState(false);
 
@@ -144,6 +146,17 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
               {roomCode}
             </div>
           </div>
+
+          {onResetRoom && (
+            <button
+              onClick={onResetRoom}
+              className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-brand-secondary hover:text-orange-500 px-3 py-1.5 rounded-xl border border-slate-200 hover:border-orange-300 bg-slate-50 hover:bg-orange-50/50 transition-all shadow-sm"
+              title="Generate a brand new room code and clear participant list"
+            >
+              <RotateCcw className="w-3.5 h-3.5 text-orange-500" />
+              <span>Reset / New Room</span>
+            </button>
+          )}
 
           {/* Join Link & Copy */}
           <div className="mt-6 w-full flex items-center justify-between gap-2 px-4 py-3 rounded-2xl bg-brand-light border border-slate-200 text-xs font-mono text-brand-dark">

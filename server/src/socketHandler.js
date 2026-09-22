@@ -434,12 +434,10 @@ export function setupSocketHandlers(io) {
           leaderboards
         };
 
-        io.to(targetCode).emit('question:revealed', payload);
-        io.to(targetCode).emit('answer:revealed', payload);
-
+        // Emit individual score updates to each participant first so their state is set
         for (const [pid, p] of Object.entries(room.participants)) {
           const userAns = room.answers?.[room.currentQuestionIndex]?.[pid];
-          const isCorrect = userAns ? userAns.isCorrect : false;
+          const isCorrect = userAns ? !!userAns.isCorrect : false;
           const pts = userAns ? (userAns.pointsEarned ?? userAns.pointsAwarded ?? 0) : 0;
 
           const scorePayload = {
@@ -451,12 +449,13 @@ export function setupSocketHandlers(io) {
             explanation: question.explanation
           };
 
-          // Emit directly to participant socket; if they have no socket (offline)
-          // skip — they will receive the full room state on reconnect.
           if (p.socketId) {
             io.to(p.socketId).emit('participant:score-updated', scorePayload);
           }
         }
+
+        io.to(targetCode).emit('question:revealed', payload);
+        io.to(targetCode).emit('answer:revealed', payload);
 
         if (typeof callback === 'function') callback({ success: true, stats, leaderboards });
       } catch (err) {
@@ -674,6 +673,22 @@ export function setupSocketHandlers(io) {
         room: formatClientRoom(room)
       });
     });
+
+    // ==========================================
+    // END / RESET WORKSHOP (Single Room Engine)
+    // ==========================================
+    const handleEndRoom = ({ code, roomCode }) => {
+      const targetCode = (code || roomCode || socket.roomCode || '').toUpperCase().trim();
+      console.log(`🛑 [END WORKSHOP] Room: ${targetCode}`);
+      stopRoomTimer(targetCode);
+      io.to(targetCode).emit('room:ended', {
+        message: 'The facilitator has ended this workshop. Thank you for participating!'
+      });
+      gameEngine.endRoom(targetCode);
+    };
+
+    socket.on('room:end', handleEndRoom);
+    socket.on('host:end_workshop', handleEndRoom);
 
     // ==========================================
     // DISCONNECT

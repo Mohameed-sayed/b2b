@@ -161,6 +161,9 @@ class GameEngine {
       return existing;
     }
 
+    // Single-Room Engine: Clear previous zombie rooms so there is strictly 1 active room
+    this.clearAllRooms();
+
     const room = {
       code: roomCode,
       hostToken,
@@ -184,6 +187,27 @@ class GameEngine {
     this.saveRoomToDb(room);
     console.log(`🎮 Room created: ${roomCode} with game "${selectedGame.title}" [Mode: ${room.mode}]`);
     return room;
+  }
+
+  clearAllRooms() {
+    this.rooms.clear();
+    try {
+      db.clearRooms();
+    } catch (err) {
+      console.error('Failed to clear rooms in db:', err);
+    }
+  }
+
+  endRoom(roomCode) {
+    if (!roomCode) return false;
+    const target = roomCode.toUpperCase();
+    this.rooms.delete(target);
+    try {
+      db.deleteRoom(target);
+    } catch (err) {
+      console.error(`Failed to delete room ${target} from db:`, err);
+    }
+    return true;
   }
 
   getRoom(code) {
@@ -349,9 +373,21 @@ class GameEngine {
     room.currentQuestionIndex = 0;
     room.questionStartTime = Date.now();
     room.questionTimeLimit = question.timeLimit || 30;
-    if (!room.answers[0]) {
-      room.answers[0] = {};
+    
+    // Always start fresh answers map for the new game run
+    room.answers = { 0: {} };
+
+    // Reset round-specific flags on all participants
+    if (room.participants) {
+      for (const p of Object.values(room.participants)) {
+        p.lastAnswer = null;
+        p.lastAnswerTime = null;
+        p.lastPointsEarned = 0;
+        p.isCorrectLast = null;
+        p.hasAnsweredCurrent = false;
+      }
     }
+
     room.updatedAt = Date.now();
     this.saveRoomToDb(room);
     return room;
@@ -430,6 +466,12 @@ class GameEngine {
       pointsEarned,
       submittedAt: now
     };
+
+    participant.hasAnsweredCurrent = true;
+    participant.lastAnswer = optionId;
+    participant.lastAnswerTime = now;
+    participant.lastPointsEarned = pointsEarned;
+    participant.isCorrectLast = isCorrect;
 
     room.answers[qIndex][participantId] = answerRecord;
     participant.answers[question.id || `q-${qIndex}`] = answerRecord;
@@ -568,9 +610,20 @@ class GameEngine {
       room.isPaused = false;
       room.questionStartTime = Date.now();
       room.questionTimeLimit = question.timeLimit || 30;
-      if (!room.answers[nextIndex]) {
-        room.answers[nextIndex] = {};
+      
+      // Clean slate for next question answers
+      room.answers[nextIndex] = {};
+
+      if (room.participants) {
+        for (const p of Object.values(room.participants)) {
+          p.lastAnswer = null;
+          p.lastAnswerTime = null;
+          p.lastPointsEarned = 0;
+          p.isCorrectLast = null;
+          p.hasAnsweredCurrent = false;
+        }
       }
+
       room.updatedAt = Date.now();
       this.saveRoomToDb(room);
       return { room, finished: false, question, questionIndex: nextIndex, totalQuestions };

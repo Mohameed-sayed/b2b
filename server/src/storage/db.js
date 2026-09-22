@@ -116,6 +116,9 @@ export const db = {
     delete rooms[code.toUpperCase()];
     writeJsonFile(ROOMS_FILE, rooms);
   },
+  clearRooms() {
+    writeJsonFile(ROOMS_FILE, {});
+  },
 
   // Reflections
   getReflections(roomCode) {
