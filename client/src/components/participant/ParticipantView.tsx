@@ -73,10 +73,21 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
       setRoomCode(pendingSession.roomCode);
 
       const attemptReconnect = () => {
+        let responded = false;
+        const fallbackTimer = setTimeout(() => {
+          if (!responded) {
+            console.warn('[Reconnect] Server timeout');
+            socketService.clearParticipantSession();
+            setSubState('join');
+          }
+        }, 5000);
+
         socket.emit('room:reconnect', {
           code: pendingSession.roomCode,
           participantId: pendingSession.participantId,
         }, (res: any) => {
+          responded = true;
+          clearTimeout(fallbackTimer);
           if (res?.success && res.participant) {
             setParticipant(res.participant);
             // Re-save with full data (server may have updated avatar/team)
@@ -304,31 +315,14 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
         // join_success also fires 'room:joined' broadcast — handled by socket listener above
       });
     } else {
-      // Standalone / offline preview
-      const mockParticipant: Participant = {
-        id: 'p-' + Date.now(),
-        socketId: 'mock-socket',
-        name, avatar, team,
-        score: 0, streak: 0, isOnline: true,
-      };
-      setParticipant(mockParticipant);
-      socketService.saveParticipantSession(cleanCode, mockParticipant.id, name, avatar, team);
-      setCurrentQuestion(defaultGames[0].questions[0]);
-      setQuestionIndex(0);
-      setTotalQuestions(defaultGames[0].questions.length);
-      setTimeRemaining(defaultGames[0].questions[0].timeLimit);
-      setSubState('waiting');
+      // If socket is not connected, try connecting and alert the user
+      socket.connect();
+      setErrorMessage('Connecting to server... Please try again in a few seconds.');
       setIsLoading(false);
     }
   }, []);
 
-  // Standalone mode: auto-start question after 3s in waiting
-  useEffect(() => {
-    if (subState === 'waiting' && !socketService.isConnected()) {
-      const t = setTimeout(() => setSubState('question'), 3000);
-      return () => clearTimeout(t);
-    }
-  }, [subState]);
+  // Standalone mode auto-start removed for production resilience
 
   // ── Submit Answer ──────────────────────────────────────────────
   const handleSubmitAnswer = useCallback((answerId: string) => {
