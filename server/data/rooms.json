@@ -20434,7 +20434,7 @@
   "B2BFP": {
     "code": "B2BFP",
     "hostToken": "b9117a61ddc0f0960e0d8b2c042747a9",
-    "hostSocketId": "o9PYLJ32tcRX_Cp0AAAC",
+    "hostSocketId": null,
     "gameId": "game-1",
     "game": {
       "id": "game-1",
@@ -20543,12 +20543,12 @@
     "answers": {},
     "reflections": [],
     "createdAt": 1790092156802,
-    "updatedAt": 1790092156802
+    "updatedAt": 1790093394549
   },
   "B2BVJ": {
     "code": "B2BVJ",
     "hostToken": "8a0b5f6e1b34df22782b6713d9b94f58",
-    "hostSocketId": "o9PYLJ32tcRX_Cp0AAAC",
+    "hostSocketId": null,
     "gameId": "game-1",
     "game": {
       "id": "game-1",
@@ -20657,12 +20657,12 @@
     "answers": {},
     "reflections": [],
     "createdAt": 1790092156848,
-    "updatedAt": 1790092156848
+    "updatedAt": 1790093394576
   },
   "B2BBX": {
     "code": "B2BBX",
     "hostToken": "a7c211b6cca91d703ab8eb91ee391a06",
-    "hostSocketId": "o9PYLJ32tcRX_Cp0AAAC",
+    "hostSocketId": null,
     "gameId": "game-1",
     "game": {
       "id": "game-1",
@@ -20771,12 +20771,12 @@
     "answers": {},
     "reflections": [],
     "createdAt": 1790092163302,
-    "updatedAt": 1790092163302
+    "updatedAt": 1790093394615
   },
   "B2BMG": {
     "code": "B2BMG",
     "hostToken": "057bb563ea5e1aaa3555e0b74b98c815",
-    "hostSocketId": "o9PYLJ32tcRX_Cp0AAAC",
+    "hostSocketId": null,
     "gameId": "game-1",
     "game": {
       "id": "game-1",
@@ -20885,6 +20885,1374 @@
     "answers": {},
     "reflections": [],
     "createdAt": 1790092163336,
-    "updatedAt": 1790092163336
+    "updatedAt": 1790093394650
+  },
+  "B2BTM": {
+    "code": "B2BTM",
+    "hostToken": "aaf9fb46aaa431cf144d2d7c6aa930d0",
+    "hostSocketId": null,
+    "gameId": "game-1",
+    "game": {
+      "id": "game-1",
+      "title": "Game 1: Urgent or Fake Urgent?",
+      "subtitle": "Distinguish actual urgency from things that just sound loud",
+      "topic": "Prioritization",
+      "description": "Teach participants to assess true business impact and deadlines rather than panicking over loud requests.",
+      "category": "Prioritization",
+      "order": 1,
+      "questions": [
+        {
+          "id": "g1-q1",
+          "type": "multiple-choice",
+          "title": "The Quadruple Ping",
+          "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Drop everything and fix the 'URGENT!!' slide deck."
+            },
+            {
+              "id": "B",
+              "text": "Help your teammate review their Scratch project immediately."
+            },
+            {
+              "id": "C",
+              "text": "Complete your 11:30 AM preparation first, then reply to the mentor about the 2:00 PM class."
+            },
+            {
+              "id": "D",
+              "text": "Rush to fill in the weekly attendance log to get admin off your back."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 45,
+          "explanation": "Your immediate commitment is the 11:30 AM class happening in 75 minutes. The mentor's 2:00 PM request has a clear time window, whereas 'URGENT' without context or deadline is often fake urgency.",
+          "learningObjective": "Prioritize by real deadline & direct classroom impact, not by who types in ALL CAPS.",
+          "discussionQuestion": "Why do we instinctively jump to whoever writes 'URGENT' in capital letters?",
+          "facilitatorTips": "Ask the room: 'Who chose A? Why does the word URGENT trigger panic?'",
+          "dynamicUpdate": {
+            "round": 2,
+            "announcement": "🚨 PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
+            "questionText": "Now that you know this, what is the professional rule for incoming 'urgent' tasks?",
+            "options": [
+              {
+                "id": "A",
+                "text": "Ignore all WhatsApp messages forever."
+              },
+              {
+                "id": "B",
+                "text": "Always ask: 'What is the hard deadline and who is impacted?' before switching tasks."
+              },
+              {
+                "id": "C",
+                "text": "Complain to the team that they wasted your time."
+              },
+              {
+                "id": "D",
+                "text": "Only do what is on your calendar and refuse any changes."
+              }
+            ],
+            "correctAnswer": "B",
+            "explanation": "Clarifying deadline and impact prevents derailment from your active commitments."
+          }
+        },
+        {
+          "id": "g1-q2",
+          "type": "multiple-choice",
+          "title": "The Mid-Session Distraction",
+          "scenario": "You are 15 minutes into teaching a live coding class with 18 students. Your mentor sends you a private Slack message:\n\n'Hey, please send me the student roster for Grade 6 right now.'\n\nWhat is your best response?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Stop the class, open Excel, find the roster, and send it immediately."
+            },
+            {
+              "id": "B",
+              "text": "Ignore the message completely until the end of the day."
+            },
+            {
+              "id": "C",
+              "text": "Give students a 2-minute independent challenge, reply quickly: 'Currently teaching live until 12:00. Will send immediately at 12:05 PM', and continue teaching."
+            },
+            {
+              "id": "D",
+              "text": "Reply with 'Busy!' and mute your laptop."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 35,
+          "explanation": "Classroom delivery is sacred. Never compromise student experience for back-office requests. A quick acknowledgment with an exact ETA manages expectations professionally.",
+          "learningObjective": "Acknowledge promptly with an ETA without abandoning your live classroom.",
+          "discussionQuestion": "What happens to instructor credibility when you look away from the students to do admin work?"
+        }
+      ]
+    },
+    "mode": "individual",
+    "state": "LOBBY",
+    "isPaused": false,
+    "currentQuestionIndex": 0,
+    "questionStartTime": null,
+    "questionTimeLimit": 30,
+    "participants": {},
+    "answers": {},
+    "reflections": [],
+    "createdAt": 1790093394810,
+    "updatedAt": 1790093690211
+  },
+  "B2BFL": {
+    "code": "B2BFL",
+    "hostToken": "bdd993193e132dc24fab8291cd10fafc",
+    "hostSocketId": null,
+    "gameId": "game-1",
+    "game": {
+      "id": "game-1",
+      "title": "Game 1: Urgent or Fake Urgent?",
+      "subtitle": "Distinguish actual urgency from things that just sound loud",
+      "topic": "Prioritization",
+      "description": "Teach participants to assess true business impact and deadlines rather than panicking over loud requests.",
+      "category": "Prioritization",
+      "order": 1,
+      "questions": [
+        {
+          "id": "g1-q1",
+          "type": "multiple-choice",
+          "title": "The Quadruple Ping",
+          "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Drop everything and fix the 'URGENT!!' slide deck."
+            },
+            {
+              "id": "B",
+              "text": "Help your teammate review their Scratch project immediately."
+            },
+            {
+              "id": "C",
+              "text": "Complete your 11:30 AM preparation first, then reply to the mentor about the 2:00 PM class."
+            },
+            {
+              "id": "D",
+              "text": "Rush to fill in the weekly attendance log to get admin off your back."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 45,
+          "explanation": "Your immediate commitment is the 11:30 AM class happening in 75 minutes. The mentor's 2:00 PM request has a clear time window, whereas 'URGENT' without context or deadline is often fake urgency.",
+          "learningObjective": "Prioritize by real deadline & direct classroom impact, not by who types in ALL CAPS.",
+          "discussionQuestion": "Why do we instinctively jump to whoever writes 'URGENT' in capital letters?",
+          "facilitatorTips": "Ask the room: 'Who chose A? Why does the word URGENT trigger panic?'",
+          "dynamicUpdate": {
+            "round": 2,
+            "announcement": "🚨 PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
+            "questionText": "Now that you know this, what is the professional rule for incoming 'urgent' tasks?",
+            "options": [
+              {
+                "id": "A",
+                "text": "Ignore all WhatsApp messages forever."
+              },
+              {
+                "id": "B",
+                "text": "Always ask: 'What is the hard deadline and who is impacted?' before switching tasks."
+              },
+              {
+                "id": "C",
+                "text": "Complain to the team that they wasted your time."
+              },
+              {
+                "id": "D",
+                "text": "Only do what is on your calendar and refuse any changes."
+              }
+            ],
+            "correctAnswer": "B",
+            "explanation": "Clarifying deadline and impact prevents derailment from your active commitments."
+          }
+        },
+        {
+          "id": "g1-q2",
+          "type": "multiple-choice",
+          "title": "The Mid-Session Distraction",
+          "scenario": "You are 15 minutes into teaching a live coding class with 18 students. Your mentor sends you a private Slack message:\n\n'Hey, please send me the student roster for Grade 6 right now.'\n\nWhat is your best response?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Stop the class, open Excel, find the roster, and send it immediately."
+            },
+            {
+              "id": "B",
+              "text": "Ignore the message completely until the end of the day."
+            },
+            {
+              "id": "C",
+              "text": "Give students a 2-minute independent challenge, reply quickly: 'Currently teaching live until 12:00. Will send immediately at 12:05 PM', and continue teaching."
+            },
+            {
+              "id": "D",
+              "text": "Reply with 'Busy!' and mute your laptop."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 35,
+          "explanation": "Classroom delivery is sacred. Never compromise student experience for back-office requests. A quick acknowledgment with an exact ETA manages expectations professionally.",
+          "learningObjective": "Acknowledge promptly with an ETA without abandoning your live classroom.",
+          "discussionQuestion": "What happens to instructor credibility when you look away from the students to do admin work?"
+        }
+      ]
+    },
+    "mode": "individual",
+    "state": "LOBBY",
+    "isPaused": false,
+    "currentQuestionIndex": 0,
+    "questionStartTime": null,
+    "questionTimeLimit": 30,
+    "participants": {},
+    "answers": {},
+    "reflections": [],
+    "createdAt": 1790093394849,
+    "updatedAt": 1790093690238
+  },
+  "B2BVF": {
+    "code": "B2BVF",
+    "hostToken": "f3d8e7ee6e52f7b5f5e02f3069fbf356",
+    "hostSocketId": null,
+    "gameId": "game-1",
+    "game": {
+      "id": "game-1",
+      "title": "Game 1: Urgent or Fake Urgent?",
+      "subtitle": "Distinguish actual urgency from things that just sound loud",
+      "topic": "Prioritization",
+      "description": "Teach participants to assess true business impact and deadlines rather than panicking over loud requests.",
+      "category": "Prioritization",
+      "order": 1,
+      "questions": [
+        {
+          "id": "g1-q1",
+          "type": "multiple-choice",
+          "title": "The Quadruple Ping",
+          "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Drop everything and fix the 'URGENT!!' slide deck."
+            },
+            {
+              "id": "B",
+              "text": "Help your teammate review their Scratch project immediately."
+            },
+            {
+              "id": "C",
+              "text": "Complete your 11:30 AM preparation first, then reply to the mentor about the 2:00 PM class."
+            },
+            {
+              "id": "D",
+              "text": "Rush to fill in the weekly attendance log to get admin off your back."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 45,
+          "explanation": "Your immediate commitment is the 11:30 AM class happening in 75 minutes. The mentor's 2:00 PM request has a clear time window, whereas 'URGENT' without context or deadline is often fake urgency.",
+          "learningObjective": "Prioritize by real deadline & direct classroom impact, not by who types in ALL CAPS.",
+          "discussionQuestion": "Why do we instinctively jump to whoever writes 'URGENT' in capital letters?",
+          "facilitatorTips": "Ask the room: 'Who chose A? Why does the word URGENT trigger panic?'",
+          "dynamicUpdate": {
+            "round": 2,
+            "announcement": "🚨 PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
+            "questionText": "Now that you know this, what is the professional rule for incoming 'urgent' tasks?",
+            "options": [
+              {
+                "id": "A",
+                "text": "Ignore all WhatsApp messages forever."
+              },
+              {
+                "id": "B",
+                "text": "Always ask: 'What is the hard deadline and who is impacted?' before switching tasks."
+              },
+              {
+                "id": "C",
+                "text": "Complain to the team that they wasted your time."
+              },
+              {
+                "id": "D",
+                "text": "Only do what is on your calendar and refuse any changes."
+              }
+            ],
+            "correctAnswer": "B",
+            "explanation": "Clarifying deadline and impact prevents derailment from your active commitments."
+          }
+        },
+        {
+          "id": "g1-q2",
+          "type": "multiple-choice",
+          "title": "The Mid-Session Distraction",
+          "scenario": "You are 15 minutes into teaching a live coding class with 18 students. Your mentor sends you a private Slack message:\n\n'Hey, please send me the student roster for Grade 6 right now.'\n\nWhat is your best response?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Stop the class, open Excel, find the roster, and send it immediately."
+            },
+            {
+              "id": "B",
+              "text": "Ignore the message completely until the end of the day."
+            },
+            {
+              "id": "C",
+              "text": "Give students a 2-minute independent challenge, reply quickly: 'Currently teaching live until 12:00. Will send immediately at 12:05 PM', and continue teaching."
+            },
+            {
+              "id": "D",
+              "text": "Reply with 'Busy!' and mute your laptop."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 35,
+          "explanation": "Classroom delivery is sacred. Never compromise student experience for back-office requests. A quick acknowledgment with an exact ETA manages expectations professionally.",
+          "learningObjective": "Acknowledge promptly with an ETA without abandoning your live classroom.",
+          "discussionQuestion": "What happens to instructor credibility when you look away from the students to do admin work?"
+        }
+      ]
+    },
+    "mode": "individual",
+    "state": "LOBBY",
+    "isPaused": false,
+    "currentQuestionIndex": 0,
+    "questionStartTime": null,
+    "questionTimeLimit": 30,
+    "participants": {},
+    "answers": {},
+    "reflections": [],
+    "createdAt": 1790093690451,
+    "updatedAt": 1790093699379
+  },
+  "B2BM2": {
+    "code": "B2BM2",
+    "hostToken": "c291203492c55068c5f84970b0cff396",
+    "hostSocketId": null,
+    "gameId": "game-1",
+    "game": {
+      "id": "game-1",
+      "title": "Game 1: Urgent or Fake Urgent?",
+      "subtitle": "Distinguish actual urgency from things that just sound loud",
+      "topic": "Prioritization",
+      "description": "Teach participants to assess true business impact and deadlines rather than panicking over loud requests.",
+      "category": "Prioritization",
+      "order": 1,
+      "questions": [
+        {
+          "id": "g1-q1",
+          "type": "multiple-choice",
+          "title": "The Quadruple Ping",
+          "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Drop everything and fix the 'URGENT!!' slide deck."
+            },
+            {
+              "id": "B",
+              "text": "Help your teammate review their Scratch project immediately."
+            },
+            {
+              "id": "C",
+              "text": "Complete your 11:30 AM preparation first, then reply to the mentor about the 2:00 PM class."
+            },
+            {
+              "id": "D",
+              "text": "Rush to fill in the weekly attendance log to get admin off your back."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 45,
+          "explanation": "Your immediate commitment is the 11:30 AM class happening in 75 minutes. The mentor's 2:00 PM request has a clear time window, whereas 'URGENT' without context or deadline is often fake urgency.",
+          "learningObjective": "Prioritize by real deadline & direct classroom impact, not by who types in ALL CAPS.",
+          "discussionQuestion": "Why do we instinctively jump to whoever writes 'URGENT' in capital letters?",
+          "facilitatorTips": "Ask the room: 'Who chose A? Why does the word URGENT trigger panic?'",
+          "dynamicUpdate": {
+            "round": 2,
+            "announcement": "🚨 PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
+            "questionText": "Now that you know this, what is the professional rule for incoming 'urgent' tasks?",
+            "options": [
+              {
+                "id": "A",
+                "text": "Ignore all WhatsApp messages forever."
+              },
+              {
+                "id": "B",
+                "text": "Always ask: 'What is the hard deadline and who is impacted?' before switching tasks."
+              },
+              {
+                "id": "C",
+                "text": "Complain to the team that they wasted your time."
+              },
+              {
+                "id": "D",
+                "text": "Only do what is on your calendar and refuse any changes."
+              }
+            ],
+            "correctAnswer": "B",
+            "explanation": "Clarifying deadline and impact prevents derailment from your active commitments."
+          }
+        },
+        {
+          "id": "g1-q2",
+          "type": "multiple-choice",
+          "title": "The Mid-Session Distraction",
+          "scenario": "You are 15 minutes into teaching a live coding class with 18 students. Your mentor sends you a private Slack message:\n\n'Hey, please send me the student roster for Grade 6 right now.'\n\nWhat is your best response?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Stop the class, open Excel, find the roster, and send it immediately."
+            },
+            {
+              "id": "B",
+              "text": "Ignore the message completely until the end of the day."
+            },
+            {
+              "id": "C",
+              "text": "Give students a 2-minute independent challenge, reply quickly: 'Currently teaching live until 12:00. Will send immediately at 12:05 PM', and continue teaching."
+            },
+            {
+              "id": "D",
+              "text": "Reply with 'Busy!' and mute your laptop."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 35,
+          "explanation": "Classroom delivery is sacred. Never compromise student experience for back-office requests. A quick acknowledgment with an exact ETA manages expectations professionally.",
+          "learningObjective": "Acknowledge promptly with an ETA without abandoning your live classroom.",
+          "discussionQuestion": "What happens to instructor credibility when you look away from the students to do admin work?"
+        }
+      ]
+    },
+    "mode": "individual",
+    "state": "LOBBY",
+    "isPaused": false,
+    "currentQuestionIndex": 0,
+    "questionStartTime": null,
+    "questionTimeLimit": 30,
+    "participants": {},
+    "answers": {},
+    "reflections": [],
+    "createdAt": 1790093690504,
+    "updatedAt": 1790093699418
+  },
+  "B2BHQ": {
+    "code": "B2BHQ",
+    "hostToken": "25dd9909939ca9a2dc80f7db6d66756e",
+    "hostSocketId": "b6mMRI3EnhUYvVD5AAAF",
+    "gameId": "game-1",
+    "game": {
+      "id": "game-1",
+      "title": "Game 1: Urgent or Fake Urgent?",
+      "subtitle": "Distinguish actual urgency from things that just sound loud",
+      "topic": "Prioritization",
+      "description": "Teach participants to assess true business impact and deadlines rather than panicking over loud requests.",
+      "category": "Prioritization",
+      "order": 1,
+      "questions": [
+        {
+          "id": "g1-q1",
+          "type": "multiple-choice",
+          "title": "The Quadruple Ping",
+          "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Drop everything and fix the 'URGENT!!' slide deck."
+            },
+            {
+              "id": "B",
+              "text": "Help your teammate review their Scratch project immediately."
+            },
+            {
+              "id": "C",
+              "text": "Complete your 11:30 AM preparation first, then reply to the mentor about the 2:00 PM class."
+            },
+            {
+              "id": "D",
+              "text": "Rush to fill in the weekly attendance log to get admin off your back."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 45,
+          "explanation": "Your immediate commitment is the 11:30 AM class happening in 75 minutes. The mentor's 2:00 PM request has a clear time window, whereas 'URGENT' without context or deadline is often fake urgency.",
+          "learningObjective": "Prioritize by real deadline & direct classroom impact, not by who types in ALL CAPS.",
+          "discussionQuestion": "Why do we instinctively jump to whoever writes 'URGENT' in capital letters?",
+          "facilitatorTips": "Ask the room: 'Who chose A? Why does the word URGENT trigger panic?'",
+          "dynamicUpdate": {
+            "round": 2,
+            "announcement": "🚨 PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
+            "questionText": "Now that you know this, what is the professional rule for incoming 'urgent' tasks?",
+            "options": [
+              {
+                "id": "A",
+                "text": "Ignore all WhatsApp messages forever."
+              },
+              {
+                "id": "B",
+                "text": "Always ask: 'What is the hard deadline and who is impacted?' before switching tasks."
+              },
+              {
+                "id": "C",
+                "text": "Complain to the team that they wasted your time."
+              },
+              {
+                "id": "D",
+                "text": "Only do what is on your calendar and refuse any changes."
+              }
+            ],
+            "correctAnswer": "B",
+            "explanation": "Clarifying deadline and impact prevents derailment from your active commitments."
+          }
+        },
+        {
+          "id": "g1-q2",
+          "type": "multiple-choice",
+          "title": "The Mid-Session Distraction",
+          "scenario": "You are 15 minutes into teaching a live coding class with 18 students. Your mentor sends you a private Slack message:\n\n'Hey, please send me the student roster for Grade 6 right now.'\n\nWhat is your best response?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Stop the class, open Excel, find the roster, and send it immediately."
+            },
+            {
+              "id": "B",
+              "text": "Ignore the message completely until the end of the day."
+            },
+            {
+              "id": "C",
+              "text": "Give students a 2-minute independent challenge, reply quickly: 'Currently teaching live until 12:00. Will send immediately at 12:05 PM', and continue teaching."
+            },
+            {
+              "id": "D",
+              "text": "Reply with 'Busy!' and mute your laptop."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 35,
+          "explanation": "Classroom delivery is sacred. Never compromise student experience for back-office requests. A quick acknowledgment with an exact ETA manages expectations professionally.",
+          "learningObjective": "Acknowledge promptly with an ETA without abandoning your live classroom.",
+          "discussionQuestion": "What happens to instructor credibility when you look away from the students to do admin work?"
+        }
+      ]
+    },
+    "mode": "individual",
+    "state": "LOBBY",
+    "isPaused": false,
+    "currentQuestionIndex": 0,
+    "questionStartTime": null,
+    "questionTimeLimit": 30,
+    "participants": {},
+    "answers": {},
+    "reflections": [],
+    "createdAt": 1790093699556,
+    "updatedAt": 1790093699556
+  },
+  "B2B6L": {
+    "code": "B2B6L",
+    "hostToken": "b2b4057c3529366231f012cca29ee5b3",
+    "hostSocketId": "b6mMRI3EnhUYvVD5AAAF",
+    "gameId": "game-1",
+    "game": {
+      "id": "game-1",
+      "title": "Game 1: Urgent or Fake Urgent?",
+      "subtitle": "Distinguish actual urgency from things that just sound loud",
+      "topic": "Prioritization",
+      "description": "Teach participants to assess true business impact and deadlines rather than panicking over loud requests.",
+      "category": "Prioritization",
+      "order": 1,
+      "questions": [
+        {
+          "id": "g1-q1",
+          "type": "multiple-choice",
+          "title": "The Quadruple Ping",
+          "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Drop everything and fix the 'URGENT!!' slide deck."
+            },
+            {
+              "id": "B",
+              "text": "Help your teammate review their Scratch project immediately."
+            },
+            {
+              "id": "C",
+              "text": "Complete your 11:30 AM preparation first, then reply to the mentor about the 2:00 PM class."
+            },
+            {
+              "id": "D",
+              "text": "Rush to fill in the weekly attendance log to get admin off your back."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 45,
+          "explanation": "Your immediate commitment is the 11:30 AM class happening in 75 minutes. The mentor's 2:00 PM request has a clear time window, whereas 'URGENT' without context or deadline is often fake urgency.",
+          "learningObjective": "Prioritize by real deadline & direct classroom impact, not by who types in ALL CAPS.",
+          "discussionQuestion": "Why do we instinctively jump to whoever writes 'URGENT' in capital letters?",
+          "facilitatorTips": "Ask the room: 'Who chose A? Why does the word URGENT trigger panic?'",
+          "dynamicUpdate": {
+            "round": 2,
+            "announcement": "🚨 PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
+            "questionText": "Now that you know this, what is the professional rule for incoming 'urgent' tasks?",
+            "options": [
+              {
+                "id": "A",
+                "text": "Ignore all WhatsApp messages forever."
+              },
+              {
+                "id": "B",
+                "text": "Always ask: 'What is the hard deadline and who is impacted?' before switching tasks."
+              },
+              {
+                "id": "C",
+                "text": "Complain to the team that they wasted your time."
+              },
+              {
+                "id": "D",
+                "text": "Only do what is on your calendar and refuse any changes."
+              }
+            ],
+            "correctAnswer": "B",
+            "explanation": "Clarifying deadline and impact prevents derailment from your active commitments."
+          }
+        },
+        {
+          "id": "g1-q2",
+          "type": "multiple-choice",
+          "title": "The Mid-Session Distraction",
+          "scenario": "You are 15 minutes into teaching a live coding class with 18 students. Your mentor sends you a private Slack message:\n\n'Hey, please send me the student roster for Grade 6 right now.'\n\nWhat is your best response?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Stop the class, open Excel, find the roster, and send it immediately."
+            },
+            {
+              "id": "B",
+              "text": "Ignore the message completely until the end of the day."
+            },
+            {
+              "id": "C",
+              "text": "Give students a 2-minute independent challenge, reply quickly: 'Currently teaching live until 12:00. Will send immediately at 12:05 PM', and continue teaching."
+            },
+            {
+              "id": "D",
+              "text": "Reply with 'Busy!' and mute your laptop."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 35,
+          "explanation": "Classroom delivery is sacred. Never compromise student experience for back-office requests. A quick acknowledgment with an exact ETA manages expectations professionally.",
+          "learningObjective": "Acknowledge promptly with an ETA without abandoning your live classroom.",
+          "discussionQuestion": "What happens to instructor credibility when you look away from the students to do admin work?"
+        }
+      ]
+    },
+    "mode": "individual",
+    "state": "LOBBY",
+    "isPaused": false,
+    "currentQuestionIndex": 0,
+    "questionStartTime": null,
+    "questionTimeLimit": 30,
+    "participants": {},
+    "answers": {},
+    "reflections": [],
+    "createdAt": 1790093699603,
+    "updatedAt": 1790093699603
+  },
+  "B2B8D": {
+    "code": "B2B8D",
+    "hostToken": "deed396d174748ea64fb3f071731f4e1",
+    "hostSocketId": null,
+    "gameId": "game-1",
+    "game": {
+      "id": "game-1",
+      "title": "Game 1: Urgent or Fake Urgent?",
+      "subtitle": "Distinguish actual urgency from things that just sound loud",
+      "topic": "Prioritization",
+      "description": "Teach participants to assess true business impact and deadlines rather than panicking over loud requests.",
+      "category": "Prioritization",
+      "order": 1,
+      "questions": [
+        {
+          "id": "g1-q1",
+          "type": "multiple-choice",
+          "title": "The Quadruple Ping",
+          "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Drop everything and fix the 'URGENT!!' slide deck."
+            },
+            {
+              "id": "B",
+              "text": "Help your teammate review their Scratch project immediately."
+            },
+            {
+              "id": "C",
+              "text": "Complete your 11:30 AM preparation first, then reply to the mentor about the 2:00 PM class."
+            },
+            {
+              "id": "D",
+              "text": "Rush to fill in the weekly attendance log to get admin off your back."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 45,
+          "explanation": "Your immediate commitment is the 11:30 AM class happening in 75 minutes. The mentor's 2:00 PM request has a clear time window, whereas 'URGENT' without context or deadline is often fake urgency.",
+          "learningObjective": "Prioritize by real deadline & direct classroom impact, not by who types in ALL CAPS.",
+          "discussionQuestion": "Why do we instinctively jump to whoever writes 'URGENT' in capital letters?",
+          "facilitatorTips": "Ask the room: 'Who chose A? Why does the word URGENT trigger panic?'",
+          "dynamicUpdate": {
+            "round": 2,
+            "announcement": "🚨 PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
+            "questionText": "Now that you know this, what is the professional rule for incoming 'urgent' tasks?",
+            "options": [
+              {
+                "id": "A",
+                "text": "Ignore all WhatsApp messages forever."
+              },
+              {
+                "id": "B",
+                "text": "Always ask: 'What is the hard deadline and who is impacted?' before switching tasks."
+              },
+              {
+                "id": "C",
+                "text": "Complain to the team that they wasted your time."
+              },
+              {
+                "id": "D",
+                "text": "Only do what is on your calendar and refuse any changes."
+              }
+            ],
+            "correctAnswer": "B",
+            "explanation": "Clarifying deadline and impact prevents derailment from your active commitments."
+          }
+        },
+        {
+          "id": "g1-q2",
+          "type": "multiple-choice",
+          "title": "The Mid-Session Distraction",
+          "scenario": "You are 15 minutes into teaching a live coding class with 18 students. Your mentor sends you a private Slack message:\n\n'Hey, please send me the student roster for Grade 6 right now.'\n\nWhat is your best response?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Stop the class, open Excel, find the roster, and send it immediately."
+            },
+            {
+              "id": "B",
+              "text": "Ignore the message completely until the end of the day."
+            },
+            {
+              "id": "C",
+              "text": "Give students a 2-minute independent challenge, reply quickly: 'Currently teaching live until 12:00. Will send immediately at 12:05 PM', and continue teaching."
+            },
+            {
+              "id": "D",
+              "text": "Reply with 'Busy!' and mute your laptop."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 35,
+          "explanation": "Classroom delivery is sacred. Never compromise student experience for back-office requests. A quick acknowledgment with an exact ETA manages expectations professionally.",
+          "learningObjective": "Acknowledge promptly with an ETA without abandoning your live classroom.",
+          "discussionQuestion": "What happens to instructor credibility when you look away from the students to do admin work?"
+        }
+      ]
+    },
+    "mode": "individual",
+    "state": "LOBBY",
+    "isPaused": false,
+    "currentQuestionIndex": 0,
+    "questionStartTime": null,
+    "questionTimeLimit": 30,
+    "participants": {},
+    "answers": {},
+    "reflections": [],
+    "createdAt": 1790093708681,
+    "updatedAt": 1790093723636
+  },
+  "B2B8W": {
+    "code": "B2B8W",
+    "hostToken": "e4b40389fc80d41f9b84f9920e173269",
+    "hostSocketId": null,
+    "gameId": "game-1",
+    "game": {
+      "id": "game-1",
+      "title": "Game 1: Urgent or Fake Urgent?",
+      "subtitle": "Distinguish actual urgency from things that just sound loud",
+      "topic": "Prioritization",
+      "description": "Teach participants to assess true business impact and deadlines rather than panicking over loud requests.",
+      "category": "Prioritization",
+      "order": 1,
+      "questions": [
+        {
+          "id": "g1-q1",
+          "type": "multiple-choice",
+          "title": "The Quadruple Ping",
+          "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Drop everything and fix the 'URGENT!!' slide deck."
+            },
+            {
+              "id": "B",
+              "text": "Help your teammate review their Scratch project immediately."
+            },
+            {
+              "id": "C",
+              "text": "Complete your 11:30 AM preparation first, then reply to the mentor about the 2:00 PM class."
+            },
+            {
+              "id": "D",
+              "text": "Rush to fill in the weekly attendance log to get admin off your back."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 45,
+          "explanation": "Your immediate commitment is the 11:30 AM class happening in 75 minutes. The mentor's 2:00 PM request has a clear time window, whereas 'URGENT' without context or deadline is often fake urgency.",
+          "learningObjective": "Prioritize by real deadline & direct classroom impact, not by who types in ALL CAPS.",
+          "discussionQuestion": "Why do we instinctively jump to whoever writes 'URGENT' in capital letters?",
+          "facilitatorTips": "Ask the room: 'Who chose A? Why does the word URGENT trigger panic?'",
+          "dynamicUpdate": {
+            "round": 2,
+            "announcement": "🚨 PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
+            "questionText": "Now that you know this, what is the professional rule for incoming 'urgent' tasks?",
+            "options": [
+              {
+                "id": "A",
+                "text": "Ignore all WhatsApp messages forever."
+              },
+              {
+                "id": "B",
+                "text": "Always ask: 'What is the hard deadline and who is impacted?' before switching tasks."
+              },
+              {
+                "id": "C",
+                "text": "Complain to the team that they wasted your time."
+              },
+              {
+                "id": "D",
+                "text": "Only do what is on your calendar and refuse any changes."
+              }
+            ],
+            "correctAnswer": "B",
+            "explanation": "Clarifying deadline and impact prevents derailment from your active commitments."
+          }
+        },
+        {
+          "id": "g1-q2",
+          "type": "multiple-choice",
+          "title": "The Mid-Session Distraction",
+          "scenario": "You are 15 minutes into teaching a live coding class with 18 students. Your mentor sends you a private Slack message:\n\n'Hey, please send me the student roster for Grade 6 right now.'\n\nWhat is your best response?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Stop the class, open Excel, find the roster, and send it immediately."
+            },
+            {
+              "id": "B",
+              "text": "Ignore the message completely until the end of the day."
+            },
+            {
+              "id": "C",
+              "text": "Give students a 2-minute independent challenge, reply quickly: 'Currently teaching live until 12:00. Will send immediately at 12:05 PM', and continue teaching."
+            },
+            {
+              "id": "D",
+              "text": "Reply with 'Busy!' and mute your laptop."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 35,
+          "explanation": "Classroom delivery is sacred. Never compromise student experience for back-office requests. A quick acknowledgment with an exact ETA manages expectations professionally.",
+          "learningObjective": "Acknowledge promptly with an ETA without abandoning your live classroom.",
+          "discussionQuestion": "What happens to instructor credibility when you look away from the students to do admin work?"
+        }
+      ]
+    },
+    "mode": "individual",
+    "state": "LOBBY",
+    "isPaused": false,
+    "currentQuestionIndex": 0,
+    "questionStartTime": null,
+    "questionTimeLimit": 30,
+    "participants": {},
+    "answers": {},
+    "reflections": [],
+    "createdAt": 1790093708706,
+    "updatedAt": 1790093723669
+  },
+  "B2B7U": {
+    "code": "B2B7U",
+    "hostToken": "fef569ca4debbe7486fab8cdcfc72425",
+    "hostSocketId": null,
+    "gameId": "game-1",
+    "game": {
+      "id": "game-1",
+      "title": "Game 1: Urgent or Fake Urgent?",
+      "subtitle": "Distinguish actual urgency from things that just sound loud",
+      "topic": "Prioritization",
+      "description": "Teach participants to assess true business impact and deadlines rather than panicking over loud requests.",
+      "category": "Prioritization",
+      "order": 1,
+      "questions": [
+        {
+          "id": "g1-q1",
+          "type": "multiple-choice",
+          "title": "The Quadruple Ping",
+          "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Drop everything and fix the 'URGENT!!' slide deck."
+            },
+            {
+              "id": "B",
+              "text": "Help your teammate review their Scratch project immediately."
+            },
+            {
+              "id": "C",
+              "text": "Complete your 11:30 AM preparation first, then reply to the mentor about the 2:00 PM class."
+            },
+            {
+              "id": "D",
+              "text": "Rush to fill in the weekly attendance log to get admin off your back."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 45,
+          "explanation": "Your immediate commitment is the 11:30 AM class happening in 75 minutes. The mentor's 2:00 PM request has a clear time window, whereas 'URGENT' without context or deadline is often fake urgency.",
+          "learningObjective": "Prioritize by real deadline & direct classroom impact, not by who types in ALL CAPS.",
+          "discussionQuestion": "Why do we instinctively jump to whoever writes 'URGENT' in capital letters?",
+          "facilitatorTips": "Ask the room: 'Who chose A? Why does the word URGENT trigger panic?'",
+          "dynamicUpdate": {
+            "round": 2,
+            "announcement": "🚨 PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
+            "questionText": "Now that you know this, what is the professional rule for incoming 'urgent' tasks?",
+            "options": [
+              {
+                "id": "A",
+                "text": "Ignore all WhatsApp messages forever."
+              },
+              {
+                "id": "B",
+                "text": "Always ask: 'What is the hard deadline and who is impacted?' before switching tasks."
+              },
+              {
+                "id": "C",
+                "text": "Complain to the team that they wasted your time."
+              },
+              {
+                "id": "D",
+                "text": "Only do what is on your calendar and refuse any changes."
+              }
+            ],
+            "correctAnswer": "B",
+            "explanation": "Clarifying deadline and impact prevents derailment from your active commitments."
+          }
+        },
+        {
+          "id": "g1-q2",
+          "type": "multiple-choice",
+          "title": "The Mid-Session Distraction",
+          "scenario": "You are 15 minutes into teaching a live coding class with 18 students. Your mentor sends you a private Slack message:\n\n'Hey, please send me the student roster for Grade 6 right now.'\n\nWhat is your best response?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Stop the class, open Excel, find the roster, and send it immediately."
+            },
+            {
+              "id": "B",
+              "text": "Ignore the message completely until the end of the day."
+            },
+            {
+              "id": "C",
+              "text": "Give students a 2-minute independent challenge, reply quickly: 'Currently teaching live until 12:00. Will send immediately at 12:05 PM', and continue teaching."
+            },
+            {
+              "id": "D",
+              "text": "Reply with 'Busy!' and mute your laptop."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 35,
+          "explanation": "Classroom delivery is sacred. Never compromise student experience for back-office requests. A quick acknowledgment with an exact ETA manages expectations professionally.",
+          "learningObjective": "Acknowledge promptly with an ETA without abandoning your live classroom.",
+          "discussionQuestion": "What happens to instructor credibility when you look away from the students to do admin work?"
+        }
+      ]
+    },
+    "mode": "individual",
+    "state": "LOBBY",
+    "isPaused": false,
+    "currentQuestionIndex": 0,
+    "questionStartTime": null,
+    "questionTimeLimit": 30,
+    "participants": {},
+    "answers": {},
+    "reflections": [],
+    "createdAt": 1790093792027,
+    "updatedAt": 1790093953715
+  },
+  "B2BVB": {
+    "code": "B2BVB",
+    "hostToken": "a2ae2e2834f44a6639fcf7cab9c3c598",
+    "hostSocketId": null,
+    "gameId": "game-1",
+    "game": {
+      "id": "game-1",
+      "title": "Game 1: Urgent or Fake Urgent?",
+      "subtitle": "Distinguish actual urgency from things that just sound loud",
+      "topic": "Prioritization",
+      "description": "Teach participants to assess true business impact and deadlines rather than panicking over loud requests.",
+      "category": "Prioritization",
+      "order": 1,
+      "questions": [
+        {
+          "id": "g1-q1",
+          "type": "multiple-choice",
+          "title": "The Quadruple Ping",
+          "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Drop everything and fix the 'URGENT!!' slide deck."
+            },
+            {
+              "id": "B",
+              "text": "Help your teammate review their Scratch project immediately."
+            },
+            {
+              "id": "C",
+              "text": "Complete your 11:30 AM preparation first, then reply to the mentor about the 2:00 PM class."
+            },
+            {
+              "id": "D",
+              "text": "Rush to fill in the weekly attendance log to get admin off your back."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 45,
+          "explanation": "Your immediate commitment is the 11:30 AM class happening in 75 minutes. The mentor's 2:00 PM request has a clear time window, whereas 'URGENT' without context or deadline is often fake urgency.",
+          "learningObjective": "Prioritize by real deadline & direct classroom impact, not by who types in ALL CAPS.",
+          "discussionQuestion": "Why do we instinctively jump to whoever writes 'URGENT' in capital letters?",
+          "facilitatorTips": "Ask the room: 'Who chose A? Why does the word URGENT trigger panic?'",
+          "dynamicUpdate": {
+            "round": 2,
+            "announcement": "🚨 PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
+            "questionText": "Now that you know this, what is the professional rule for incoming 'urgent' tasks?",
+            "options": [
+              {
+                "id": "A",
+                "text": "Ignore all WhatsApp messages forever."
+              },
+              {
+                "id": "B",
+                "text": "Always ask: 'What is the hard deadline and who is impacted?' before switching tasks."
+              },
+              {
+                "id": "C",
+                "text": "Complain to the team that they wasted your time."
+              },
+              {
+                "id": "D",
+                "text": "Only do what is on your calendar and refuse any changes."
+              }
+            ],
+            "correctAnswer": "B",
+            "explanation": "Clarifying deadline and impact prevents derailment from your active commitments."
+          }
+        },
+        {
+          "id": "g1-q2",
+          "type": "multiple-choice",
+          "title": "The Mid-Session Distraction",
+          "scenario": "You are 15 minutes into teaching a live coding class with 18 students. Your mentor sends you a private Slack message:\n\n'Hey, please send me the student roster for Grade 6 right now.'\n\nWhat is your best response?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Stop the class, open Excel, find the roster, and send it immediately."
+            },
+            {
+              "id": "B",
+              "text": "Ignore the message completely until the end of the day."
+            },
+            {
+              "id": "C",
+              "text": "Give students a 2-minute independent challenge, reply quickly: 'Currently teaching live until 12:00. Will send immediately at 12:05 PM', and continue teaching."
+            },
+            {
+              "id": "D",
+              "text": "Reply with 'Busy!' and mute your laptop."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 35,
+          "explanation": "Classroom delivery is sacred. Never compromise student experience for back-office requests. A quick acknowledgment with an exact ETA manages expectations professionally.",
+          "learningObjective": "Acknowledge promptly with an ETA without abandoning your live classroom.",
+          "discussionQuestion": "What happens to instructor credibility when you look away from the students to do admin work?"
+        }
+      ]
+    },
+    "mode": "individual",
+    "state": "LOBBY",
+    "isPaused": false,
+    "currentQuestionIndex": 0,
+    "questionStartTime": null,
+    "questionTimeLimit": 30,
+    "participants": {},
+    "answers": {},
+    "reflections": [],
+    "createdAt": 1790093792073,
+    "updatedAt": 1790093953750
+  },
+  "B2BR8": {
+    "code": "B2BR8",
+    "hostToken": "68423bf4fbb03fda152b40ba65230b3e",
+    "hostSocketId": null,
+    "gameId": "game-1",
+    "game": {
+      "id": "game-1",
+      "title": "Game 1: Urgent or Fake Urgent?",
+      "subtitle": "Distinguish actual urgency from things that just sound loud",
+      "topic": "Prioritization",
+      "description": "Teach participants to assess true business impact and deadlines rather than panicking over loud requests.",
+      "category": "Prioritization",
+      "order": 1,
+      "questions": [
+        {
+          "id": "g1-q1",
+          "type": "multiple-choice",
+          "title": "The Quadruple Ping",
+          "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Drop everything and fix the 'URGENT!!' slide deck."
+            },
+            {
+              "id": "B",
+              "text": "Help your teammate review their Scratch project immediately."
+            },
+            {
+              "id": "C",
+              "text": "Complete your 11:30 AM preparation first, then reply to the mentor about the 2:00 PM class."
+            },
+            {
+              "id": "D",
+              "text": "Rush to fill in the weekly attendance log to get admin off your back."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 45,
+          "explanation": "Your immediate commitment is the 11:30 AM class happening in 75 minutes. The mentor's 2:00 PM request has a clear time window, whereas 'URGENT' without context or deadline is often fake urgency.",
+          "learningObjective": "Prioritize by real deadline & direct classroom impact, not by who types in ALL CAPS.",
+          "discussionQuestion": "Why do we instinctively jump to whoever writes 'URGENT' in capital letters?",
+          "facilitatorTips": "Ask the room: 'Who chose A? Why does the word URGENT trigger panic?'",
+          "dynamicUpdate": {
+            "round": 2,
+            "announcement": "🚨 PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
+            "questionText": "Now that you know this, what is the professional rule for incoming 'urgent' tasks?",
+            "options": [
+              {
+                "id": "A",
+                "text": "Ignore all WhatsApp messages forever."
+              },
+              {
+                "id": "B",
+                "text": "Always ask: 'What is the hard deadline and who is impacted?' before switching tasks."
+              },
+              {
+                "id": "C",
+                "text": "Complain to the team that they wasted your time."
+              },
+              {
+                "id": "D",
+                "text": "Only do what is on your calendar and refuse any changes."
+              }
+            ],
+            "correctAnswer": "B",
+            "explanation": "Clarifying deadline and impact prevents derailment from your active commitments."
+          }
+        },
+        {
+          "id": "g1-q2",
+          "type": "multiple-choice",
+          "title": "The Mid-Session Distraction",
+          "scenario": "You are 15 minutes into teaching a live coding class with 18 students. Your mentor sends you a private Slack message:\n\n'Hey, please send me the student roster for Grade 6 right now.'\n\nWhat is your best response?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Stop the class, open Excel, find the roster, and send it immediately."
+            },
+            {
+              "id": "B",
+              "text": "Ignore the message completely until the end of the day."
+            },
+            {
+              "id": "C",
+              "text": "Give students a 2-minute independent challenge, reply quickly: 'Currently teaching live until 12:00. Will send immediately at 12:05 PM', and continue teaching."
+            },
+            {
+              "id": "D",
+              "text": "Reply with 'Busy!' and mute your laptop."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 35,
+          "explanation": "Classroom delivery is sacred. Never compromise student experience for back-office requests. A quick acknowledgment with an exact ETA manages expectations professionally.",
+          "learningObjective": "Acknowledge promptly with an ETA without abandoning your live classroom.",
+          "discussionQuestion": "What happens to instructor credibility when you look away from the students to do admin work?"
+        }
+      ]
+    },
+    "mode": "individual",
+    "state": "LOBBY",
+    "isPaused": false,
+    "currentQuestionIndex": 0,
+    "questionStartTime": null,
+    "questionTimeLimit": 30,
+    "participants": {},
+    "answers": {},
+    "reflections": [],
+    "createdAt": 1790093953977,
+    "updatedAt": 1790094001193
+  },
+  "B2B4B": {
+    "code": "B2B4B",
+    "hostToken": "ceee0f5a7569cdd99353baac497f54a6",
+    "hostSocketId": null,
+    "gameId": "game-1",
+    "game": {
+      "id": "game-1",
+      "title": "Game 1: Urgent or Fake Urgent?",
+      "subtitle": "Distinguish actual urgency from things that just sound loud",
+      "topic": "Prioritization",
+      "description": "Teach participants to assess true business impact and deadlines rather than panicking over loud requests.",
+      "category": "Prioritization",
+      "order": 1,
+      "questions": [
+        {
+          "id": "g1-q1",
+          "type": "multiple-choice",
+          "title": "The Quadruple Ping",
+          "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Drop everything and fix the 'URGENT!!' slide deck."
+            },
+            {
+              "id": "B",
+              "text": "Help your teammate review their Scratch project immediately."
+            },
+            {
+              "id": "C",
+              "text": "Complete your 11:30 AM preparation first, then reply to the mentor about the 2:00 PM class."
+            },
+            {
+              "id": "D",
+              "text": "Rush to fill in the weekly attendance log to get admin off your back."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 45,
+          "explanation": "Your immediate commitment is the 11:30 AM class happening in 75 minutes. The mentor's 2:00 PM request has a clear time window, whereas 'URGENT' without context or deadline is often fake urgency.",
+          "learningObjective": "Prioritize by real deadline & direct classroom impact, not by who types in ALL CAPS.",
+          "discussionQuestion": "Why do we instinctively jump to whoever writes 'URGENT' in capital letters?",
+          "facilitatorTips": "Ask the room: 'Who chose A? Why does the word URGENT trigger panic?'",
+          "dynamicUpdate": {
+            "round": 2,
+            "announcement": "🚨 PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
+            "questionText": "Now that you know this, what is the professional rule for incoming 'urgent' tasks?",
+            "options": [
+              {
+                "id": "A",
+                "text": "Ignore all WhatsApp messages forever."
+              },
+              {
+                "id": "B",
+                "text": "Always ask: 'What is the hard deadline and who is impacted?' before switching tasks."
+              },
+              {
+                "id": "C",
+                "text": "Complain to the team that they wasted your time."
+              },
+              {
+                "id": "D",
+                "text": "Only do what is on your calendar and refuse any changes."
+              }
+            ],
+            "correctAnswer": "B",
+            "explanation": "Clarifying deadline and impact prevents derailment from your active commitments."
+          }
+        },
+        {
+          "id": "g1-q2",
+          "type": "multiple-choice",
+          "title": "The Mid-Session Distraction",
+          "scenario": "You are 15 minutes into teaching a live coding class with 18 students. Your mentor sends you a private Slack message:\n\n'Hey, please send me the student roster for Grade 6 right now.'\n\nWhat is your best response?",
+          "options": [
+            {
+              "id": "A",
+              "text": "Stop the class, open Excel, find the roster, and send it immediately."
+            },
+            {
+              "id": "B",
+              "text": "Ignore the message completely until the end of the day."
+            },
+            {
+              "id": "C",
+              "text": "Give students a 2-minute independent challenge, reply quickly: 'Currently teaching live until 12:00. Will send immediately at 12:05 PM', and continue teaching."
+            },
+            {
+              "id": "D",
+              "text": "Reply with 'Busy!' and mute your laptop."
+            }
+          ],
+          "correctAnswer": "C",
+          "points": 1000,
+          "timeLimit": 35,
+          "explanation": "Classroom delivery is sacred. Never compromise student experience for back-office requests. A quick acknowledgment with an exact ETA manages expectations professionally.",
+          "learningObjective": "Acknowledge promptly with an ETA without abandoning your live classroom.",
+          "discussionQuestion": "What happens to instructor credibility when you look away from the students to do admin work?"
+        }
+      ]
+    },
+    "mode": "individual",
+    "state": "LOBBY",
+    "isPaused": false,
+    "currentQuestionIndex": 0,
+    "questionStartTime": null,
+    "questionTimeLimit": 30,
+    "participants": {},
+    "answers": {},
+    "reflections": [],
+    "createdAt": 1790093954024,
+    "updatedAt": 1790094001221
   }
 }
