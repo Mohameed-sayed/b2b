@@ -408,7 +408,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
 
       const newCode = generateRandomCode();
       setRoomCode(newCode);
-      socket.emit('room:create', { code: newCode, gameId: selectedGameId, teamMode }, (res: any) => {
+      socket.emit('room:create', { code: newCode, gameId: selectedGameId, teamMode, forceNew: true }, (res: any) => {
         if (res && res.code) {
           setRoomCode(res.code);
           if (res.hostToken) {
@@ -435,7 +435,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
 
       const newCode = generateRandomCode();
       setRoomCode(newCode);
-      socket.emit('room:create', { code: newCode, gameId: selectedGameId, teamMode }, (res: any) => {
+      socket.emit('room:create', { code: newCode, gameId: selectedGameId, teamMode, forceNew: true }, (res: any) => {
         if (res && res.code) {
           setRoomCode(res.code);
           if (res.hostToken) {

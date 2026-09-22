@@ -41,7 +41,14 @@ export const App: React.FC = () => {
         return;
       }
 
-      // Default to host mode
+      // On mobile devices, default to participant mode so joining on phones never mounts facilitator host
+      const isMobile = window.innerWidth < 768 || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      if (isMobile) {
+        setMode('participant');
+        return;
+      }
+
+      // Default to host mode for desktop presentation screens
       setMode('host');
     };
 

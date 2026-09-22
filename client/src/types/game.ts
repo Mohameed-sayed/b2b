@@ -202,8 +202,8 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-  'room:create': (data: { code?: string; gameId?: string; teamMode?: boolean; mode?: string }, callback?: (res: { success: boolean; code: string; roomCode: string; hostToken: string; room: Room }) => void) => void;
-  'host:create_room': (data: { code?: string; gameId?: string; teamMode?: boolean; mode?: string }, callback?: (res: { success: boolean; code: string; roomCode: string; hostToken: string; room: Room }) => void) => void;
+  'room:create': (data: { code?: string; gameId?: string; teamMode?: boolean; mode?: string; forceNew?: boolean }, callback?: (res: { success: boolean; code: string; roomCode: string; hostToken: string; room: Room }) => void) => void;
+  'host:create_room': (data: { code?: string; gameId?: string; teamMode?: boolean; mode?: string; forceNew?: boolean }, callback?: (res: { success: boolean; code: string; roomCode: string; hostToken: string; room: Room }) => void) => void;
   'room:end': (data: { code: string; roomCode?: string }, callback?: (res: { success: boolean }) => void) => void;
   'host:end_workshop': (data: { code: string; roomCode?: string }, callback?: (res: { success: boolean }) => void) => void;
   'room:join': (data: { code?: string; roomCode?: string; name: string; avatar?: string; team?: string; participantId?: string }, callback?: (res: { success: boolean; participant?: Participant; room?: Room; error?: string; message?: string }) => void) => void;

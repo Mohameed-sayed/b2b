@@ -122,6 +122,21 @@ class SocketService {
     return fallback;
   }
 
+  /**
+   * Fetches current active room from the server
+   */
+  public async fetchActiveRoom(): Promise<{ success: boolean; hasActiveRoom: boolean; roomCode: string | null }> {
+    try {
+      const res = await fetch(`${this.backendUrl}/api/active-room`, { method: 'GET' });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {
+      // Backend not yet reachable or API endpoint missing
+    }
+    return { success: false, hasActiveRoom: false, roomCode: null };
+  }
+
   // Local storage helpers for participant session resilience
   public saveParticipantSession(
     roomCode: string,

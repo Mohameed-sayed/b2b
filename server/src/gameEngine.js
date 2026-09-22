@@ -140,7 +140,33 @@ class GameEngine {
     }
   }
 
-  createRoom({ gameId, mode = 'individual', hostSocketId = null, code = null, customCode = null }) {
+  getActiveRoom() {
+    if (this.rooms.size === 0) return null;
+    const all = Array.from(this.rooms.values());
+    return all[all.length - 1] || null;
+  }
+
+  createRoom({ gameId, mode = 'individual', hostSocketId = null, code = null, customCode = null, forceNew = false }) {
+    const targetCode = (code || customCode || '').toUpperCase().trim();
+
+    // 1. If not forcing a new room, reuse existing room
+    if (!forceNew) {
+      if (targetCode && this.rooms.has(targetCode)) {
+        const existing = this.rooms.get(targetCode);
+        if (hostSocketId) existing.hostSocketId = hostSocketId;
+        return existing;
+      }
+      const active = this.getActiveRoom();
+      if (active) {
+        if (hostSocketId) active.hostSocketId = hostSocketId;
+        console.log(`♻️ [REUSING ACTIVE ROOM] Returning existing room ${active.code} instead of overwriting.`);
+        return active;
+      }
+    }
+
+    // 2. Only wipe previous rooms if forceNew is explicitly true or no active room exists
+    this.clearAllRooms();
+
     const games = db.getGames();
     let selectedGame = games.find(g => g.id === gameId);
     if (!selectedGame) {
@@ -151,18 +177,8 @@ class GameEngine {
       throw new Error('No games available to create a room');
     }
 
-    const roomCode = (code || customCode || this.generateRoomCode()).toUpperCase();
+    const roomCode = (targetCode || this.generateRoomCode()).toUpperCase();
     const hostToken = crypto.randomBytes(16).toString('hex');
-
-    // If room already exists, update host socket and return it
-    if (this.rooms.has(roomCode)) {
-      const existing = this.rooms.get(roomCode);
-      if (hostSocketId) existing.hostSocketId = hostSocketId;
-      return existing;
-    }
-
-    // Single-Room Engine: Clear previous zombie rooms so there is strictly 1 active room
-    this.clearAllRooms();
 
     const room = {
       code: roomCode,

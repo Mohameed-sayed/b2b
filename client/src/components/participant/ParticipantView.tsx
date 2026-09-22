@@ -65,6 +65,17 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
   const roomCodeRef = useRef<string>(roomCode);
   useEffect(() => { roomCodeRef.current = roomCode; }, [roomCode]);
 
+  // If no room code in URL, auto-fetch the currently active workshop room
+  useEffect(() => {
+    if (!roomCode) {
+      socketService.fetchActiveRoom().then((data) => {
+        if (data?.hasActiveRoom && data.roomCode) {
+          setRoomCode(data.roomCode);
+        }
+      });
+    }
+  }, [roomCode]);
+
   // Initialize socket & attach ALL game event listeners
   useEffect(() => {
     const socket = socketService.connect();

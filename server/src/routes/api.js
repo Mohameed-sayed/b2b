@@ -75,6 +75,29 @@ router.get('/teams', (req, res) => {
 });
 
 /**
+ * GET /api/active-room
+ * Returns current active room code if any exists
+ */
+router.get('/active-room', (req, res) => {
+  const active = gameEngine.getActiveRoom();
+  if (active) {
+    res.json({
+      success: true,
+      hasActiveRoom: true,
+      roomCode: active.code,
+      gameId: active.gameId,
+      status: active.state
+    });
+  } else {
+    res.json({
+      success: true,
+      hasActiveRoom: false,
+      roomCode: null
+    });
+  }
+});
+
+/**
  * GET /api/games
  * Returns all games
  */

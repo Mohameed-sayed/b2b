@@ -48,13 +48,15 @@ export function setupSocketHandlers(io) {
     // ==========================================
     // ROOM CREATION (Supports room:create & host:create_room)
     // ==========================================
-    const handleCreateRoom = async ({ gameId, mode, teamMode } = {}, callback) => {
+    const handleCreateRoom = async ({ gameId, mode, teamMode, code, customCode, forceNew } = {}, callback) => {
       try {
         const isTeam = teamMode === true || mode === 'team';
         const room = gameEngine.createRoom({
           gameId,
           mode: isTeam ? 'team' : 'individual',
-          hostSocketId: socket.id
+          hostSocketId: socket.id,
+          code: code || customCode,
+          forceNew: !!forceNew
         });
 
         socket.roomCode = room.code;
@@ -75,7 +77,7 @@ export function setupSocketHandlers(io) {
           room: clientRoom
         };
 
-        console.log(`✅ [ROOM CREATED] Code: ${room.code} by Host Socket: ${socket.id}`);
+        console.log(`✅ [ROOM CREATED/ATTACHED] Code: ${room.code} by Host Socket: ${socket.id}`);
 
         socket.emit('room:created', { room: clientRoom });
         socket.emit('host:room_created', response);
@@ -94,20 +96,42 @@ export function setupSocketHandlers(io) {
     socket.on('host:create_room', handleCreateRoom);
 
     // ==========================================
+    // GET ACTIVE ROOM (Single Room Query)
+    // ==========================================
+    socket.on('room:get-active', (callback) => {
+      const active = gameEngine.getActiveRoom();
+      const resp = active ? {
+        success: true,
+        hasActiveRoom: true,
+        roomCode: active.code,
+        gameId: active.gameId,
+        status: active.state
+      } : {
+        success: true,
+        hasActiveRoom: false,
+        roomCode: null
+      };
+      if (typeof callback === 'function') callback(resp);
+    });
+
+    // ==========================================
     // PARTICIPANT JOIN (Supports room:join & participant:join)
     // ==========================================
     const handleJoin = ({ code, roomCode, name, avatar, team, participantId }, callback) => {
-      const targetCode = (code || roomCode || '').toUpperCase().trim();
+      let targetCode = (code || roomCode || '').toUpperCase().trim();
       console.log(`📥 [JOIN ATTEMPT] Room: "${targetCode}", Name: "${name}", Socket: ${socket.id}`);
 
       try {
-        if (!targetCode) {
-          throw new Error('Room code is required');
-        }
-
-        const room = gameEngine.getRoom(targetCode);
+        let room = targetCode ? gameEngine.getRoom(targetCode) : null;
         if (!room) {
-          throw new Error(`Room "${targetCode}" not found. Please check the room code.`);
+          const active = gameEngine.getActiveRoom();
+          if (active) {
+            console.log(`ℹ️ [JOIN FALLBACK] Target room "${targetCode}" not found, routing to active room "${active.code}"`);
+            targetCode = active.code;
+            room = active;
+          } else {
+            throw new Error(targetCode ? `Room "${targetCode}" not found. Please check the room code.` : 'No active workshop room found. Please wait for the facilitator to start.');
+          }
         }
 
         const { participant, isReconnect, room: updatedRoom } = gameEngine.joinParticipant({
