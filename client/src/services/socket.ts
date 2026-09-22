@@ -10,14 +10,22 @@ class SocketService {
   private networkIp: string = '';
 
   constructor() {
-    // Default to port 3001 on the current hostname
     const hostname = typeof window !== 'undefined' ? window.location.hostname : 'localhost';
-    const port = 3001;
+    const browserPort = typeof window !== 'undefined' ? window.location.port : '';
     const protocol = typeof window !== 'undefined' && window.location.protocol === 'https:' ? 'https:' : 'http:';
     
-    // Check for explicit vite env override, otherwise construct from current host
+    // Check for explicit vite env override
     const envUrl = (import.meta as unknown as { env: { VITE_BACKEND_URL?: string } }).env?.VITE_BACKEND_URL;
-    this.backendUrl = envUrl || `${protocol}//${hostname}:${port}`;
+    
+    if (envUrl) {
+      this.backendUrl = envUrl;
+    } else if (browserPort === '5173' || browserPort === '3000') {
+      // Local development - backend is on 3001
+      this.backendUrl = `${protocol}//${hostname}:3001`;
+    } else {
+      // Production (DigitalOcean Nginx proxy) - connect to same host/port
+      this.backendUrl = `${protocol}//${hostname}${browserPort ? ':' + browserPort : ''}`;
+    }
   }
 
   public getSocket(): TypedSocket {
