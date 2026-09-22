@@ -18,12 +18,12 @@ function getLocalIpAddress() {
     }
   }
 
-  // Prioritize typical home/office private subnets
-  const privateIp = candidates.find(ip =>
-    ip.startsWith('192.168.') || ip.startsWith('10.') || /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(ip)
-  );
+  // Prioritize public IP if available, then local Wi-Fi LAN (192.168.x.x)
+  const publicIp = candidates.find(ip => !ip.startsWith('10.') && !ip.startsWith('192.168.') && !ip.startsWith('172.') && !ip.startsWith('127.'));
+  const lanIp = candidates.find(ip => ip.startsWith('192.168.'));
+  const otherPrivate = candidates.find(ip => ip.startsWith('10.') || /^172\.(1[6-9]|2[0-9]|3[0-1])\./.test(ip));
 
-  return privateIp || candidates[0] || 'localhost';
+  return publicIp || lanIp || otherPrivate || candidates[0] || 'localhost';
 }
 
 /**
@@ -38,11 +38,16 @@ router.get('/network-ip', (req, res) => {
     
     // Determine the base URL dynamically based on how the client reached us (Nginx proxy)
     const host = req.get('X-Forwarded-Host') || req.get('host');
-    const protocol = req.get('X-Forwarded-Proto') || req.protocol || 'http';
+    let protocol = req.get('X-Forwarded-Proto') || req.protocol || 'http';
     
-    // If we have a public host header (like 46.101.213.8 or a domain), use it!
-    // Otherwise fallback to the private LAN IP (for pure local development)
-    const clientBaseUrl = process.env.CLIENT_URL || (host ? `${protocol}://${host}` : `http://${ip}:${clientPort}`);
+    // Default to HTTPS if using public domain or DigitalOcean deployment
+    if (host && (host.includes('sslip.io') || host.includes('46.101.213.8'))) {
+      protocol = 'https';
+    }
+    
+    // Map raw IP to valid SSL domain
+    const effectiveHost = (host === '46.101.213.8') ? '46.101.213.8.sslip.io' : host;
+    const clientBaseUrl = process.env.CLIENT_URL || (effectiveHost ? `${protocol}://${effectiveHost}` : `http://${ip}:${clientPort}`);
 
     res.json({
       success: true,
@@ -50,6 +55,7 @@ router.get('/network-ip', (req, res) => {
       serverPort: Number(serverPort),
       clientPort: Number(clientPort),
       clientBaseUrl,
+      publicUrl: clientBaseUrl,
       sampleJoinUrl: `${clientBaseUrl}/join/B2B7X`
     });
   } catch (err) {

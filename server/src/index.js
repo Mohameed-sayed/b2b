@@ -59,10 +59,15 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: '*',
-    methods: ['GET', 'POST']
+    methods: ['GET', 'POST', 'OPTIONS'],
+    credentials: true
   },
-  pingInterval: 10000,
-  pingTimeout: 5000
+  pingInterval: 25000,
+  pingTimeout: 20000,
+  transports: ['polling', 'websocket'],
+  allowUpgrades: true,
+  connectTimeout: 45000,
+  maxHttpBufferSize: 1e7
 });
 
 // Attach real-time handlers

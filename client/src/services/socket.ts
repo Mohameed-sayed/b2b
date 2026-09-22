@@ -23,8 +23,8 @@ class SocketService {
       // Local development - backend is on 3001
       this.backendUrl = `${protocol}//${hostname}:3001`;
     } else {
-      // Production (DigitalOcean Nginx proxy) - connect to same host/port
-      this.backendUrl = `${protocol}//${hostname}${browserPort ? ':' + browserPort : ''}`;
+      // Production - always connect to current origin (works seamlessly with Nginx SSL & proxy)
+      this.backendUrl = typeof window !== 'undefined' ? window.location.origin : `${protocol}//${hostname}${browserPort ? ':' + browserPort : ''}`;
     }
   }
 
@@ -33,11 +33,11 @@ class SocketService {
       this.socket = io(this.backendUrl, {
         autoConnect: false,
         reconnection: true,
-        reconnectionAttempts: 10,
+        reconnectionAttempts: Infinity,
         reconnectionDelay: 1000,
         reconnectionDelayMax: 5000,
-        timeout: 10000,
-        transports: ['websocket', 'polling'],
+        timeout: 20000,
+        transports: ['polling', 'websocket'], // Robust order: reliable HTTP polling first, upgrade to WS
       });
 
       this.socket.on('connect', () => {
@@ -98,7 +98,17 @@ class SocketService {
       const res = await fetch(`${this.backendUrl}/api/network-ip`, { method: 'GET' });
       if (res.ok) {
         const data = await res.json();
-        if (data.ip) {
+        // If server provided publicUrl / clientBaseUrl, extract hostname from it
+        if (data.clientBaseUrl || data.publicUrl) {
+          try {
+            const parsed = new URL(data.clientBaseUrl || data.publicUrl);
+            if (parsed.hostname && !parsed.hostname.startsWith('10.')) {
+              this.networkIp = parsed.hostname;
+              return parsed.hostname;
+            }
+          } catch {}
+        }
+        if (data.ip && !data.ip.startsWith('10.')) {
           this.networkIp = data.ip;
           return data.ip;
         }
@@ -158,6 +168,29 @@ class SocketService {
     } catch {
       // Storage access error
     }
+  }
+
+  // Host session helpers
+  public saveHostSession(roomCode: string, hostToken?: string): void {
+    try {
+      sessionStorage.setItem('ischool_host_session', JSON.stringify({ roomCode, hostToken, timestamp: Date.now() }));
+    } catch {}
+  }
+
+  public getHostSession(): { roomCode: string; hostToken?: string } | null {
+    try {
+      const data = sessionStorage.getItem('ischool_host_session');
+      if (!data) return null;
+      return JSON.parse(data);
+    } catch {
+      return null;
+    }
+  }
+
+  public clearHostSession(): void {
+    try {
+      sessionStorage.removeItem('ischool_host_session');
+    } catch {}
   }
 }
 

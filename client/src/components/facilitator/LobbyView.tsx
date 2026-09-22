@@ -31,16 +31,42 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   const [copied, setCopied] = useState(false);
 
   // Construct join URL
-  const port = window.location.port ? `:${window.location.port}` : '';
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  const host = isLocal ? (networkIp || window.location.hostname) : window.location.hostname;
-  const protocol = window.location.protocol;
-  const joinUrl = `${protocol}//${host}${port}/join/${roomCode}`;
+  let joinUrl: string;
 
-  const handleCopyLink = () => {
-    navigator.clipboard.writeText(joinUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  if (isLocal) {
+    const port = window.location.port ? `:${window.location.port}` : '';
+    const host = networkIp && !networkIp.startsWith('10.') ? networkIp : window.location.hostname;
+    joinUrl = `${window.location.protocol}//${host}${port}/join/${roomCode}`;
+  } else {
+    // In production, ensure HTTPS domain so iOS Safari, Camera scan, WebSockets & Clipboard work 100%
+    if (window.location.hostname === '46.101.213.8') {
+      joinUrl = `https://46.101.213.8.sslip.io/join/${roomCode}`;
+    } else {
+      joinUrl = `${window.location.origin}/join/${roomCode}`;
+    }
+  }
+
+  const handleCopyLink = async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(joinUrl);
+      } else {
+        const textArea = document.createElement('textarea');
+        textArea.value = joinUrl;
+        textArea.style.position = 'fixed';
+        textArea.style.opacity = '0';
+        document.body.appendChild(textArea);
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
+      }
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const selectedGame = games.find((g) => g.id === selectedGameId) || games[0];

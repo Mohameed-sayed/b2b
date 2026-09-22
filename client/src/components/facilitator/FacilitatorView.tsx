@@ -49,7 +49,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     return res;
   };
 
-  // Connect socket and fetch network IP
+  // Connect socket, fetch network IP, and manage host lifecycle
   useEffect(() => {
     const socket = socketService.connect();
 
@@ -58,25 +58,71 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
       setNetworkIp(ip);
     });
 
-    // Create room or rejoin with deterministic code
-    const codeToUse = initialRoomCode || generateRandomCode();
+    const savedHost = socketService.getHostSession();
+    const codeToUse = initialRoomCode || savedHost?.roomCode || generateRandomCode();
     setRoomCode(codeToUse);
 
-    const initRoom = () => {
+    const initOrReconnect = () => {
+      const activeSession = socketService.getHostSession();
+      if (activeSession && (activeSession.roomCode === codeToUse || !initialRoomCode)) {
+        console.log('[Host] Attempting host reconnect for room:', activeSession.roomCode);
+        socket.emit('host:reconnect', {
+          code: activeSession.roomCode,
+          roomCode: activeSession.roomCode,
+          hostToken: activeSession.hostToken || ''
+        }, (res: any) => {
+          if (res?.success && res.room) {
+            console.log('[Host] Reconnected successfully to room:', res.room.code);
+            setRoomCode(res.room.code);
+            setStatus(res.room.status || 'lobby');
+            if (res.selectedGameId) setSelectedGameId(res.selectedGameId);
+            if (res.room.currentQuestionIndex !== undefined) setCurrentQuestionIndex(res.room.currentQuestionIndex);
+            if (res.room.participants) {
+              const pVal = res.room.participants;
+              setParticipants(Array.isArray(pVal) ? pVal : Object.values(pVal));
+            }
+            return;
+          }
+          // If reconnect failed, create fresh room
+          createNewRoom();
+        });
+      } else {
+        createNewRoom();
+      }
+    };
+
+    const createNewRoom = () => {
       socket.emit('room:create', { code: codeToUse, gameId: selectedGameId, teamMode }, (res: any) => {
         if (res && res.code) {
           setRoomCode(res.code);
+          if (res.hostToken) {
+            socketService.saveHostSession(res.code, res.hostToken);
+          }
         }
       });
     };
 
     if (socket.connected) {
-      initRoom();
+      initOrReconnect();
     } else {
-      socket.once('connect', initRoom);
+      socket.once('connect', initOrReconnect);
     }
 
-    // Socket Event Listeners — named refs so we can properly remove them
+    // Auto-reconnect host whenever socket reconnects in the background
+    const onSocketReconnect = () => {
+      console.log('[Host] Socket reconnected, re-registering host...');
+      const session = socketService.getHostSession();
+      if (session?.roomCode) {
+        socket.emit('host:reconnect', {
+          code: session.roomCode,
+          roomCode: session.roomCode,
+          hostToken: session.hostToken || ''
+        });
+      }
+    };
+    socket.on('connect', onSocketReconnect);
+
+    // Socket Event Listeners
     const onRoomCreated = (data: any) => {
       if (data.room) {
         setRoomCode(data.room.code);
@@ -87,16 +133,32 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     const onParticipantJoined = (data: any) => {
       sound.playPop();
       setParticipants((prev) => {
-        const exists = prev.some((p) => p.id === data.participant.id);
+        const pData = { ...data.participant, isOnline: true };
+        const exists = prev.some((p) => p.id === pData.id);
         if (exists) {
-          return prev.map((p) => (p.id === data.participant.id ? data.participant : p));
+          return prev.map((p) => (p.id === pData.id ? pData : p));
         }
-        return [...prev, data.participant];
+        return [...prev, pData];
       });
     };
 
-    const onParticipantLeft = (data: any) => {
-      setParticipants((prev) => prev.filter((p) => p.id !== data.participantId));
+    const onParticipantReconnected = (data: any) => {
+      sound.playPop();
+      setParticipants((prev) => {
+        const pData = { ...data.participant, isOnline: true };
+        const exists = prev.some((p) => p.id === pData.id);
+        if (exists) {
+          return prev.map((p) => (p.id === pData.id ? pData : p));
+        }
+        return [...prev, pData];
+      });
+    };
+
+    // Soft-mark participant offline rather than deleting them
+    const onParticipantOffline = (data: any) => {
+      setParticipants((prev) =>
+        prev.map((p) => (p.id === data.participantId ? { ...p, isOnline: false } : p))
+      );
     };
 
     const onQuestionStarted = (data: any) => {
@@ -135,11 +197,10 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
 
     const onRoomUpdated = (data: any) => {
       if (data.room) {
-        setStatus(data.room.status);
-        setIsPaused(data.room.isPaused);
-        setTeamMode(data.room.teamMode);
+        if (data.room.status) setStatus(data.room.status);
+        if (data.room.isPaused !== undefined) setIsPaused(data.room.isPaused);
+        if (data.room.teamMode !== undefined) setTeamMode(data.room.teamMode);
         if (data.room.participants) {
-          // participants may be an object map (from server) or already an array
           const participantsValue = data.room.participants;
           setParticipants(
             Array.isArray(participantsValue)
@@ -152,7 +213,9 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
 
     socket.on('room:created', onRoomCreated);
     socket.on('room:participant-joined', onParticipantJoined);
-    socket.on('room:participant-left', onParticipantLeft);
+    socket.on('room:participant-reconnected', onParticipantReconnected);
+    socket.on('room:participant-offline', onParticipantOffline);
+    socket.on('room:participant-left', onParticipantOffline);
     socket.on('question:started', onQuestionStarted);
     socket.on('question:tick', onQuestionTick);
     socket.on('question:answered', onQuestionAnswered);
@@ -162,9 +225,12 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     socket.on('room:updated', onRoomUpdated);
 
     return () => {
+      socket.off('connect', onSocketReconnect);
       socket.off('room:created', onRoomCreated);
       socket.off('room:participant-joined', onParticipantJoined);
-      socket.off('room:participant-left', onParticipantLeft);
+      socket.off('room:participant-reconnected', onParticipantReconnected);
+      socket.off('room:participant-offline', onParticipantOffline);
+      socket.off('room:participant-left', onParticipantOffline);
       socket.off('question:started', onQuestionStarted);
       socket.off('question:tick', onQuestionTick);
       socket.off('question:answered', onQuestionAnswered);

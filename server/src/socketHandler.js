@@ -206,12 +206,12 @@ export function setupSocketHandlers(io) {
     // ==========================================
     // RECONNECT (Supports room:reconnect & host:reconnect)
     // ==========================================
-    socket.on('room:reconnect', ({ code, participantId }, callback) => {
-      const targetCode = (code || '').toUpperCase().trim();
+    socket.on('room:reconnect', ({ code, roomCode, participantId }, callback) => {
+      const targetCode = (code || roomCode || '').toUpperCase().trim();
       console.log(`🔄 [RECONNECT ATTEMPT] Room: ${targetCode}, PID: ${participantId}, Socket: ${socket.id}`);
       try {
         const room = gameEngine.getRoom(targetCode);
-        if (!room || !room.participants[participantId]) {
+        if (!room || !room.participants || !room.participants[participantId]) {
           const resp = { success: false, error: 'Session expired or not found' };
           if (typeof callback === 'function') callback(resp);
           return;
@@ -232,27 +232,54 @@ export function setupSocketHandlers(io) {
           hostSocketId: room.hostSocketId,
           currentGameId: room.gameId,
           currentQuestionIndex: room.currentQuestionIndex,
-          status: room.state.toLowerCase(),
+          status: room.state ? room.state.toLowerCase() : 'lobby',
           isPaused: !!room.isPaused,
-          timeRemaining: room.questionTimeLimit || 30,
+          timeRemaining: room.currentTimeRemaining !== undefined ? room.currentTimeRemaining : (room.questionTimeLimit || 30),
           participants: room.participants || {},
           submissions: {},
           teamMode: room.mode === 'team',
           reflections: room.reflections || []
         };
 
-        const response = { success: true, participant, room: clientRoom };
+        const currentQuestion = gameEngine.getCurrentQuestion(room);
+
+        const response = {
+          success: true,
+          participant,
+          room: clientRoom,
+          currentQuestion,
+          questionIndex: room.currentQuestionIndex,
+          totalQuestions: room.game?.questions?.length || 1,
+          timeRemaining: room.currentTimeRemaining !== undefined ? room.currentTimeRemaining : (room.questionTimeLimit || 30)
+        };
+
         console.log(`✅ [RECONNECTED] ${participant.name} back in ${targetCode}`);
         if (typeof callback === 'function') callback(response);
+
+        // Broadcast to host and room that participant is back online!
+        io.to(targetCode).emit('room:participant-reconnected', {
+          participant,
+          count: Object.values(room.participants).filter(p => p.isOnline).length
+        });
+        io.to(targetCode).emit('room:updated', { room: clientRoom });
       } catch (err) {
         console.error('Reconnect error:', err);
         if (typeof callback === 'function') callback({ success: false, error: err.message });
       }
     });
 
-    socket.on('host:reconnect', ({ roomCode, hostToken }, callback) => {
+    socket.on('host:reconnect', ({ code, roomCode, hostToken }, callback) => {
       try {
-        const targetCode = (roomCode || '').toUpperCase().trim();
+        const targetCode = (code || roomCode || '').toUpperCase().trim();
+        console.log(`👑 [HOST RECONNECT ATTEMPT] Room: ${targetCode}, Socket: ${socket.id}`);
+        const room = gameEngine.getRoom(targetCode);
+        if (!room) {
+          const resp = { success: false, error: 'Room expired or not found' };
+          socket.emit('error', resp);
+          if (typeof callback === 'function') callback(resp);
+          return;
+        }
+
         const valid = gameEngine.validateHost(targetCode, hostToken);
         if (!valid) {
           const resp = { success: false, error: 'Invalid host credentials or room expired' };
@@ -268,8 +295,36 @@ export function setupSocketHandlers(io) {
         socket.join(`${targetCode}:host`);
 
         const fullRoom = gameEngine.getFullRoomForHost(targetCode);
-        const response = { success: true, room: fullRoom };
+        const clientRoom = {
+          code: fullRoom.code,
+          hostSocketId: socket.id,
+          currentGameId: fullRoom.gameId,
+          currentQuestionIndex: fullRoom.currentQuestionIndex,
+          status: fullRoom.state ? fullRoom.state.toLowerCase() : 'lobby',
+          isPaused: !!fullRoom.isPaused,
+          timeRemaining: fullRoom.currentTimeRemaining !== undefined ? fullRoom.currentTimeRemaining : (fullRoom.questionTimeLimit || 30),
+          participants: fullRoom.participants || {},
+          submissions: fullRoom.submissions || {},
+          teamMode: fullRoom.mode === 'team',
+          reflections: fullRoom.reflections || []
+        };
+
+        const currentQuestion = gameEngine.getCurrentQuestion(fullRoom);
+
+        const response = {
+          success: true,
+          code: fullRoom.code,
+          roomCode: fullRoom.code,
+          hostToken: fullRoom.hostToken,
+          room: clientRoom,
+          fullRoom,
+          currentQuestion,
+          selectedGameId: fullRoom.gameId
+        };
+
+        console.log(`👑 [HOST RECONNECTED] Room: ${targetCode} to Socket: ${socket.id}`);
         socket.emit('host:sync', response);
+        socket.emit('room:updated', { room: clientRoom });
         if (typeof callback === 'function') callback(response);
       } catch (err) {
         console.error('host:reconnect error:', err);
@@ -698,9 +753,20 @@ export function setupSocketHandlers(io) {
         const updatedRooms = gameEngine.handleDisconnect(socket.id);
         for (const item of updatedRooms) {
           if (item.participant) {
+            const onlineCount = Object.values(item.room.participants).filter(p => p.isOnline).length;
+            io.to(item.room.code).emit('room:participant-offline', {
+              participantId: item.participant.id,
+              count: onlineCount
+            });
             io.to(item.room.code).emit('room:participant-left', {
               participantId: item.participant.id,
-              count: Object.values(item.room.participants).filter(p => p.isOnline).length
+              count: onlineCount
+            });
+            io.to(item.room.code).emit('room:updated', {
+              room: {
+                code: item.room.code,
+                participants: item.room.participants
+              }
             });
           }
         }

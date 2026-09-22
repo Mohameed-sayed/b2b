@@ -59,13 +59,49 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const localTimerRef = useRef<number | null>(null);
-  // Keep a ref to the latest participant so socket closures always have fresh data
+  // Keep refs so socket closures always have fresh data
   const participantRef = useRef<Participant | null>(null);
   useEffect(() => { participantRef.current = participant; }, [participant]);
+  const roomCodeRef = useRef<string>(roomCode);
+  useEffect(() => { roomCodeRef.current = roomCode; }, [roomCode]);
 
   // Initialize socket & attach ALL game event listeners
   useEffect(() => {
     const socket = socketService.connect();
+
+    // ── Auto-reconnect participant whenever socket reconnects ──
+    const onSocketConnect = () => {
+      const p = participantRef.current;
+      const code = roomCodeRef.current;
+      if (p && code) {
+        console.log('[Participant] Socket connected, re-authenticating:', p.name, p.id);
+        socket.emit('room:reconnect', {
+          code,
+          roomCode: code,
+          participantId: p.id,
+        }, (res: any) => {
+          if (res?.success && res.participant) {
+            console.log('[Participant] Auto-reconnected successfully to room:', code);
+            setParticipant(res.participant);
+            const roomStatus: string = res.room?.status || 'lobby';
+            if (roomStatus === 'leaderboard') {
+              setSubState('leaderboard');
+            } else if (roomStatus === 'revealing' || roomStatus === 'answer_revealed') {
+              setSubState('result');
+            } else if (roomStatus === 'question' || roomStatus === 'question_active') {
+              if (res.currentQuestion) {
+                setCurrentQuestion(res.currentQuestion);
+                setQuestionIndex(res.questionIndex ?? 0);
+                setTotalQuestions(res.totalQuestions ?? 1);
+                setTimeRemaining(res.timeRemaining ?? 30);
+                setSubState('question');
+              }
+            }
+          }
+        });
+      }
+    };
+    socket.on('connect', onSocketConnect);
 
     // ── Attempt session reconnect ──────────────────────────────
     // pendingSession is captured in a useState initializer so it's stable.
@@ -252,6 +288,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
     socket.on('error', onRoomError);
 
     return () => {
+      socket.off('connect', onSocketConnect);
       socket.off('room:joined', onRoomJoined);
       socket.off('room:updated', onRoomUpdated);
       socket.off('question:started', onQuestionStarted);
@@ -290,13 +327,14 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
     setRoomCode(cleanCode);
 
     const socket = socketService.getSocket();
-    if (socket.connected) {
+
+    const doJoin = () => {
       const timer = setTimeout(() => {
         setIsLoading(false);
         setErrorMessage('Server took too long to respond. Check room code and try again.');
-      }, 6000);
+      }, 8000);
 
-      socket.emit('room:join', { code: cleanCode, name, avatar, team }, (res: any) => {
+      socket.emit('room:join', { code: cleanCode, roomCode: cleanCode, name, avatar, team }, (res: any) => {
         clearTimeout(timer);
         setIsLoading(false);
         if (res && !res.success) {
@@ -312,13 +350,26 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
           );
           setSubState('waiting');
         }
-        // join_success also fires 'room:joined' broadcast — handled by socket listener above
       });
+    };
+
+    if (socket.connected) {
+      doJoin();
     } else {
-      // If socket is not connected, try connecting and alert the user
+      // Auto-connect and execute join as soon as handshake completes
+      setErrorMessage('Connecting to workshop server...');
       socket.connect();
-      setErrorMessage('Connecting to server... Please try again in a few seconds.');
-      setIsLoading(false);
+      const onConnectOnce = () => {
+        clearTimeout(timeoutFail);
+        setErrorMessage('');
+        doJoin();
+      };
+      const timeoutFail = setTimeout(() => {
+        socket.off('connect', onConnectOnce);
+        setIsLoading(false);
+        setErrorMessage('Unable to connect to server. Please check your connection and tap Join again.');
+      }, 9000);
+      socket.once('connect', onConnectOnce);
     }
   }, []);
 
