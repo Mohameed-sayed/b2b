@@ -113,7 +113,7 @@ export const FacilitatorControlsBar: React.FC<FacilitatorControlsBarProps> = ({
 
         {/* Center/Right: Primary Action Buttons based on current state */}
         <div className="flex items-center gap-3">
-          {status === 'question' && onRevealAnswer && (
+          {(status === 'question' || status === 'escape-room' || (status as string) === 'question_active') && onRevealAnswer && (
             <Button
               variant="orange"
               size="md"
@@ -125,7 +125,7 @@ export const FacilitatorControlsBar: React.FC<FacilitatorControlsBarProps> = ({
             </Button>
           )}
 
-          {status === 'revealing' && onShowLeaderboard && (
+          {(status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief') && onShowLeaderboard && (
             <Button
               variant="primary"
               size="md"
@@ -136,7 +136,7 @@ export const FacilitatorControlsBar: React.FC<FacilitatorControlsBarProps> = ({
             </Button>
           )}
 
-          {status === 'leaderboard' && onNextQuestion && (
+          {(status === 'leaderboard' || (status as string) === 'completed') && onNextQuestion && (
             <Button
               variant="orange"
               size="md"

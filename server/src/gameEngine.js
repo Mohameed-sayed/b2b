@@ -11,6 +11,67 @@ export const ROOM_STATES = {
   COMPLETED: 'COMPLETED'
 };
 
+/**
+ * Normalizes internal server room state to the frontend RoomStatus string.
+ * Prevents host/participant UI crashes when state names differ.
+ */
+export function toClientStatus(state, gameId) {
+  if (!state) return 'lobby';
+  const s = String(state).trim().toUpperCase();
+  switch (s) {
+    case ROOM_STATES.LOBBY:
+      return 'lobby';
+    case ROOM_STATES.QUESTION_ACTIVE:
+    case 'QUESTION':
+      if (gameId === 'game-7') return 'escape-room';
+      if (gameId === 'game-8') return 'reflection-wall';
+      return 'question';
+    case 'ESCAPE-ROOM':
+    case 'ESCAPE_ROOM':
+      return 'escape-room';
+    case ROOM_STATES.REFLECTION:
+    case 'REFLECTION-WALL':
+    case 'REFLECTION_WALL':
+      return 'reflection-wall';
+    case ROOM_STATES.ANSWER_REVEALED:
+    case 'ANSWER-REVEALED':
+    case ROOM_STATES.DEBRIEF:
+    case 'REVEALING':
+      return 'revealing';
+    case ROOM_STATES.LEADERBOARD:
+    case ROOM_STATES.COMPLETED:
+    case 'ENDED':
+      return 'leaderboard';
+    default: {
+      const lower = s.toLowerCase();
+      if (['lobby', 'question', 'revealing', 'leaderboard', 'escape-room', 'reflection-wall', 'ended'].includes(lower)) {
+        return lower;
+      }
+      return 'question';
+    }
+  }
+}
+
+/**
+ * Formats a room object strictly adhering to the client-side Room interface.
+ */
+export function formatClientRoom(room, hostSocketId = null) {
+  if (!room) return null;
+  return {
+    code: room.code,
+    hostSocketId: hostSocketId || room.hostSocketId || null,
+    currentGameId: room.gameId,
+    currentQuestionIndex: room.currentQuestionIndex ?? 0,
+    status: toClientStatus(room.state, room.gameId),
+    isPaused: !!room.isPaused,
+    timeRemaining: room.currentTimeRemaining !== undefined ? room.currentTimeRemaining : (room.questionTimeLimit || 30),
+    participants: room.participants || {},
+    submissions: room.submissions || room.answers?.[room.currentQuestionIndex] || {},
+    teamMode: room.mode === 'team',
+    reflections: room.reflections || []
+  };
+}
+
 export const TEAMS = [
   { id: 'Team Alpha', name: 'Team Alpha', color: '#F59E0B', badge: '🦁' },
   { id: 'Team Beta', name: 'Team Beta', color: '#3B82F6', badge: '🦅' },
@@ -279,7 +340,12 @@ class GameEngine {
     const question = this.getCurrentQuestion(room);
     if (!question) throw new Error('No questions found in game');
 
-    room.state = ROOM_STATES.QUESTION_ACTIVE;
+    if (question.type === 'reflection' || room.gameId === 'game-8') {
+      room.state = ROOM_STATES.REFLECTION;
+    } else {
+      room.state = ROOM_STATES.QUESTION_ACTIVE;
+    }
+    room.isPaused = false;
     room.currentQuestionIndex = 0;
     room.questionStartTime = Date.now();
     room.questionTimeLimit = question.timeLimit || 30;
@@ -433,6 +499,7 @@ class GameEngine {
     if (!room) throw new Error('Room not found');
 
     room.state = ROOM_STATES.ANSWER_REVEALED;
+    room.isPaused = false;
     room.updatedAt = Date.now();
     this.saveRoomToDb(room);
 
@@ -498,6 +565,7 @@ class GameEngine {
         room.state = ROOM_STATES.QUESTION_ACTIVE;
       }
 
+      room.isPaused = false;
       room.questionStartTime = Date.now();
       room.questionTimeLimit = question.timeLimit || 30;
       if (!room.answers[nextIndex]) {
@@ -509,6 +577,7 @@ class GameEngine {
     } else {
       // Finished all questions in current game
       room.state = ROOM_STATES.COMPLETED;
+      room.isPaused = false;
       room.updatedAt = Date.now();
       this.saveRoomToDb(room);
       const leaderboards = this.getLeaderboards(roomCode);

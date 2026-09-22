@@ -140,8 +140,19 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
               setSubState('leaderboard');
             } else if (roomStatus === 'revealing' || roomStatus === 'answer_revealed') {
               setSubState('result');
+            } else if (roomStatus === 'question' || roomStatus === 'question_active' || roomStatus === 'escape-room' || roomStatus === 'reflection-wall') {
+              if (res.currentQuestion) {
+                setCurrentQuestion(res.currentQuestion);
+                setQuestionIndex(res.questionIndex ?? 0);
+                setTotalQuestions(res.totalQuestions ?? 1);
+                setTimeRemaining(res.timeRemaining ?? 30);
+                if (res.room?.isPaused !== undefined) setIsPaused(res.room.isPaused);
+                setSubState('question');
+              } else {
+                setSubState('waiting');
+              }
             } else {
-              // For lobby / question_active / any other state: go to waiting.
+              // For lobby / any other state: go to waiting.
               // The server will send question:started to push us into question view.
               setSubState('waiting');
             }
@@ -192,6 +203,9 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
       if (data.room?.isPaused !== undefined) {
         setIsPaused(data.room.isPaused);
       }
+      if (data.room?.timeRemaining !== undefined && data.room.isPaused) {
+        setTimeRemaining(data.room.timeRemaining);
+      }
     };
 
     // ── New question received ──────────────────────────────────
@@ -200,6 +214,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
       setQuestionIndex(data.index ?? 0);
       setTotalQuestions(data.total ?? 1);
       setTimeRemaining(data.timeLimit ?? 30);
+      setIsPaused(false);
       setSelectedAnswer('');
       setSubState('question');
     };

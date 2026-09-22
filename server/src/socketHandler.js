@@ -1,4 +1,4 @@
-import { gameEngine, ROOM_STATES } from './gameEngine.js';
+import { gameEngine, ROOM_STATES, toClientStatus, formatClientRoom } from './gameEngine.js';
 import { db } from './storage/db.js';
 
 // Active question interval timers per room: roomCode -> timerId
@@ -65,19 +65,7 @@ export function setupSocketHandlers(io) {
         const fullRoom = gameEngine.getFullRoomForHost(room.code);
 
         // Format room object matching client Room interface
-        const clientRoom = {
-          code: room.code,
-          hostSocketId: socket.id,
-          currentGameId: room.gameId,
-          currentQuestionIndex: room.currentQuestionIndex,
-          status: 'lobby',
-          isPaused: !!room.isPaused,
-          timeRemaining: room.questionTimeLimit || 30,
-          participants: room.participants || {},
-          submissions: {},
-          teamMode: room.mode === 'team',
-          reflections: room.reflections || []
-        };
+        const clientRoom = formatClientRoom(room, socket.id);
 
         const response = {
           success: true,
@@ -143,19 +131,7 @@ export function setupSocketHandlers(io) {
         socket.join(targetCode);
 
         // Format room object matching client Room interface
-        const clientRoom = {
-          code: updatedRoom.code,
-          hostSocketId: updatedRoom.hostSocketId,
-          currentGameId: updatedRoom.gameId,
-          currentQuestionIndex: updatedRoom.currentQuestionIndex,
-          status: updatedRoom.state.toLowerCase(),
-          isPaused: !!updatedRoom.isPaused,
-          timeRemaining: updatedRoom.questionTimeLimit || 30,
-          participants: updatedRoom.participants || {},
-          submissions: {},
-          teamMode: updatedRoom.mode === 'team',
-          reflections: updatedRoom.reflections || []
-        };
+        const clientRoom = formatClientRoom(updatedRoom);
 
         const response = {
           success: true,
@@ -227,19 +203,7 @@ export function setupSocketHandlers(io) {
         socket.participantId = participant.id;
         socket.join(targetCode);
 
-        const clientRoom = {
-          code: room.code,
-          hostSocketId: room.hostSocketId,
-          currentGameId: room.gameId,
-          currentQuestionIndex: room.currentQuestionIndex,
-          status: room.state ? room.state.toLowerCase() : 'lobby',
-          isPaused: !!room.isPaused,
-          timeRemaining: room.currentTimeRemaining !== undefined ? room.currentTimeRemaining : (room.questionTimeLimit || 30),
-          participants: room.participants || {},
-          submissions: {},
-          teamMode: room.mode === 'team',
-          reflections: room.reflections || []
-        };
+        const clientRoom = formatClientRoom(room);
 
         const currentQuestion = gameEngine.getCurrentQuestion(room);
 
@@ -295,19 +259,7 @@ export function setupSocketHandlers(io) {
         socket.join(`${targetCode}:host`);
 
         const fullRoom = gameEngine.getFullRoomForHost(targetCode);
-        const clientRoom = {
-          code: fullRoom.code,
-          hostSocketId: socket.id,
-          currentGameId: fullRoom.gameId,
-          currentQuestionIndex: fullRoom.currentQuestionIndex,
-          status: fullRoom.state ? fullRoom.state.toLowerCase() : 'lobby',
-          isPaused: !!fullRoom.isPaused,
-          timeRemaining: fullRoom.currentTimeRemaining !== undefined ? fullRoom.currentTimeRemaining : (fullRoom.questionTimeLimit || 30),
-          participants: fullRoom.participants || {},
-          submissions: fullRoom.submissions || {},
-          teamMode: fullRoom.mode === 'team',
-          reflections: fullRoom.reflections || []
-        };
+        const clientRoom = formatClientRoom(fullRoom, socket.id);
 
         const currentQuestion = gameEngine.getCurrentQuestion(fullRoom);
 
@@ -688,18 +640,7 @@ export function setupSocketHandlers(io) {
           room.mode = room.mode === 'team' ? 'individual' : 'team';
           gameEngine.saveRoomToDb(room);
           io.to(targetCode).emit('room:updated', { 
-            room: {
-              code: room.code,
-              hostSocketId: room.hostSocketId,
-              currentGameId: room.gameId,
-              currentQuestionIndex: room.currentQuestionIndex,
-              status: room.state.toLowerCase(),
-              isPaused: room.isPaused,
-              timeRemaining: room.questionTimeLimit || 30,
-              participants: room.participants || {},
-              submissions: {},
-              teamMode: room.mode === 'team',
-            }
+            room: formatClientRoom(room)
           });
         }
     });
@@ -717,30 +658,20 @@ export function setupSocketHandlers(io) {
 
       if (room.isPaused) {
         stopRoomTimer(targetCode);
-        console.log(`⏸️ Room ${targetCode} paused`);
+        console.log(`⏸️ Room ${targetCode} paused at ${room.currentTimeRemaining}s`);
       } else {
         // Resume timer with remaining time
-        if (room.state === 'QUESTION_ACTIVE' && room.questionTimeLimit > 0) {
+        if ((room.state === ROOM_STATES.QUESTION_ACTIVE || room.state === ROOM_STATES.REFLECTION) && room.questionTimeLimit > 0) {
           const resumeTime = room.currentTimeRemaining !== undefined ? room.currentTimeRemaining : room.questionTimeLimit;
-          startRoomTimer(io, targetCode, resumeTime);
+          if (resumeTime > 0) {
+            startRoomTimer(io, targetCode, resumeTime);
+          }
         }
         console.log(`▶ Room ${targetCode} resumed`);
       }
 
       io.to(targetCode).emit('room:updated', {
-        room: {
-          code: room.code,
-          hostSocketId: room.hostSocketId,
-          currentGameId: room.gameId,
-          currentQuestionIndex: room.currentQuestionIndex,
-          status: room.state.toLowerCase(),
-          isPaused: room.isPaused,
-          timeRemaining: room.questionTimeLimit || 30,
-          participants: room.participants || {},
-          submissions: {},
-          teamMode: room.mode === 'team',
-          reflections: room.reflections || []
-        }
+        room: formatClientRoom(room)
       });
     });
 

@@ -49,6 +49,34 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     return res;
   };
 
+  // Helper to normalize room status safely
+  const normalizeStatus = useCallback((s: any, gameId?: string): RoomStatus => {
+    if (!s) return 'lobby';
+    const str = String(s).toLowerCase();
+    const activeGame = gameId || selectedGameId;
+    if (str === 'question_active' || str === 'question') {
+      if (activeGame === 'game-7') return 'escape-room';
+      if (activeGame === 'game-8') return 'reflection-wall';
+      return 'question';
+    }
+    if (str === 'answer_revealed' || str === 'debrief' || str === 'revealing') {
+      return 'revealing';
+    }
+    if (str === 'leaderboard' || str === 'completed') {
+      return 'leaderboard';
+    }
+    if (str === 'reflection' || str === 'reflection-wall') {
+      return 'reflection-wall';
+    }
+    if (str === 'escape-room' || str === 'escape_room') {
+      return 'escape-room';
+    }
+    if (str === 'lobby') {
+      return 'lobby';
+    }
+    return 'question';
+  }, [selectedGameId]);
+
   // Connect socket, fetch network IP, and manage host lifecycle
   useEffect(() => {
     const socket = socketService.connect();
@@ -74,9 +102,11 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
           if (res?.success && res.room) {
             console.log('[Host] Reconnected successfully to room:', res.room.code);
             setRoomCode(res.room.code);
-            setStatus(res.room.status || 'lobby');
+            setStatus(normalizeStatus(res.room.status, res.selectedGameId || res.room.currentGameId));
             if (res.selectedGameId) setSelectedGameId(res.selectedGameId);
             if (res.room.currentQuestionIndex !== undefined) setCurrentQuestionIndex(res.room.currentQuestionIndex);
+            if (res.room.isPaused !== undefined) setIsPaused(res.room.isPaused);
+            if (res.room.timeRemaining !== undefined) setTimeRemaining(res.room.timeRemaining);
             if (res.room.participants) {
               const pVal = res.room.participants;
               setParticipants(Array.isArray(pVal) ? pVal : Object.values(pVal));
@@ -126,7 +156,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     const onRoomCreated = (data: any) => {
       if (data.room) {
         setRoomCode(data.room.code);
-        setStatus(data.room.status);
+        setStatus(normalizeStatus(data.room.status, data.room.currentGameId));
       }
     };
 
@@ -166,7 +196,14 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
       setCurrentQuestionIndex(data.index);
       setTimeRemaining(data.timeLimit);
       setAnsweredCount(0);
-      setStatus('question');
+      setIsPaused(false);
+      if (selectedGameId === 'game-7') {
+        setStatus('escape-room');
+      } else if (selectedGameId === 'game-8' || data.question?.type === 'reflection') {
+        setStatus('reflection-wall');
+      } else {
+        setStatus('question');
+      }
     };
 
     const onQuestionTick = (data: any) => {
@@ -197,8 +234,9 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
 
     const onRoomUpdated = (data: any) => {
       if (data.room) {
-        if (data.room.status) setStatus(data.room.status);
+        if (data.room.status) setStatus(normalizeStatus(data.room.status, data.room.currentGameId));
         if (data.room.isPaused !== undefined) setIsPaused(data.room.isPaused);
+        if (data.room.timeRemaining !== undefined && data.room.isPaused) setTimeRemaining(data.room.timeRemaining);
         if (data.room.teamMode !== undefined) setTeamMode(data.room.teamMode);
         if (data.room.participants) {
           const participantsValue = data.room.participants;
@@ -388,11 +426,11 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
       }
       if (e.code === 'Space') {
         e.preventDefault();
-        if (status === 'question' || status === 'escape-room') {
+        if (status === 'question' || status === 'escape-room' || (status as string) === 'question_active') {
           handleRevealAnswer();
-        } else if (status === 'revealing') {
+        } else if (status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief') {
           handleShowLeaderboard();
-        } else if (status === 'leaderboard') {
+        } else if (status === 'leaderboard' || (status as string) === 'completed') {
           handleNextQuestion();
         }
       }
@@ -443,7 +481,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
         />
       )}
 
-      {status === 'question' && (
+      {(status === 'question' || (status as string) === 'question_active') && (
         <QuestionView
           question={currentQuestion}
           questionIndex={currentQuestionIndex}
@@ -456,7 +494,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
         />
       )}
 
-      {status === 'revealing' && (
+      {(status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief') && (
         <AnswerRevealView
           question={currentQuestion}
           stats={revealStats}
@@ -465,12 +503,35 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
         />
       )}
 
-      {status === 'leaderboard' && (
+      {(status === 'leaderboard' || (status as string) === 'completed') && (
         <LeaderboardView
           participants={participants}
           teamMode={teamMode}
           isLastQuestion={isLastQuestion}
           onNextQuestion={handleNextQuestion}
+        />
+      )}
+
+      {/* Robust Fallback View: Guarantees no white screen even if status is unexpected */}
+      {status !== 'lobby' &&
+       status !== 'escape-room' &&
+       status !== 'reflection-wall' &&
+       status !== 'question' &&
+       (status as string) !== 'question_active' &&
+       status !== 'revealing' &&
+       (status as string) !== 'answer_revealed' &&
+       (status as string) !== 'debrief' &&
+       status !== 'leaderboard' &&
+       (status as string) !== 'completed' && (
+        <QuestionView
+          question={currentQuestion}
+          questionIndex={currentQuestionIndex}
+          totalQuestions={currentGame.questions.length}
+          timeRemaining={timeRemaining}
+          isPaused={isPaused}
+          participants={participants}
+          answeredCount={answeredCount}
+          onRevealAnswer={handleRevealAnswer}
         />
       )}
 
@@ -486,9 +547,9 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
           onTogglePause={handleTogglePause}
           onToggleTeamMode={handleToggleTeamMode}
           onOpenPointsModal={() => setIsPointsModalOpen(true)}
-          onRevealAnswer={status === 'question' || status === 'escape-room' ? handleRevealAnswer : undefined}
-          onShowLeaderboard={status === 'revealing' ? handleShowLeaderboard : undefined}
-          onNextQuestion={status === 'leaderboard' ? handleNextQuestion : undefined}
+          onRevealAnswer={status === 'question' || status === 'escape-room' || (status as string) === 'question_active' ? handleRevealAnswer : undefined}
+          onShowLeaderboard={status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief' ? handleShowLeaderboard : undefined}
+          onNextQuestion={status === 'leaderboard' || (status as string) === 'completed' ? handleNextQuestion : undefined}
           isLastQuestion={isLastQuestion}
         />
       )}
