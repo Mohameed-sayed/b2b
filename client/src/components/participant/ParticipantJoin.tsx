@@ -34,16 +34,16 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center px-4 py-8 max-w-md mx-auto">
+    <div className="min-h-screen bg-brand-light flex flex-col justify-center px-4 py-8 max-w-md mx-auto">
       {/* Brand Header */}
       <div className="text-center mb-6 space-y-2">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-tr from-orange-500 to-amber-500 text-3xl shadow-xl shadow-orange-500/20 font-black mb-2 animate-bounce-short">
+        <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-tr from-brand-accent to-brand-accent text-3xl shadow-xl shadow-brand-accent/20 font-black mb-2 animate-bounce-short">
           {selectedAvatar}
         </div>
-        <h1 className="text-2xl font-black text-white font-display tracking-tight">
+        <h1 className="text-2xl font-black text-brand-dark font-display tracking-tight">
           iSchool B2B Onboarding
         </h1>
-        <p className="text-xs text-slate-400">
+        <p className="text-xs text-brand-secondary">
           Enter your name and join the live interactive workshop session
         </p>
       </div>
@@ -51,17 +51,17 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
       {/* Join Form Card */}
       <form
         onSubmit={handleSubmit}
-        className="rounded-3xl bg-slate-900/90 border-2 border-slate-800 p-6 shadow-2xl space-y-5 backdrop-blur-md"
+        className="rounded-3xl bg-brand-white border-2 border-slate-200 p-6 shadow-2xl space-y-5 backdrop-blur-md"
       >
         {errorMessage && (
-          <div className="p-3 rounded-xl bg-rose-500/20 border border-rose-500/40 text-rose-300 text-xs font-bold text-center">
+          <div className="p-3 rounded-xl bg-red-600/20 border border-red-600/40 text-rose-300 text-xs font-bold text-center">
             {errorMessage}
           </div>
         )}
 
         {/* Room Code */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+          <label className="block text-xs font-bold uppercase tracking-wider text-brand-secondary mb-1.5">
             Room Code
           </label>
           <input
@@ -71,13 +71,13 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
             placeholder="e.g. B2B7X"
             maxLength={8}
             required
-            className="w-full rounded-2xl bg-slate-950 border-2 border-slate-800 px-4 py-3 text-center text-xl font-mono font-black text-orange-400 placeholder:text-slate-700 focus:border-orange-500 focus:outline-none tracking-widest uppercase transition-all"
+            className="w-full rounded-2xl bg-brand-light border-2 border-slate-200 px-4 py-3 text-center text-xl font-mono font-black text-orange-400 placeholder:text-slate-700 focus:border-brand-accent focus:outline-none tracking-widest uppercase transition-all"
           />
         </div>
 
         {/* Name */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+          <label className="block text-xs font-bold uppercase tracking-wider text-brand-secondary mb-1.5">
             Your Name / Nickname
           </label>
           <input
@@ -87,13 +87,13 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
             placeholder="e.g. Mostafa or Nour"
             maxLength={25}
             required
-            className="w-full rounded-2xl bg-slate-950 border-2 border-slate-800 px-4 py-3 text-slate-100 font-bold placeholder:text-slate-700 focus:border-orange-500 focus:outline-none text-base transition-all"
+            className="w-full rounded-2xl bg-brand-light border-2 border-slate-200 px-4 py-3 text-brand-dark font-bold placeholder:text-slate-700 focus:border-brand-accent focus:outline-none text-base transition-all"
           />
         </div>
 
         {/* Avatar Picker */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+          <label className="block text-xs font-bold uppercase tracking-wider text-brand-secondary mb-2">
             Choose Your Avatar
           </label>
           <div className="grid grid-cols-6 gap-2">
@@ -105,7 +105,7 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
                   sound.playPop();
                   setSelectedAvatar(emoji);
                 }}
-                className={`w-11 h-11 text-xl rounded-xl border flex items-center justify-center transition-all ${selectedAvatar === emoji ? 'border-orange-500 bg-orange-500/20 scale-110 shadow-md' : 'border-slate-800 bg-slate-950 hover:bg-slate-800'}`}
+                className={`w-11 h-11 text-xl rounded-xl border flex items-center justify-center transition-all ${selectedAvatar === emoji ? 'border-brand-accent bg-brand-accent/20 scale-110 shadow-md' : 'border-slate-200 bg-brand-light hover:bg-slate-100'}`}
               >
                 {emoji}
               </button>
@@ -115,7 +115,7 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
 
         {/* Team Picker */}
         <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">
+          <label className="block text-xs font-bold uppercase tracking-wider text-brand-secondary mb-2">
             Select Your Team
           </label>
           <div className="grid grid-cols-2 gap-2">
@@ -127,7 +127,7 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
                   sound.playPop();
                   setSelectedTeam(t);
                 }}
-                className={`py-2 px-3 text-xs font-bold rounded-xl border text-left transition-all ${selectedTeam === t ? 'border-purple-500 bg-purple-600/20 text-purple-300 shadow-md' : 'border-slate-800 bg-slate-950 text-slate-400 hover:bg-slate-800'}`}
+                className={`py-2 px-3 text-xs font-bold rounded-xl border text-left transition-all ${selectedTeam === t ? 'border-purple-500 bg-purple-600/20 text-purple-300 shadow-md' : 'border-slate-200 bg-brand-light text-brand-secondary hover:bg-slate-100'}`}
               >
                 {t}
               </button>
@@ -144,14 +144,14 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
           iconPosition="right"
           isLoading={isLoading}
           disabled={!code.trim() || !name.trim()}
-          className="w-full shadow-xl shadow-orange-500/25"
+          className="w-full shadow-xl shadow-brand-accent/25"
         >
           JOIN WORKSHOP
         </Button>
 
         <div className="text-center pt-1">
-          <span className="text-[11px] text-slate-500 flex items-center justify-center gap-1">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+          <span className="text-[11px] text-brand-secondary flex items-center justify-center gap-1">
+            <ShieldCheck className="w-3.5 h-3.5 text-green-600" />
             <span>Instant participation. No app download needed.</span>
           </span>
         </div>
@@ -159,3 +159,4 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
     </div>
   );
 };
+

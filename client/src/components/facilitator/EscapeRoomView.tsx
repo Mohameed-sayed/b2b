@@ -86,9 +86,9 @@ export const EscapeRoomView: React.FC<EscapeRoomViewProps> = ({
   return (
     <div className="min-h-screen flex flex-col justify-between p-6 md:p-10 max-w-7xl mx-auto pb-24 animate-fade-in">
       {/* Crisis Banner */}
-      <div className="p-4 rounded-2xl bg-gradient-to-r from-red-600/30 via-orange-600/20 to-slate-900 border-2 border-red-500/50 flex flex-wrap items-center justify-between gap-4 shadow-2xl">
+      <div className="p-4 rounded-2xl bg-brand-white border-2 border-red-500/50 flex flex-wrap items-center justify-between gap-4 shadow-2xl">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-red-600 text-white flex items-center justify-center animate-pulse">
+          <div className="w-10 h-10 rounded-xl bg-red-600 text-brand-dark flex items-center justify-center animate-pulse">
             <ShieldAlert className="w-6 h-6" />
           </div>
           <div>
@@ -100,14 +100,14 @@ export const EscapeRoomView: React.FC<EscapeRoomViewProps> = ({
                 GAME 7
               </Badge>
             </div>
-            <h2 className="text-xl font-black text-white">
+            <h2 className="text-xl font-black text-brand-dark">
               The 45-Minute Emergency: Operation Salvage
             </h2>
           </div>
         </div>
 
         {/* Countdown Timer */}
-        <div className="flex items-center gap-3 bg-slate-950 px-4 py-2 rounded-xl border border-red-500/40">
+        <div className="flex items-center gap-3 bg-brand-light px-4 py-2 rounded-xl border border-red-500/40">
           <Clock className="w-5 h-5 text-red-400 animate-spin" />
           <div className="font-mono text-2xl font-black text-red-400">
             {Math.floor(timeRemaining / 60)}:{(timeRemaining % 60).toString().padStart(2, '0')}
@@ -118,7 +118,7 @@ export const EscapeRoomView: React.FC<EscapeRoomViewProps> = ({
       {/* Progressive Clue Tabs */}
       <div className="my-6">
         <div className="flex items-center justify-between pb-3">
-          <div className="text-xs font-black uppercase tracking-widest text-slate-400 flex items-center gap-2">
+          <div className="text-xs font-black uppercase tracking-widest text-brand-secondary flex items-center gap-2">
             <Unlock className="w-4 h-4 text-orange-400" />
             <span>
               EMERGENCY BRIEFING DOSSIER ({unlockedCount}/{clues.length} CLUES UNLOCKED)
@@ -147,17 +147,17 @@ export const EscapeRoomView: React.FC<EscapeRoomViewProps> = ({
                 key={clue.id}
                 onClick={() => isUnlocked && setActiveClueIndex(idx)}
                 disabled={!isUnlocked}
-                className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between min-h-[70px] ${!isUnlocked ? 'border-slate-800 bg-slate-950/40 opacity-40 cursor-not-allowed' : isActive ? 'border-orange-500 bg-orange-500/15 shadow-lg shadow-orange-500/10' : 'border-slate-800 bg-slate-900/80 hover:bg-slate-850'}`}
+                className={`p-3 rounded-xl border text-left transition-all flex flex-col justify-between min-h-[70px] ${!isUnlocked ? 'border-slate-200 bg-brand-light/40 opacity-40 cursor-not-allowed' : isActive ? 'border-brand-accent bg-brand-accent/15 shadow-lg shadow-brand-accent/10' : 'border-slate-200 bg-brand-white hover:bg-slate-850'}`}
               >
                 <div className="flex items-center justify-between">
                   <span className="text-base">{clue.icon}</span>
                   {isUnlocked ? (
                     <Unlock className="w-3.5 h-3.5 text-emerald-400" />
                   ) : (
-                    <Lock className="w-3.5 h-3.5 text-slate-500" />
+                    <Lock className="w-3.5 h-3.5 text-brand-secondary" />
                   )}
                 </div>
-                <div className="text-[11px] font-bold text-slate-200 truncate mt-1">
+                <div className="text-[11px] font-bold text-brand-dark truncate mt-1">
                   Clue #{clue.id}
                 </div>
               </button>
@@ -167,11 +167,11 @@ export const EscapeRoomView: React.FC<EscapeRoomViewProps> = ({
       </div>
 
       {/* Active Clue Detail Card */}
-      <div className="p-8 rounded-3xl bg-slate-900/90 border-2 border-slate-700 shadow-2xl relative overflow-hidden">
+      <div className="p-8 rounded-3xl bg-brand-white border-2 border-slate-300 shadow-2xl relative overflow-hidden">
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center gap-3">
             <span className="text-3xl">{clues[activeClueIndex].icon}</span>
-            <h3 className="text-xl font-black text-white">
+            <h3 className="text-xl font-black text-brand-dark">
               {clues[activeClueIndex].title}
             </h3>
           </div>
@@ -189,14 +189,14 @@ export const EscapeRoomView: React.FC<EscapeRoomViewProps> = ({
           </Badge>
         </div>
 
-        <p className="text-lg md:text-xl text-slate-100 font-medium leading-relaxed">
+        <p className="text-lg md:text-xl text-brand-dark font-medium leading-relaxed">
           {clues[activeClueIndex].content}
         </p>
       </div>
 
       {/* Action Options Preview & Facilitator Reveal Button */}
-      <div className="mt-6 flex flex-col md:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800">
-        <div className="text-xs text-slate-400 flex items-center gap-2">
+      <div className="mt-6 flex flex-col md:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-200">
+        <div className="text-xs text-brand-secondary flex items-center gap-2">
           <Users className="w-4 h-4 text-blue-400" />
           <span>Instructors are deliberating with their teams on the best coordinated action!</span>
         </div>
@@ -213,3 +213,4 @@ export const EscapeRoomView: React.FC<EscapeRoomViewProps> = ({
     </div>
   );
 };
+

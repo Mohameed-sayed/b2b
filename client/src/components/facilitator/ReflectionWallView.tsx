@@ -29,21 +29,21 @@ export const ReflectionWallView: React.FC<ReflectionWallViewProps> = ({
   return (
     <div className="min-h-screen flex flex-col justify-between p-6 md:p-10 max-w-7xl mx-auto pb-24 animate-fade-in">
       {/* Top Header */}
-      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-800">
+      <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-orange-500 to-amber-500 flex items-center justify-center text-2xl shadow-lg shadow-orange-500/20 font-black">
+          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-brand-accent to-brand-accent flex items-center justify-center text-2xl shadow-lg shadow-brand-accent/20 font-black">
             🎯
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h1 className="text-2xl md:text-3xl font-black text-white font-display">
+              <h1 className="text-2xl md:text-3xl font-black text-brand-dark font-display">
                 B2B Commitment Wall
               </h1>
               <Badge variant="orange" size="sm">
                 FINAL REFLECTION
               </Badge>
             </div>
-            <p className="text-xs md:text-sm text-slate-400">
+            <p className="text-xs md:text-sm text-brand-secondary">
               One specific behavior each instructor commits to practicing starting tomorrow
             </p>
           </div>
@@ -60,7 +60,7 @@ export const ReflectionWallView: React.FC<ReflectionWallViewProps> = ({
             size="lg"
             icon={<Rocket className="w-5 h-5" />}
             onClick={handleLaunchFinale}
-            className="shadow-2xl shadow-orange-500/30 hover:scale-105"
+            className="shadow-2xl shadow-brand-accent/30 hover:scale-105"
           >
             READY. SET. GO. 🚀
           </Button>
@@ -70,12 +70,12 @@ export const ReflectionWallView: React.FC<ReflectionWallViewProps> = ({
       {/* Main Grid: Live Masonry Wall */}
       <div className="my-8 flex-1">
         {reflections.length === 0 ? (
-          <div className="h-96 flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-slate-800 p-8 text-center bg-slate-900/40">
+          <div className="h-96 flex flex-col items-center justify-center rounded-3xl border-2 border-dashed border-slate-200 p-8 text-center bg-brand-white">
             <div className="text-5xl mb-3 animate-bounce">✍️</div>
-            <h3 className="text-lg font-bold text-white mb-1">
+            <h3 className="text-lg font-bold text-brand-dark mb-1">
               Awaiting Instructor Commitments...
             </h3>
-            <p className="text-sm text-slate-400 max-w-md">
+            <p className="text-sm text-brand-secondary max-w-md">
               Instructors are currently typing their personal behavioral pledges on their phones. Pledges will appear here in real time!
             </p>
           </div>
@@ -84,17 +84,17 @@ export const ReflectionWallView: React.FC<ReflectionWallViewProps> = ({
             {reflections.map((item) => (
               <div
                 key={item.id}
-                className="p-6 rounded-3xl bg-gradient-to-br from-slate-900 to-slate-950 border-2 border-slate-800 hover:border-orange-500/60 transition-all shadow-xl flex flex-col justify-between gap-4 animate-slide-up"
+                className="p-6 rounded-3xl bg-brand-white border-2 border-slate-200 hover:border-brand-accent/60 transition-all shadow-xl flex flex-col justify-between gap-4 animate-slide-up"
               >
                 <div>
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2.5">
                       <span className="text-2xl">{item.participantAvatar}</span>
                       <div>
-                        <div className="text-sm font-bold text-slate-100">
+                        <div className="text-sm font-bold text-brand-dark">
                           {item.participantName}
                         </div>
-                        <div className="text-[10px] text-slate-400">
+                        <div className="text-[10px] text-brand-secondary">
                           {item.team}
                         </div>
                       </div>
@@ -104,14 +104,14 @@ export const ReflectionWallView: React.FC<ReflectionWallViewProps> = ({
                     </span>
                   </div>
 
-                  <p className="text-base font-semibold text-slate-200 leading-relaxed italic">
+                  <p className="text-base font-semibold text-brand-dark leading-relaxed italic">
                     "{item.behaviorText}"
                   </p>
                 </div>
 
-                <div className="pt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] text-slate-500">
+                <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between text-[11px] text-brand-secondary">
                   <span>Pledged live</span>
-                  <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500/30" />
+                  <Heart className="w-3.5 h-3.5 text-red-600 fill-red-600/30" />
                 </div>
               </div>
             ))}
@@ -121,7 +121,7 @@ export const ReflectionWallView: React.FC<ReflectionWallViewProps> = ({
 
       {/* Celebratory Banner on finale */}
       {celebrating && (
-        <div className="p-6 rounded-3xl bg-gradient-to-r from-orange-600 via-amber-500 to-emerald-500 text-slate-950 font-black shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4 animate-bounce-short">
+        <div className="p-6 rounded-3xl bg-gradient-to-r from-orange-600 via-brand-accent to-green-600 text-brand-white font-black shadow-2xl flex flex-col md:flex-row items-center justify-between gap-4 animate-bounce-short">
           <div className="flex items-center gap-3">
             <span className="text-4xl">🌟</span>
             <div>
@@ -143,3 +143,4 @@ export const ReflectionWallView: React.FC<ReflectionWallViewProps> = ({
     </div>
   );
 };
+

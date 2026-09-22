@@ -13,11 +13,11 @@ export const Card: React.FC<CardProps> = ({
   ...props
 }) => {
   const variantStyles = {
-    default: 'bg-slate-900/80 border border-slate-800 backdrop-blur-md',
-    glow: 'bg-gradient-to-b from-slate-900/90 to-slate-950/90 border border-slate-700/60 shadow-xl shadow-blue-500/5',
-    accent: 'bg-gradient-to-br from-orange-950/40 via-slate-900/90 to-slate-950 border border-orange-500/30 shadow-xl shadow-orange-500/10',
-    success: 'bg-gradient-to-br from-emerald-950/40 via-slate-900/90 to-slate-950 border border-emerald-500/30 shadow-xl shadow-emerald-500/10',
-    danger: 'bg-gradient-to-br from-rose-950/40 via-slate-900/90 to-slate-950 border border-rose-500/30 shadow-xl shadow-rose-500/10',
+    default: 'bg-brand-white border border-slate-200 backdrop-blur-md',
+    glow: 'bg-brand-white border border-slate-300 shadow-xl shadow-brand-primary/10',
+    accent: 'bg-brand-white border-2 border-brand-accent/40 shadow-lg shadow-brand-accent/10',
+    success: 'bg-brand-white border-2 border-green-600/40 shadow-lg shadow-green-600/10',
+    danger: 'bg-brand-white border-2 border-red-600/40 shadow-lg shadow-red-600/10',
   };
 
   const interactiveStyles = interactive

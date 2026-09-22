@@ -10,15 +10,16 @@ interface ParticipantQuestionProps {
   questionIndex: number;
   totalQuestions: number;
   timeRemaining: number;
+  isPaused?: boolean;
   onSubmitAnswer: (answerId: string) => void;
   onSubmitReflection?: (text: string) => void;
 }
 
 const mcOptionColors = [
-  { bg: 'bg-rose-500/15 border-rose-500/50 active:bg-rose-500/30 text-rose-300', badge: 'bg-rose-500 text-white' },
-  { bg: 'bg-blue-500/15 border-blue-500/50 active:bg-blue-500/30 text-blue-300', badge: 'bg-blue-500 text-white' },
-  { bg: 'bg-amber-500/15 border-amber-500/50 active:bg-amber-500/30 text-amber-300', badge: 'bg-amber-500 text-slate-900' },
-  { bg: 'bg-emerald-500/15 border-emerald-500/50 active:bg-emerald-500/30 text-emerald-300', badge: 'bg-emerald-500 text-white' },
+  { bg: 'bg-red-600/15 border-red-600/50 active:bg-red-600/30 text-rose-300', badge: 'bg-red-600 text-brand-dark' },
+  { bg: 'bg-brand-primary/15 border-brand-primary/50 active:bg-brand-primary/30 text-blue-300', badge: 'bg-brand-primary text-brand-dark' },
+  { bg: 'bg-brand-accent/15 border-brand-accent/50 active:bg-brand-accent/30 text-amber-300', badge: 'bg-brand-accent text-brand-dark' },
+  { bg: 'bg-green-600/15 border-green-600/50 active:bg-green-600/30 text-emerald-300', badge: 'bg-green-600 text-brand-dark' },
 ];
 
 export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
@@ -26,6 +27,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
   questionIndex,
   totalQuestions,
   timeRemaining,
+  isPaused,
   onSubmitAnswer,
   onSubmitReflection,
 }) => {
@@ -55,14 +57,14 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-between p-4 md:p-6 max-w-md mx-auto animate-fade-in pb-12">
+    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-4 md:p-6 max-w-md mx-auto animate-fade-in pb-12">
       {/* Top Header: Question Index & Countdown */}
       <div>
-        <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-3 border-b border-slate-200">
           <span className="font-mono text-xs font-black text-orange-400">
             QUESTION {questionIndex + 1} OF {totalQuestions}
           </span>
-          <span className="text-xs font-bold text-slate-400">
+          <span className="text-xs font-bold text-brand-secondary">
             +{question.points} PTS
           </span>
         </div>
@@ -71,6 +73,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
           <TimerBar
             timeRemaining={timeRemaining}
             totalTime={question.timeLimit}
+            isPaused={isPaused}
           />
         </div>
       </div>
@@ -78,7 +81,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
       {/* Main Question Content Area */}
       <div className="my-auto py-4 space-y-4">
         {/* Title */}
-        <h2 className="text-lg md:text-xl font-black text-white font-display text-center leading-snug">
+        <h2 className="text-lg md:text-xl font-black text-brand-dark font-display text-center leading-snug">
           {question.title}
         </h2>
 
@@ -86,24 +89,24 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
         {question.type === 'voting' ? (
           <div className="space-y-4">
             {/* Realistic WhatsApp Chat Box Mockup */}
-            <div className="rounded-2xl bg-[#0b141a] border border-slate-800 overflow-hidden shadow-2xl">
+            <div className="rounded-2xl bg-[#efeae2] border border-slate-200 overflow-hidden shadow-xl">
               {/* WhatsApp Header */}
-              <div className="bg-[#202c33] px-3 py-2.5 flex items-center gap-2.5 border-b border-slate-700/50">
-                <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-sm font-bold text-white">
+              <div className="bg-[#008069] px-3 py-2.5 flex items-center gap-2.5 shadow-sm relative z-10">
+                <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold text-slate-700">
                   M
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-slate-100 leading-none">
+                  <div className="text-xs font-bold text-white leading-none">
                     iSchool B2B Coordinator
                   </div>
-                  <div className="text-[10px] text-emerald-400">online</div>
+                  <div className="text-[10px] text-emerald-100 mt-0.5">online</div>
                 </div>
               </div>
 
               {/* Chat Canvas with Wallpaper look */}
-              <div className="p-3.5 space-y-3 bg-[#0b141a] bg-opacity-95 text-xs">
+              <div className="p-3.5 space-y-3 bg-[#efeae2] text-xs">
                 {/* Incoming Message Bubble */}
-                <div className="bg-[#202c33] text-slate-100 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm space-y-1">
+                <div className="bg-white text-slate-800 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm space-y-1 relative">
                   <p className="whitespace-pre-line text-xs">
                     {question.scenario.split('\n\n')[0] || question.scenario}
                   </p>
@@ -114,13 +117,13 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
 
                 {/* Outgoing Message Bubble */}
                 {question.scenario.includes('\n\n') && (
-                  <div className="ml-auto bg-[#005c4b] text-white p-2.5 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm space-y-1">
+                  <div className="ml-auto bg-[#d9fdd3] text-slate-800 p-2.5 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm space-y-1 relative">
                     <p className="whitespace-pre-line text-xs font-medium">
                       {question.scenario.split('\n\n')[1]}
                     </p>
-                    <div className="flex items-center justify-end gap-1 text-[10px] text-emerald-200">
+                    <div className="flex items-center justify-end gap-1 text-[10px] text-slate-500">
                       <span>11:30 PM</span>
-                      <CheckCheck className="w-3.5 h-3.5 text-blue-400" />
+                      <CheckCheck className="w-3.5 h-3.5 text-blue-500" />
                     </div>
                   </div>
                 )}
@@ -128,7 +131,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
             </div>
 
             {/* Verdict Prompt */}
-            <div className="text-center text-xs font-black uppercase tracking-wider text-slate-300">
+            <div className="text-center text-xs font-black uppercase tracking-wider text-brand-dark">
               Judge this message: Is it professional?
             </div>
 
@@ -137,7 +140,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectOption('YES')}
-                className="py-4 px-3 rounded-2xl bg-gradient-to-b from-emerald-600 to-emerald-700 hover:from-emerald-500 hover:to-emerald-600 active:scale-95 text-white font-black text-sm flex flex-col items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/20 border border-emerald-400/30 transition-all"
+                className="py-4 px-3 rounded-2xl bg-gradient-to-b from-emerald-600 to-emerald-700 hover:from-green-600 hover:to-emerald-600 active:scale-95 text-brand-dark font-black text-sm flex flex-col items-center justify-center gap-1.5 shadow-lg shadow-emerald-600/20 border border-emerald-400/30 transition-all"
               >
                 <ThumbsUp className="w-6 h-6" />
                 <span>PROFESSIONAL</span>
@@ -146,7 +149,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectOption('NO')}
-                className="py-4 px-3 rounded-2xl bg-gradient-to-b from-rose-600 to-rose-700 hover:from-rose-500 hover:to-rose-600 active:scale-95 text-white font-black text-sm flex flex-col items-center justify-center gap-1.5 shadow-lg shadow-rose-600/20 border border-rose-400/30 transition-all"
+                className="py-4 px-3 rounded-2xl bg-gradient-to-b from-rose-600 to-rose-700 hover:from-red-600 hover:to-rose-600 active:scale-95 text-brand-dark font-black text-sm flex flex-col items-center justify-center gap-1.5 shadow-lg shadow-rose-600/20 border border-rose-400/30 transition-all"
               >
                 <ThumbsDown className="w-6 h-6" />
                 <span>UNPROFESSIONAL</span>
@@ -157,11 +160,11 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
           /* 2. TRIAGE QUESTION TYPE (OWN IT, SUPPORT IT, ESCALATE IT) */
           <div className="space-y-4">
             {/* Scenario snippet */}
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-sm text-slate-200 font-medium leading-relaxed">
+            <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 text-sm text-brand-dark font-medium leading-relaxed">
               {question.scenario}
             </div>
 
-            <div className="text-center text-xs font-black uppercase tracking-wider text-slate-400">
+            <div className="text-center text-xs font-black uppercase tracking-wider text-brand-secondary">
               Select the appropriate triage action:
             </div>
 
@@ -169,7 +172,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectOption('OWN')}
-                className="w-full py-4 px-4 rounded-2xl bg-emerald-950/40 hover:bg-emerald-950/70 active:scale-95 border-2 border-emerald-500/50 text-emerald-300 font-black text-base flex items-center justify-between shadow-lg shadow-emerald-500/10 transition-all"
+                className="w-full py-4 px-4 rounded-2xl bg-emerald-950/40 hover:bg-emerald-950/70 active:scale-95 border-2 border-green-600/50 text-emerald-300 font-black text-base flex items-center justify-between shadow-lg shadow-green-600/10 transition-all"
               >
                 <span className="flex items-center gap-3">
                   <span className="text-xl">🟢</span>
@@ -181,7 +184,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectOption('SUPPORT')}
-                className="w-full py-4 px-4 rounded-2xl bg-amber-950/40 hover:bg-amber-950/70 active:scale-95 border-2 border-amber-500/50 text-amber-300 font-black text-base flex items-center justify-between shadow-lg shadow-amber-500/10 transition-all"
+                className="w-full py-4 px-4 rounded-2xl bg-amber-950/40 hover:bg-amber-950/70 active:scale-95 border-2 border-brand-accent/50 text-amber-300 font-black text-base flex items-center justify-between shadow-lg shadow-brand-accent/10 transition-all"
               >
                 <span className="flex items-center gap-3">
                   <span className="text-xl">🟡</span>
@@ -193,7 +196,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectOption('ESCALATE')}
-                className="w-full py-4 px-4 rounded-2xl bg-rose-950/40 hover:bg-rose-950/70 active:scale-95 border-2 border-rose-500/50 text-rose-300 font-black text-base flex items-center justify-between shadow-lg shadow-rose-500/10 transition-all"
+                className="w-full py-4 px-4 rounded-2xl bg-rose-950/40 hover:bg-rose-950/70 active:scale-95 border-2 border-red-600/50 text-rose-300 font-black text-base flex items-center justify-between shadow-lg shadow-red-600/10 transition-all"
               >
                 <span className="flex items-center gap-3">
                   <span className="text-xl">🔴</span>
@@ -206,13 +209,13 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
         ) : question.type === 'reflection' ? (
           /* 3. REFLECTION QUESTION TYPE */
           <form onSubmit={handleReflectionSubmit} className="space-y-4">
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs text-slate-300">
+            <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 text-xs text-brand-dark">
               {question.scenario}
             </div>
 
             {/* Quick Suggestion Chips */}
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-brand-secondary mb-1.5">
                 Quick Commitments (Tap to use)
               </label>
               <div className="flex flex-col gap-2">
@@ -226,7 +229,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                     key={idx}
                     type="button"
                     onClick={() => handleSelectSuggestion(chip)}
-                    className="p-2.5 rounded-xl border border-slate-800 bg-slate-900/60 hover:bg-slate-850 text-left text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+                    className="p-2.5 rounded-xl border border-slate-200 bg-brand-white hover:bg-slate-850 text-left text-xs font-semibold text-brand-dark hover:text-brand-dark transition-colors"
                   >
                     "{chip}"
                   </button>
@@ -236,7 +239,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
 
             {/* Custom Input */}
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+              <label className="block text-[11px] font-bold uppercase tracking-wider text-brand-secondary mb-1.5">
                 Or write your own commitment:
               </label>
               <textarea
@@ -245,7 +248,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                 placeholder="In one clear sentence, what will you do differently starting tomorrow?"
                 rows={3}
                 required
-                className="w-full rounded-xl bg-slate-950 border border-slate-700 p-3 text-xs text-slate-100 placeholder:text-slate-600 focus:border-orange-500 focus:outline-none"
+                className="w-full rounded-xl bg-brand-light border border-slate-300 p-3 text-xs text-brand-dark placeholder:text-slate-600 focus:border-brand-accent focus:outline-none"
               />
             </div>
 
@@ -265,7 +268,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
           /* 4. STANDARD MULTIPLE CHOICE / RAPID RESPONSE */
           <div className="space-y-4">
             {/* Scenario snippet */}
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-xs md:text-sm text-slate-200 font-medium leading-relaxed max-h-36 overflow-y-auto">
+            <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 text-xs md:text-sm text-brand-dark font-medium leading-relaxed max-h-36 overflow-y-auto">
               {question.scenario}
             </div>
 
@@ -279,14 +282,14 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                     key={opt.id}
                     type="button"
                     onClick={() => handleSelectOption(opt.id)}
-                    className={`p-3.5 rounded-2xl border-2 text-left transition-all active:scale-98 flex items-start gap-3 ${style.bg} ${isSelected ? 'ring-2 ring-orange-500 scale-[1.02]' : ''}`}
+                    className={`p-3.5 rounded-2xl border-2 text-left transition-all active:scale-98 flex items-start gap-3 ${style.bg} ${isSelected ? 'ring-2 ring-brand-accent scale-[1.02]' : ''}`}
                   >
                     <span
                       className={`w-8 h-8 rounded-xl font-black font-mono flex items-center justify-center shrink-0 text-xs shadow ${style.badge}`}
                     >
                       {opt.id}
                     </span>
-                    <span className="text-xs md:text-sm font-bold text-slate-100 mt-1 leading-snug flex-1">
+                    <span className="text-xs md:text-sm font-bold text-brand-dark mt-1 leading-snug flex-1">
                       {opt.text}
                     </span>
                   </button>
@@ -298,10 +301,11 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
       </div>
 
       <div className="text-center pt-2">
-        <span className="text-[10px] text-slate-500">
+        <span className="text-[10px] text-brand-secondary">
           Select carefully · Answer cannot be modified once submitted
         </span>
       </div>
     </div>
   );
 };
+

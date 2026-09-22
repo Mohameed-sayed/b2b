@@ -34,20 +34,20 @@ export const PointsAdjustModal: React.FC<PointsAdjustModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fade-in">
-      <div className="relative w-full max-w-lg rounded-2xl bg-slate-900 border border-slate-700 shadow-2xl p-6 text-slate-100">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+      <div className="relative w-full max-w-lg rounded-2xl bg-brand-white border border-slate-300 shadow-2xl p-6 text-brand-dark">
+        <div className="flex items-center justify-between pb-4 border-b border-slate-200">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-orange-500/20 text-orange-400 flex items-center justify-center font-bold">
+            <div className="w-10 h-10 rounded-xl bg-brand-accent/20 text-orange-400 flex items-center justify-center font-bold">
               <Award className="w-6 h-6" />
             </div>
             <div>
               <h3 className="text-lg font-bold">Facilitator Points Adjustment</h3>
-              <p className="text-xs text-slate-400">Award bonus points for great insights or participation</p>
+              <p className="text-xs text-brand-secondary">Award bonus points for great insights or participation</p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 hover:text-white transition-colors"
+            className="rounded-lg p-2 text-brand-secondary hover:bg-slate-100 hover:text-brand-dark transition-colors"
           >
             <X className="w-5 h-5" />
           </button>
@@ -55,16 +55,16 @@ export const PointsAdjustModal: React.FC<PointsAdjustModalProps> = ({
 
         <div className="space-y-4 py-4">
           {/* Toggle Target Type */}
-          <div className="flex rounded-xl bg-slate-800/80 p-1 border border-slate-700/60">
+          <div className="flex rounded-xl bg-slate-100/80 p-1 border border-slate-300/60">
             <button
               onClick={() => { setIsTeamTarget(false); setSelectedTarget(''); }}
-              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${!isTeamTarget ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${!isTeamTarget ? 'bg-blue-600 text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark'}`}
             >
               Individual Participant
             </button>
             <button
               onClick={() => { setIsTeamTarget(true); setSelectedTarget(''); }}
-              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${isTeamTarget ? 'bg-orange-600 text-white shadow-md' : 'text-slate-400 hover:text-white'}`}
+              className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${isTeamTarget ? 'bg-orange-600 text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark'}`}
             >
               Whole Team
             </button>
@@ -72,13 +72,13 @@ export const PointsAdjustModal: React.FC<PointsAdjustModalProps> = ({
 
           {/* Select Target */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-brand-secondary mb-2">
               Select {isTeamTarget ? 'Team' : 'Participant'}
             </label>
             <select
               value={selectedTarget}
               onChange={(e) => setSelectedTarget(e.target.value)}
-              className="w-full rounded-xl bg-slate-950 border border-slate-700 px-4 py-3 text-slate-100 focus:border-orange-500 focus:outline-none text-sm font-medium"
+              className="w-full rounded-xl bg-brand-light border border-slate-300 px-4 py-3 text-brand-dark focus:border-brand-accent focus:outline-none text-sm font-medium"
             >
               <option value="">-- Choose {isTeamTarget ? 'Team' : 'Participant'} --</option>
               {isTeamTarget ? (
@@ -97,7 +97,7 @@ export const PointsAdjustModal: React.FC<PointsAdjustModalProps> = ({
 
           {/* Points Presets */}
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-brand-secondary mb-2">
               Preset Amounts
             </label>
             <div className="grid grid-cols-4 gap-2">
@@ -106,7 +106,7 @@ export const PointsAdjustModal: React.FC<PointsAdjustModalProps> = ({
                   key={val}
                   type="button"
                   onClick={() => setPointsInput(val)}
-                  className={`py-2 text-sm font-bold rounded-lg border transition-all ${pointsInput === val ? 'border-orange-500 bg-orange-500/20 text-orange-400' : 'border-slate-800 bg-slate-800/40 text-slate-300 hover:bg-slate-800'}`}
+                  className={`py-2 text-sm font-bold rounded-lg border transition-all ${pointsInput === val ? 'border-brand-accent bg-brand-accent/20 text-orange-400' : 'border-slate-200 bg-slate-100/40 text-brand-dark hover:bg-slate-100'}`}
                 >
                   +{val}
                 </button>
@@ -115,19 +115,19 @@ export const PointsAdjustModal: React.FC<PointsAdjustModalProps> = ({
           </div>
 
           <div>
-            <label className="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-2">
+            <label className="block text-xs font-semibold uppercase tracking-wider text-brand-secondary mb-2">
               Custom Points
             </label>
             <input
               type="number"
               value={pointsInput}
               onChange={(e) => setPointsInput(Math.max(1, parseInt(e.target.value) || 0))}
-              className="w-full rounded-xl bg-slate-950 border border-slate-700 px-4 py-2.5 text-slate-100 text-sm font-mono"
+              className="w-full rounded-xl bg-brand-light border border-slate-300 px-4 py-2.5 text-brand-dark text-sm font-mono"
             />
           </div>
         </div>
 
-        <div className="flex gap-3 pt-4 border-t border-slate-800">
+        <div className="flex gap-3 pt-4 border-t border-slate-200">
           <Button
             variant="danger"
             size="md"
@@ -153,3 +153,4 @@ export const PointsAdjustModal: React.FC<PointsAdjustModalProps> = ({
     </div>
   );
 };
+

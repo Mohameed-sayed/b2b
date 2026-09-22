@@ -7,6 +7,9 @@ const roomTimers = new Map();
 function startRoomTimer(io, roomCode, timeLimit) {
   stopRoomTimer(roomCode);
   let remaining = timeLimit;
+  
+  const room = gameEngine.getRoom(roomCode);
+  if (room) room.currentTimeRemaining = remaining;
 
   // Broadcast initial tick
   io.to(roomCode).emit('question:tick', { timeRemaining: remaining });
@@ -14,6 +17,8 @@ function startRoomTimer(io, roomCode, timeLimit) {
   const timerId = setInterval(() => {
     remaining -= 1;
     if (remaining < 0) remaining = 0;
+
+    if (room) room.currentTimeRemaining = remaining;
 
     io.to(roomCode).emit('question:tick', { timeRemaining: remaining });
 
@@ -66,7 +71,7 @@ export function setupSocketHandlers(io) {
           currentGameId: room.gameId,
           currentQuestionIndex: room.currentQuestionIndex,
           status: 'lobby',
-          isPaused: false,
+          isPaused: !!room.isPaused,
           timeRemaining: room.questionTimeLimit || 30,
           participants: room.participants || {},
           submissions: {},
@@ -144,7 +149,7 @@ export function setupSocketHandlers(io) {
           currentGameId: updatedRoom.gameId,
           currentQuestionIndex: updatedRoom.currentQuestionIndex,
           status: updatedRoom.state.toLowerCase(),
-          isPaused: false,
+          isPaused: !!updatedRoom.isPaused,
           timeRemaining: updatedRoom.questionTimeLimit || 30,
           participants: updatedRoom.participants || {},
           submissions: {},
@@ -228,7 +233,7 @@ export function setupSocketHandlers(io) {
           currentGameId: room.gameId,
           currentQuestionIndex: room.currentQuestionIndex,
           status: room.state.toLowerCase(),
-          isPaused: false,
+          isPaused: !!room.isPaused,
           timeRemaining: room.questionTimeLimit || 30,
           participants: room.participants || {},
           submissions: {},
@@ -624,11 +629,24 @@ export function setupSocketHandlers(io) {
     socket.on('game:toggle-team-mode', ({ code }) => {
       const targetCode = (code || socket.roomCode || '').toUpperCase().trim();
       const room = gameEngine.getRoom(targetCode);
-      if (room) {
-        room.mode = room.mode === 'team' ? 'individual' : 'team';
-        gameEngine.saveRoomToDb(room);
-        io.to(targetCode).emit('room:updated', { room });
-      }
+        if (room) {
+          room.mode = room.mode === 'team' ? 'individual' : 'team';
+          gameEngine.saveRoomToDb(room);
+          io.to(targetCode).emit('room:updated', { 
+            room: {
+              code: room.code,
+              hostSocketId: room.hostSocketId,
+              currentGameId: room.gameId,
+              currentQuestionIndex: room.currentQuestionIndex,
+              status: room.state.toLowerCase(),
+              isPaused: room.isPaused,
+              timeRemaining: room.questionTimeLimit || 30,
+              participants: room.participants || {},
+              submissions: {},
+              teamMode: room.mode === 'team',
+            }
+          });
+        }
     });
 
     socket.on('game:pause-toggle', ({ code }) => {
@@ -648,9 +666,10 @@ export function setupSocketHandlers(io) {
       } else {
         // Resume timer with remaining time
         if (room.state === 'QUESTION_ACTIVE' && room.questionTimeLimit > 0) {
-          startRoomTimer(io, targetCode, room.questionTimeLimit);
+          const resumeTime = room.currentTimeRemaining !== undefined ? room.currentTimeRemaining : room.questionTimeLimit;
+          startRoomTimer(io, targetCode, resumeTime);
         }
-        console.log(`▶️ Room ${targetCode} resumed`);
+        console.log(`▶ Room ${targetCode} resumed`);
       }
 
       io.to(targetCode).emit('room:updated', {

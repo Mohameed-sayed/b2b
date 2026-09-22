@@ -249,26 +249,6 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
   };
 
   const handleRevealAnswer = () => {
-    // Generate distribution stats from current question options
-    const totalAns = Math.max(answeredCount, participants.length > 0 ? participants.length : 1);
-    const stats: OptionDistributionStats[] = currentQuestion.options.map((opt, idx) => {
-      const isCorrect = opt.id === currentQuestion.correctAnswer;
-      // Synthesize realistic distribution for test/standalone mode if no live answers
-      const mockCount = isCorrect ? Math.ceil(totalAns * 0.65) : Math.floor((totalAns * 0.35) / (currentQuestion.options.length - 1 || 1));
-      const count = mockCount;
-      const percentage = Math.round((count / totalAns) * 100);
-      return {
-        optionId: opt.id,
-        text: opt.text,
-        count,
-        percentage,
-        isCorrect,
-      };
-    });
-
-    setRevealStats(stats);
-    setStatus('revealing');
-
     const socket = socketService.getSocket();
     if (socket.connected) {
       socket.emit('game:reveal-answer', { code: roomCode });
@@ -276,16 +256,6 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
   };
 
   const handleShowLeaderboard = () => {
-    // In standalone/preview, assign points to mock participants if needed
-    setParticipants((prev) =>
-      prev.map((p, idx) => ({
-        ...p,
-        score: p.score + (idx % 2 === 0 ? currentQuestion.points : 0),
-        streak: idx % 2 === 0 ? p.streak + 1 : 0,
-      }))
-    );
-
-    setStatus('leaderboard');
     const socket = socketService.getSocket();
     if (socket.connected) {
       socket.emit('game:show-leaderboard', { code: roomCode });
@@ -313,14 +283,8 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
         socket.emit('game:next-question', { code: roomCode });
       }
     } else {
-      // Go to final reflection or return to lobby
-      if (currentGame.id !== 'game-8') {
-        setSelectedGameId('game-8');
-        setCurrentQuestionIndex(0);
-        setStatus('reflection-wall');
-      } else {
-        setStatus('lobby');
-      }
+      // Go back to lobby to select the next game
+      setStatus('lobby');
     }
   };
 
@@ -378,7 +342,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
   const isLastQuestion = currentQuestionIndex >= currentGame.questions.length - 1;
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-orange-500 selection:text-white relative overflow-x-hidden">
+    <div className="min-h-screen bg-brand-light text-brand-dark font-sans selection:bg-brand-accent selection:text-brand-dark relative overflow-x-hidden">
       {/* Background Ambience */}
       <div className="fixed inset-0 pointer-events-none bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(255,107,0,0.08),rgba(255,255,255,0))]" />
 
@@ -474,3 +438,4 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     </div>
   );
 };
+

@@ -40,6 +40,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
   const [questionIndex, setQuestionIndex] = useState<number>(0);
   const [totalQuestions, setTotalQuestions] = useState<number>(1);
   const [timeRemaining, setTimeRemaining] = useState<number>(30);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
   const [resultData, setResultData] = useState<{
     isCorrect: boolean;
@@ -135,8 +136,15 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
         data.participant.avatar,
         data.participant.team
       );
+      if (data.room?.isPaused !== undefined) setIsPaused(data.room.isPaused);
       setSubState('waiting');
       setIsLoading(false);
+    };
+
+    const onRoomUpdated = (data: any) => {
+      if (data.room?.isPaused !== undefined) {
+        setIsPaused(data.room.isPaused);
+      }
     };
 
     // ── New question received ──────────────────────────────────
@@ -220,6 +228,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
     };
 
     socket.on('room:joined', onRoomJoined);
+    socket.on('room:updated', onRoomUpdated);
     socket.on('question:started', onQuestionStarted);
     socket.on('question:tick', onQuestionTick);
     socket.on('question:revealed', onQuestionRevealed);
@@ -233,6 +242,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
 
     return () => {
       socket.off('room:joined', onRoomJoined);
+      socket.off('room:updated', onRoomUpdated);
       socket.off('question:started', onQuestionStarted);
       socket.off('question:tick', onQuestionTick);
       socket.off('question:revealed', onQuestionRevealed);
@@ -248,7 +258,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
 
   // Local fallback timer when disconnected (standalone demo)
   useEffect(() => {
-    if (subState === 'question' && timeRemaining > 0 && !socketService.isConnected()) {
+    if (subState === 'question' && timeRemaining > 0 && !socketService.isConnected() && !isPaused) {
       localTimerRef.current = window.setInterval(() => {
         setTimeRemaining(prev => {
           if (prev <= 1) { clearInterval(localTimerRef.current!); return 0; }
@@ -259,7 +269,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
       if (localTimerRef.current) clearInterval(localTimerRef.current);
     }
     return () => { if (localTimerRef.current) clearInterval(localTimerRef.current); };
-  }, [subState]);
+  }, [subState, isPaused]);
 
   // ── Join Room Handler ──────────────────────────────────────────
   const handleJoin = useCallback((code: string, name: string, avatar: string, team: TeamName) => {
@@ -397,7 +407,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
   }, [roomCode]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-orange-500 selection:text-white">
+    <div className="min-h-screen bg-brand-light text-brand-dark font-sans selection:bg-brand-accent selection:text-brand-dark">
       {/* Shown while attempting to restore a saved session after refresh/close */}
       {subState === 'reconnecting' && (
         <ReconnectingScreen
@@ -435,6 +445,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
           questionIndex={questionIndex}
           totalQuestions={totalQuestions}
           timeRemaining={timeRemaining}
+          isPaused={isPaused}
           onSubmitAnswer={handleSubmitAnswer}
           onSubmitReflection={handleSubmitReflection}
         />

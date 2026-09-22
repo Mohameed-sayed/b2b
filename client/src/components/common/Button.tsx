@@ -22,13 +22,13 @@ export const Button: React.FC<ButtonProps> = ({
   const baseStyles = 'inline-flex items-center justify-center font-bold rounded-xl transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:pointer-events-none disabled:active:scale-100 shadow-sm cursor-pointer select-none';
 
   const variantStyles = {
-    primary: 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-500/20 hover:shadow-lg hover:shadow-blue-500/30 border border-blue-400/20',
-    orange: 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white shadow-orange-500/25 hover:shadow-lg hover:shadow-orange-500/40 border border-orange-400/30',
-    secondary: 'bg-slate-800 hover:bg-slate-700 text-slate-100 border border-slate-700 hover:border-slate-600',
-    success: 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-500/20 hover:shadow-lg hover:shadow-emerald-500/30 border border-emerald-400/20',
-    danger: 'bg-rose-600 hover:bg-rose-500 text-white shadow-rose-500/20 hover:shadow-lg hover:shadow-rose-500/30 border border-rose-400/20',
-    ghost: 'bg-transparent hover:bg-slate-800/60 text-slate-300 hover:text-white',
-    outline: 'bg-transparent hover:bg-slate-800 text-slate-200 border-2 border-slate-700 hover:border-slate-500',
+    primary: 'bg-brand-primary hover:bg-[#045bbd] text-brand-white shadow-md shadow-brand-primary/20',
+    orange: 'bg-brand-accent hover:bg-[#e67015] text-brand-white shadow-md shadow-brand-accent/20',
+    secondary: 'bg-brand-white hover:bg-brand-light text-brand-primary border-2 border-brand-primary',
+    success: 'bg-green-600 hover:bg-green-700 text-brand-white',
+    danger: 'bg-red-600 hover:bg-red-700 text-brand-white',
+    ghost: 'bg-transparent hover:bg-brand-light text-brand-primary',
+    outline: 'bg-transparent hover:bg-brand-light text-brand-dark border-2 border-slate-300',
   };
 
   const sizeStyles = {

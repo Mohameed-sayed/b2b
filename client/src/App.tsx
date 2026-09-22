@@ -89,12 +89,12 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 selection:bg-orange-500 selection:text-white">
+    <div className="min-h-screen bg-brand-light text-brand-dark selection:bg-brand-accent selection:text-brand-dark">
       {/* Top Floating App Bar: View Switcher & Live Connection Status */}
-      <nav className="fixed top-3 right-4 z-50 flex items-center gap-2 bg-slate-900/90 backdrop-blur-md border border-slate-800 p-1.5 rounded-2xl shadow-2xl text-xs">
+      <nav className="fixed top-3 right-4 z-50 flex items-center gap-2 bg-brand-white backdrop-blur-md border border-slate-200 p-1.5 rounded-2xl shadow-2xl text-xs">
         {/* Connection Status indicator */}
         <div
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl font-mono text-[11px] font-bold ${isConnected ? 'text-emerald-400 bg-emerald-500/10' : 'text-slate-400 bg-slate-800'}`}
+          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl font-mono text-[11px] font-bold ${isConnected ? 'text-emerald-400 bg-green-600/10' : 'text-brand-secondary bg-slate-100'}`}
           title={isConnected ? 'Connected to live workshop server' : 'Running in local preview mode'}
         >
           {isConnected ? (
@@ -113,7 +113,7 @@ export const App: React.FC = () => {
         {/* Host Mode Button */}
         <button
           onClick={() => switchMode('host')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'host' ? 'bg-orange-500 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'host' ? 'bg-brand-accent text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark hover:bg-slate-100'}`}
           title="Facilitator screen-share view"
         >
           <Monitor className="w-3.5 h-3.5" />
@@ -123,7 +123,7 @@ export const App: React.FC = () => {
         {/* Participant Mode Button */}
         <button
           onClick={() => switchMode('participant')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'participant' ? 'bg-blue-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'participant' ? 'bg-blue-600 text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark hover:bg-slate-100'}`}
           title="Mobile participant web view"
         >
           <Smartphone className="w-3.5 h-3.5" />
@@ -133,7 +133,7 @@ export const App: React.FC = () => {
         {/* Admin Mode Button */}
         <button
           onClick={() => switchMode('admin')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'admin' ? 'bg-purple-600 text-white shadow-md' : 'text-slate-400 hover:text-white hover:bg-slate-800'}`}
+          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'admin' ? 'bg-purple-600 text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark hover:bg-slate-100'}`}
           title="Workshop content editor"
         >
           <Settings className="w-3.5 h-3.5" />
@@ -152,3 +152,4 @@ export const App: React.FC = () => {
 };
 
 export default App;
+

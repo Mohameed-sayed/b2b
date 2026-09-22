@@ -63,19 +63,19 @@ export const FacilitatorControlsBar: React.FC<FacilitatorControlsBarProps> = ({
   };
 
   return (
-    <footer className="fixed bottom-0 left-0 right-0 z-40 bg-slate-950/95 backdrop-blur-md border-t border-slate-800 px-6 py-3">
+    <footer className="fixed bottom-0 left-0 right-0 z-40 bg-brand-light/95 backdrop-blur-md border-t border-slate-200 px-6 py-3">
       <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
         {/* Left: Room Info & Quick Controls */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-slate-900 border border-slate-700/80 px-3 py-1.5 rounded-xl font-mono text-xs font-bold text-slate-300">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="flex items-center gap-2 bg-brand-white border border-slate-300/80 px-3 py-1.5 rounded-xl font-mono text-xs font-bold text-brand-dark">
+            <span className="w-2 h-2 rounded-full bg-green-600 animate-pulse" />
             <span>ROOM:</span>
             <span className="text-orange-400 font-black text-sm">{roomCode}</span>
           </div>
 
           <button
             onClick={onTogglePause}
-            className={`p-2.5 rounded-xl border transition-all ${isPaused ? 'bg-amber-500/20 border-amber-500/40 text-amber-400' : 'bg-slate-900 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800'}`}
+            className={`p-2.5 rounded-xl border transition-all ${isPaused ? 'bg-brand-accent/20 border-brand-accent/40 text-amber-400' : 'bg-brand-white border-slate-300 text-brand-dark hover:text-brand-dark hover:bg-slate-100'}`}
             title={isPaused ? 'Resume Game' : 'Pause Game'}
           >
             {isPaused ? <Play className="w-4 h-4 fill-current" /> : <Pause className="w-4 h-4" />}
@@ -86,7 +86,7 @@ export const FacilitatorControlsBar: React.FC<FacilitatorControlsBarProps> = ({
               sound.toggleMute();
               onToggleSound();
             }}
-            className={`p-2.5 rounded-xl border transition-all ${isMuted ? 'bg-rose-500/20 border-rose-500/40 text-rose-400' : 'bg-slate-900 border-slate-700 text-slate-300 hover:text-white hover:bg-slate-800'}`}
+            className={`p-2.5 rounded-xl border transition-all ${isMuted ? 'bg-red-600/20 border-red-600/40 text-rose-400' : 'bg-brand-white border-slate-300 text-brand-dark hover:text-brand-dark hover:bg-slate-100'}`}
             title={isMuted ? 'Unmute Sound FX' : 'Mute Sound FX'}
           >
             {isMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
@@ -94,16 +94,16 @@ export const FacilitatorControlsBar: React.FC<FacilitatorControlsBarProps> = ({
 
           <button
             onClick={onToggleTeamMode}
-            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold transition-all ${teamMode ? 'bg-purple-600/20 border-purple-500/40 text-purple-300' : 'bg-slate-900 border-slate-700 text-slate-400 hover:text-white hover:bg-slate-800'}`}
+            className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-xs font-bold transition-all ${teamMode ? 'bg-purple-600/20 border-purple-500/40 text-purple-300' : 'bg-brand-white border-slate-300 text-brand-secondary hover:text-brand-dark hover:bg-slate-100'}`}
             title="Toggle Individual vs Team scoring mode"
           >
-            {teamMode ? <Users className="w-4 h-4 text-purple-400" /> : <User className="w-4 h-4 text-slate-400" />}
+            {teamMode ? <Users className="w-4 h-4 text-purple-400" /> : <User className="w-4 h-4 text-brand-secondary" />}
             <span className="hidden sm:inline">{teamMode ? 'TEAM MODE' : 'INDIVIDUAL'}</span>
           </button>
 
           <button
             onClick={onOpenPointsModal}
-            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-700 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800 text-xs font-bold transition-all"
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl border border-slate-300 bg-brand-white text-brand-dark hover:text-brand-dark hover:bg-slate-100 text-xs font-bold transition-all"
             title="Adjust Points"
           >
             <Sliders className="w-4 h-4 text-orange-400" />
@@ -144,14 +144,14 @@ export const FacilitatorControlsBar: React.FC<FacilitatorControlsBarProps> = ({
               iconPosition="right"
               onClick={onNextQuestion}
             >
-              {isLastQuestion ? 'FINAL REFLECTIONS 🚀' : 'NEXT QUESTION'}
+              {isLastQuestion ? 'BACK TO LOBBY' : 'NEXT QUESTION'}
             </Button>
           )}
 
           {/* Fullscreen Button */}
           <button
             onClick={toggleFullscreen}
-            className="p-2.5 rounded-xl border border-slate-700 bg-slate-900 text-slate-300 hover:text-white hover:bg-slate-800 transition-colors"
+            className="p-2.5 rounded-xl border border-slate-300 bg-brand-white text-brand-dark hover:text-brand-dark hover:bg-slate-100 transition-colors"
             title="Toggle Fullscreen"
           >
             {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
@@ -161,3 +161,4 @@ export const FacilitatorControlsBar: React.FC<FacilitatorControlsBarProps> = ({
     </footer>
   );
 };
+
