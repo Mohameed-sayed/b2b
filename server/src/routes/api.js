@@ -35,7 +35,14 @@ router.get('/network-ip', (req, res) => {
     const ip = getLocalIpAddress();
     const serverPort = process.env.PORT || 3001;
     const clientPort = process.env.CLIENT_PORT || 5173;
-    const clientBaseUrl = process.env.CLIENT_URL || `http://${ip}:${clientPort}`;
+    
+    // Determine the base URL dynamically based on how the client reached us (Nginx proxy)
+    const host = req.get('X-Forwarded-Host') || req.get('host');
+    const protocol = req.get('X-Forwarded-Proto') || req.protocol || 'http';
+    
+    // If we have a public host header (like 46.101.213.8 or a domain), use it!
+    // Otherwise fallback to the private LAN IP (for pure local development)
+    const clientBaseUrl = process.env.CLIENT_URL || (host ? `${protocol}://${host}` : `http://${ip}:${clientPort}`);
 
     res.json({
       success: true,
