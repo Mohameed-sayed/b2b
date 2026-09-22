@@ -32,8 +32,10 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
 
   // Construct join URL
   const port = window.location.port ? `:${window.location.port}` : '';
-  const host = networkIp || window.location.hostname;
-  const joinUrl = `http://${host}${port}/join/${roomCode}`;
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const host = isLocal ? (networkIp || window.location.hostname) : window.location.hostname;
+  const protocol = window.location.protocol;
+  const joinUrl = `${protocol}//${host}${port}/join/${roomCode}`;
 
   const handleCopyLink = () => {
     navigator.clipboard.writeText(joinUrl);
