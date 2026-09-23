@@ -270,27 +270,27 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
             {/* Scenario snippet */}
             {question.type === 'slack-scenario' ? (
               <div className="rounded-2xl bg-[#1a1d21] border border-[#35373b] overflow-hidden shadow-xl">
-                <div className="bg-[#1a1d21] px-4 py-2 border-b border-[#35373b] flex items-center gap-2">
+                <div className="bg-[#1a1d21] px-3 md:px-4 py-2 border-b border-[#35373b] flex items-center gap-2">
                   <span className="text-slate-400 font-bold text-sm">#</span>
                   <span className="text-slate-200 font-bold text-xs tracking-wide">b2b-support</span>
                 </div>
-                <div className="p-4 space-y-4 bg-[#1a1d21] text-xs max-h-56 overflow-y-auto">
+                <div className="p-3 md:p-4 space-y-4 bg-[#1a1d21] text-sm max-h-[45vh] overflow-y-auto">
                   {question.scenario.split('\n\n').map((msg, i) => {
                     const isTutor = msg.startsWith('Tutor:');
                     const content = msg.replace(/^(Mentor|Tutor):\s*/, '');
                     const sender = isTutor ? 'Ahmed' : 'Mentor';
                     const time = `10:${12 + i} AM`; 
                     return (
-                      <div key={i} className="flex items-start gap-3">
-                        <div className={`w-8 h-8 rounded shrink-0 flex items-center justify-center text-xs font-bold text-white ${isTutor ? 'bg-blue-600' : 'bg-emerald-700'}`}>
+                      <div key={i} className="flex items-start gap-2.5 md:gap-3">
+                        <div className={`w-8 h-8 md:w-9 md:h-9 rounded shrink-0 flex items-center justify-center text-xs md:text-sm font-bold text-white ${isTutor ? 'bg-blue-600' : 'bg-emerald-700'}`}>
                           {sender[0]}
                         </div>
-                        <div className="flex-1 space-y-0.5">
+                        <div className="flex-1 space-y-0.5 min-w-0">
                           <div className="flex items-baseline gap-2">
                             <span className="font-bold text-slate-200 text-sm">{sender}</span>
-                            <span className="text-[10px] text-slate-500">{time}</span>
+                            <span className="text-[10px] md:text-xs text-slate-500">{time}</span>
                           </div>
-                          <div className="text-slate-300 leading-relaxed whitespace-pre-wrap">{content}</div>
+                          <div className="text-slate-300 text-[13px] md:text-sm leading-relaxed whitespace-pre-wrap break-words">{content}</div>
                         </div>
                       </div>
                     )

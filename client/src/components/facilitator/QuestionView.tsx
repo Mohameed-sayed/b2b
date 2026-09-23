@@ -114,12 +114,12 @@ export const QuestionView: React.FC<QuestionViewProps> = ({
                     <div className={`w-12 h-12 rounded flex items-center justify-center text-xl font-bold text-white ${isTutor ? 'bg-blue-600' : 'bg-emerald-700'}`}>
                       {sender[0]}
                     </div>
-                    <div className="flex-1 space-y-1">
+                    <div className="flex-1 space-y-1 min-w-0">
                       <div className="flex items-baseline gap-3">
                         <span className="font-bold text-slate-200 text-lg">{sender}</span>
                         <span className="text-xs text-slate-500">{time}</span>
                       </div>
-                      <div className="text-slate-300 leading-relaxed whitespace-pre-wrap">{content}</div>
+                      <div className="text-slate-300 leading-relaxed whitespace-pre-wrap break-words">{content}</div>
                     </div>
                   </div>
                 )
