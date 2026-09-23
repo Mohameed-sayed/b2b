@@ -128,15 +128,30 @@ export const FacilitatorControlsBar: React.FC<FacilitatorControlsBarProps> = ({
             </Button>
           )}
 
-          {(status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief') && onShowLeaderboard && (
-            <Button
-              variant="primary"
-              size="md"
-              icon={<Trophy className="w-4 h-4" />}
-              onClick={onShowLeaderboard}
-            >
-              SHOW LEADERBOARD
-            </Button>
+          {(status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief') && (
+            <>
+              {onShowLeaderboard && (
+                <Button
+                  variant="primary"
+                  size="md"
+                  icon={<Trophy className="w-4 h-4" />}
+                  onClick={onShowLeaderboard}
+                >
+                  SHOW LEADERBOARD
+                </Button>
+              )}
+              {onNextQuestion && (
+                <Button
+                  variant="orange"
+                  size="md"
+                  icon={<ChevronRight className="w-4 h-4" />}
+                  iconPosition="right"
+                  onClick={onNextQuestion}
+                >
+                  {isLastQuestion ? 'BACK TO LOBBY' : 'NEXT QUESTION'}
+                </Button>
+              )}
+            </>
           )}
 
           {(status === 'leaderboard' || (status as string) === 'completed') && onNextQuestion && (

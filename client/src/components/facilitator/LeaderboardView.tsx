@@ -98,6 +98,19 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               <span>Teams</span>
             </button>
           </div>
+
+          {onNextQuestion && (
+            <Button
+              variant="orange"
+              size="md"
+              icon={<ChevronRight className="w-4 h-4" />}
+              iconPosition="right"
+              onClick={onNextQuestion}
+              className="shadow-md"
+            >
+              {isLastQuestion ? 'BACK TO LOBBY' : 'NEXT QUESTION'}
+            </Button>
+          )}
         </div>
       </div>
 

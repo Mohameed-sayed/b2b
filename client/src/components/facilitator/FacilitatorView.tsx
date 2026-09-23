@@ -368,6 +368,8 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
 
   const handleNextQuestion = () => {
     const nextIdx = currentQuestionIndex + 1;
+    const socket = socketService.getSocket();
+
     if (nextIdx < currentGame.questions.length) {
       setCurrentQuestionIndex(nextIdx);
       const nextQ = currentGame.questions[nextIdx];
@@ -382,10 +384,12 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
         setStatus('question');
       }
 
+      if (socket.connected) {
+        socket.emit('game:next-question', { code: roomCode });
+      }
     } else {
       // Go back to lobby to select the next game
       setStatus('lobby');
-      const socket = socketService.getSocket();
       if (socket.connected) {
         socket.emit('game:next-question', { code: roomCode });
       }
@@ -604,7 +608,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
           onOpenPointsModal={() => setIsPointsModalOpen(true)}
           onRevealAnswer={status === 'question' || status === 'escape-room' || (status as string) === 'question_active' ? handleRevealAnswer : undefined}
           onShowLeaderboard={status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief' ? handleShowLeaderboard : undefined}
-          onNextQuestion={status === 'leaderboard' || (status as string) === 'completed' ? handleNextQuestion : undefined}
+          onNextQuestion={status === 'leaderboard' || (status as string) === 'completed' || status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief' ? handleNextQuestion : undefined}
           onEndWorkshop={handleEndWorkshop}
           isLastQuestion={isLastQuestion}
         />

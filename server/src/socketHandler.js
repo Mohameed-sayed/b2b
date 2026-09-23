@@ -529,8 +529,12 @@ export function setupSocketHandlers(io) {
     // ==========================================
     // NEXT QUESTION (Supports game:next-question & host:next_question)
     // ==========================================
-    const handleNextQuestion = ({ code, roomCode }, callback) => {
-      const targetCode = (code || roomCode || socket.roomCode || '').toUpperCase().trim();
+    const handleNextQuestion = ({ code, roomCode } = {}, callback) => {
+      let targetCode = (code || roomCode || socket.roomCode || '').toUpperCase().trim();
+      if (!targetCode) {
+        const active = gameEngine.getActiveRoom();
+        if (active) targetCode = active.code;
+      }
       console.log(`⏩ [NEXT QUESTION] Room: ${targetCode}`);
       try {
         const result = gameEngine.nextQuestion(targetCode);
