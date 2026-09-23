@@ -105,7 +105,7 @@ export const ReflectionWallView: React.FC<ReflectionWallViewProps> = ({
                   </div>
 
                   <p className="text-base font-semibold text-brand-dark leading-relaxed italic">
-                    "{item.behaviorText}"
+                    "{item.text || item.behaviorText}"
                   </p>
                 </div>
 

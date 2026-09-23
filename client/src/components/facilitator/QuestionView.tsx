@@ -18,10 +18,10 @@ interface QuestionViewProps {
 }
 
 const optionColors = [
-  { bg: 'bg-red-600/10 border-red-600/40 text-rose-400', badge: 'bg-red-600 text-brand-dark' },
-  { bg: 'bg-brand-primary/10 border-brand-primary/40 text-blue-400', badge: 'bg-brand-primary text-brand-dark' },
-  { bg: 'bg-brand-accent/10 border-brand-accent/40 text-amber-400', badge: 'bg-brand-accent text-brand-dark' },
-  { bg: 'bg-green-600/10 border-green-600/40 text-emerald-400', badge: 'bg-green-600 text-brand-dark' },
+  { bg: 'bg-brand-white border-slate-200 text-slate-500', badge: 'bg-slate-100 text-slate-500' },
+  { bg: 'bg-brand-white border-slate-200 text-slate-500', badge: 'bg-slate-100 text-slate-500' },
+  { bg: 'bg-brand-white border-slate-200 text-slate-500', badge: 'bg-slate-100 text-slate-500' },
+  { bg: 'bg-brand-white border-slate-200 text-slate-500', badge: 'bg-slate-100 text-slate-500' },
 ];
 
 export const QuestionView: React.FC<QuestionViewProps> = ({
@@ -97,9 +97,40 @@ export const QuestionView: React.FC<QuestionViewProps> = ({
         </h2>
 
         {/* Scenario Card */}
-        <div className="p-6 md:p-8 rounded-3xl bg-brand-white border-2 border-slate-300/60 shadow-2xl text-brand-dark text-lg md:text-xl font-medium leading-relaxed whitespace-pre-line">
-          {question.scenario}
-        </div>
+        {question.type === 'slack-scenario' ? (
+          <div className="rounded-3xl bg-[#1a1d21] border border-[#35373b] overflow-hidden shadow-2xl mb-8">
+            <div className="bg-[#1a1d21] px-6 py-4 border-b border-[#35373b] flex items-center gap-3">
+              <span className="text-slate-400 font-bold text-xl">#</span>
+              <span className="text-slate-200 font-bold text-lg tracking-wide">b2b-support</span>
+            </div>
+            <div className="p-6 md:p-8 space-y-6 bg-[#1a1d21] text-base max-h-96 overflow-y-auto">
+              {question.scenario.split('\n\n').map((msg, i) => {
+                const isTutor = msg.startsWith('Tutor:');
+                const content = msg.replace(/^(Mentor|Tutor):\s*/, '');
+                const sender = isTutor ? 'Ahmed' : 'Mentor';
+                const time = `10:${12 + i} AM`; 
+                return (
+                  <div key={i} className="flex items-start gap-4">
+                    <div className={`w-12 h-12 rounded flex items-center justify-center text-xl font-bold text-white ${isTutor ? 'bg-blue-600' : 'bg-emerald-700'}`}>
+                      {sender[0]}
+                    </div>
+                    <div className="flex-1 space-y-1">
+                      <div className="flex items-baseline gap-3">
+                        <span className="font-bold text-slate-200 text-lg">{sender}</span>
+                        <span className="text-xs text-slate-500">{time}</span>
+                      </div>
+                      <div className="text-slate-300 leading-relaxed whitespace-pre-wrap">{content}</div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </div>
+        ) : (
+          <div className="p-6 md:p-8 rounded-3xl bg-brand-white border-2 border-slate-300/60 shadow-2xl text-brand-dark text-lg md:text-xl font-medium leading-relaxed whitespace-pre-line mb-8">
+            {question.scenario}
+          </div>
+        )}
 
         {/* Question Options Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

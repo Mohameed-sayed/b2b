@@ -3,7 +3,8 @@ export type QuestionType =
   | 'rapid-response'
   | 'voting'
   | 'categorization'
-  | 'reflection';
+  | 'reflection'
+  | 'slack-scenario';
 
 export interface QuestionOption {
   id: string;
