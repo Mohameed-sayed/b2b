@@ -97,56 +97,58 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-brand-light text-brand-dark selection:bg-brand-accent selection:text-brand-dark">
-      {/* Top Floating App Bar: View Switcher & Live Connection Status */}
-      <nav className="fixed top-3 right-4 z-50 flex items-center gap-2 bg-brand-white backdrop-blur-md border border-slate-200 p-1.5 rounded-2xl shadow-2xl text-xs">
-        {/* Connection Status indicator */}
-        <div
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl font-mono text-[11px] font-bold ${isConnected ? 'text-emerald-400 bg-green-600/10' : 'text-brand-secondary bg-slate-100'}`}
-          title={isConnected ? 'Connected to live workshop server' : 'Running in local preview mode'}
-        >
-          {isConnected ? (
-            <>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="hidden sm:inline">LIVE SYNC</span>
-            </>
-          ) : (
-            <>
-              <span className="w-2 h-2 rounded-full bg-amber-400" />
-              <span className="hidden sm:inline">PREVIEW</span>
-            </>
-          )}
-        </div>
+      {/* Top Floating App Bar: View Switcher (Only shown on Facilitator & Admin screens) */}
+      {mode !== 'participant' && (
+        <nav className="fixed top-3 right-4 z-50 flex items-center gap-2 bg-brand-white backdrop-blur-md border border-slate-200 p-1.5 rounded-2xl shadow-2xl text-xs">
+          {/* Connection Status indicator */}
+          <div
+            className={`flex items-center gap-1.5 px-2.5 py-1 rounded-xl font-mono text-[11px] font-bold ${isConnected ? 'text-emerald-400 bg-green-600/10' : 'text-brand-secondary bg-slate-100'}`}
+            title={isConnected ? 'Connected to live workshop server' : 'Running in local preview mode'}
+          >
+            {isConnected ? (
+              <>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="hidden sm:inline">LIVE SYNC</span>
+              </>
+            ) : (
+              <>
+                <span className="w-2 h-2 rounded-full bg-amber-400" />
+                <span className="hidden sm:inline">PREVIEW</span>
+              </>
+            )}
+          </div>
 
-        {/* Host Mode Button */}
-        <button
-          onClick={() => switchMode('host')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'host' ? 'bg-brand-accent text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark hover:bg-slate-100'}`}
-          title="Facilitator screen-share view"
-        >
-          <Monitor className="w-3.5 h-3.5" />
-          <span className="hidden md:inline">Host Screen</span>
-        </button>
+          {/* Host Mode Button */}
+          <button
+            onClick={() => switchMode('host')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'host' ? 'bg-brand-accent text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark hover:bg-slate-100'}`}
+            title="Facilitator screen-share view"
+          >
+            <Monitor className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">Host Screen</span>
+          </button>
 
-        {/* Participant Mode Button */}
-        <button
-          onClick={() => switchMode('participant')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'participant' ? 'bg-blue-600 text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark hover:bg-slate-100'}`}
-          title="Mobile participant web view"
-        >
-          <Smartphone className="w-3.5 h-3.5" />
-          <span className="hidden md:inline">Player Screen</span>
-        </button>
+          {/* Participant Mode Button */}
+          <button
+            onClick={() => switchMode('participant')}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all text-brand-secondary hover:text-brand-dark hover:bg-slate-100"
+            title="Mobile participant web view"
+          >
+            <Smartphone className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">Player Screen</span>
+          </button>
 
-        {/* Admin Mode Button */}
-        <button
-          onClick={() => switchMode('admin')}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'admin' ? 'bg-purple-600 text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark hover:bg-slate-100'}`}
-          title="Workshop content editor"
-        >
-          <Settings className="w-3.5 h-3.5" />
-          <span className="hidden md:inline">Content Admin</span>
-        </button>
-      </nav>
+          {/* Admin Mode Button */}
+          <button
+            onClick={() => switchMode('admin')}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl font-bold transition-all ${mode === 'admin' ? 'bg-purple-600 text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark hover:bg-slate-100'}`}
+            title="Workshop content editor"
+          >
+            <Settings className="w-3.5 h-3.5" />
+            <span className="hidden md:inline">Content Admin</span>
+          </button>
+        </nav>
+      )}
 
       {/* Main View Router */}
       <main>
