@@ -275,9 +275,9 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                   <span className="text-slate-200 font-bold text-xs tracking-wide">b2b-support</span>
                 </div>
                 <div className="p-3 md:p-4 space-y-4 bg-[#1a1d21] text-sm max-h-[45vh] overflow-y-auto">
-                  {question.scenario.split('\n\n').map((msg, i) => {
+                  {question.scenario.split(/\\n\\n|\n\n/).map((msg, i) => {
                     const isTutor = msg.startsWith('Tutor:');
-                    const content = msg.replace(/^(Mentor|Tutor):\s*/, '');
+                    const content = msg.replace(/^(Mentor|Tutor):\s*/, '').replace(/\\n/g, '\n').replace(/â€”/g, '—').replace(/â€™/g, "'").replace(/\uFFFD/g, '—');
                     const sender = isTutor ? 'Ahmed' : 'Mentor';
                     const time = `10:${12 + i} AM`; 
                     return (
