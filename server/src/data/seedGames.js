@@ -1,7 +1,7 @@
 export const defaultGames = [
   {
     id: "game-1",
-    title: "Game 1: Urgent or Fake Urgent?",
+    title: "Game 1: B2B Jungle..",
     subtitle: "Distinguish actual urgency from things that just sound loud",
     topic: "Prioritization",
     description: "Teach participants to assess true business impact and deadlines rather than panicking over loud requests.",
