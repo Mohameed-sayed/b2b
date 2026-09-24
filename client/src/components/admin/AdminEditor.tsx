@@ -4,6 +4,7 @@ import { defaultGames } from '../../data/defaultGames';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
 import { sound } from '../../utils/audio';
+import { socketService } from '../../services/socket';
 import {
   Save,
   RotateCcw,
@@ -26,21 +27,34 @@ interface AdminEditorProps {
 }
 
 export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
-  const [games, setGames] = useState<Game[]>(() => {
-    try {
-      const saved = localStorage.getItem('ischool_admin_games');
-      if (saved) return JSON.parse(saved);
-    } catch {
-      // ignore
-    }
-    return defaultGames;
-  });
+  const [games, setGames] = useState<Game[]>(defaultGames);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [selectedGameId, setSelectedGameId] = useState<string>(games[0]?.id || 'game-1');
-  const [selectedQuestionId, setSelectedQuestionId] = useState<string>(
-    games[0]?.questions[0]?.id || ''
-  );
+  const [selectedGameId, setSelectedGameId] = useState<string>('');
+  const [selectedQuestionId, setSelectedQuestionId] = useState<string>('');
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
+
+  useEffect(() => {
+    fetch(`${socketService.getBackendUrl()}/api/games`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.games && data.games.length > 0) {
+          setGames(data.games);
+          setSelectedGameId(data.games[0].id);
+          setSelectedQuestionId(data.games[0].questions[0]?.id || '');
+        } else {
+          setGames(defaultGames);
+          setSelectedGameId(defaultGames[0].id);
+          setSelectedQuestionId(defaultGames[0].questions[0]?.id || '');
+        }
+      })
+      .catch(() => {
+        setGames(defaultGames);
+        setSelectedGameId(defaultGames[0].id);
+        setSelectedQuestionId(defaultGames[0].questions[0]?.id || '');
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
 
   const activeGame = games.find((g) => g.id === selectedGameId) || games[0];
   const activeQuestion =
@@ -49,17 +63,15 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
   // Save changes locally & sync
   const handleSaveAll = () => {
     sound.playPop();
-    localStorage.setItem('ischool_admin_games', JSON.stringify(games));
     setSaveSuccess(true);
     setTimeout(() => setSaveSuccess(false), 2500);
 
-    // Optional sync to backend API if available
-    fetch('http://localhost:3001/api/games', {
+    fetch(`${socketService.getBackendUrl()}/api/games/bulk`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(games),
     }).catch(() => {
-      // Backend not running, saved to localStorage
+      // Backend not running
     });
   };
 

@@ -77,6 +77,23 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     return 'question';
   }, [selectedGameId]);
 
+  // Fetch latest games from the server
+  useEffect(() => {
+    fetch(`${socketService.getBackendUrl()}/api/games`)
+      .then(res => res.json())
+      .then(data => {
+        if (data.success && data.games && data.games.length > 0) {
+          setGames(data.games);
+          if (data.games.find((g: Game) => g.id === selectedGameId) === undefined) {
+            setSelectedGameId(data.games[0].id);
+          }
+        }
+      })
+      .catch(() => {
+        // Fallback to default games is already set
+      });
+  }, []);
+
   // Connect socket, fetch network IP, and manage host lifecycle
   useEffect(() => {
     const socket = socketService.connect();

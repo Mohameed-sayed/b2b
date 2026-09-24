@@ -377,6 +377,13 @@ class GameEngine {
     const room = this.getRoom(roomCode);
     if (!room) throw new Error('Room not found');
 
+    // Refresh game from database to catch any recent admin edits
+    const games = db.getGames ? db.getGames() : [];
+    const updatedGame = games.find(g => g.id === room.gameId);
+    if (updatedGame) {
+      room.game = updatedGame;
+    }
+
     const question = this.getCurrentQuestion(room);
     if (!question) throw new Error('No questions found in game');
 
@@ -608,6 +615,13 @@ class GameEngine {
   nextQuestion(roomCode) {
     const room = this.getRoom(roomCode);
     if (!room) throw new Error('Room not found');
+
+    // Refresh game from database to catch any recent admin edits
+    const games = db.getGames ? db.getGames() : [];
+    const updatedGame = games.find(g => g.id === room.gameId);
+    if (updatedGame) {
+      room.game = updatedGame;
+    }
 
     const nextIndex = room.currentQuestionIndex + 1;
     const totalQuestions = room.game?.questions?.length || 0;

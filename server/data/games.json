@@ -12,7 +12,7 @@
         "id": "g1-q1",
         "type": "multiple-choice",
         "title": "The Quadruple Ping",
-        "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+        "scenario": "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n?? A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n?? A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n?? Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n?? WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
         "options": [
           {
             "id": "A",
@@ -40,7 +40,7 @@
         "facilitatorTips": "Ask the room: 'Who chose A? Why does the word URGENT trigger panic?'",
         "dynamicUpdate": {
           "round": 2,
-          "announcement": "🚨 PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
+          "announcement": "?? PLOT REVEAL: The person who sent 'URGENT!! slide deck' actually needs it for next Thursday's marketing meeting!",
           "questionText": "Now that you know this, what is the professional rule for incoming 'urgent' tasks?",
           "options": [
             {
@@ -109,7 +109,7 @@
         "id": "g2-q1",
         "type": "rapid-response",
         "title": "Breaking News: Round 1",
-        "scenario": "🚨 BREAKING UPDATE #1: You spent 2 hours thoroughly preparing an advanced Python session for Grade 5 scheduled at 4:00 PM.\n\nAt 3:40 PM (20 minutes before class), the B2B coordinator pings you:\n'SURPRISE: The school requested switching to Grade 3 block-based Scratch instead of Python!'\n\nWhat is your very first reaction?",
+        "scenario": "?? BREAKING UPDATE #1: You spent 2 hours thoroughly preparing an advanced Python session for Grade 5 scheduled at 4:00 PM.\n\nAt 3:40 PM (20 minutes before class), the B2B coordinator pings you:\n'SURPRISE: The school requested switching to Grade 3 block-based Scratch instead of Python!'\n\nWhat is your very first reaction?",
         "options": [
           {
             "id": "A",
@@ -132,14 +132,14 @@
         "points": 1000,
         "timeLimit": 30,
         "explanation": "Adaptability is our core B2B value. Pausing prevents emotional escalation, checking assets gives clarity, and confirming gives the client confidence.",
-        "learningObjective": "Framework: Pause → Clarify → Check Assets → Confirm.",
+        "learningObjective": "Framework: Pause ? Clarify ? Check Assets ? Confirm.",
         "discussionQuestion": "How do you keep your cool when the entire lesson plan flips 20 minutes before kickoff?"
       },
       {
         "id": "g2-q2",
         "type": "rapid-response",
         "title": "Breaking News: Round 2 (The Tech Glitch)",
-        "scenario": "🚨 BREAKING UPDATE #2: You log into the classroom with the Grade 3 students. Half the students cannot open Scratch because the school firewall blocks the online editor!\n\nYou have 40 minutes left in the session. What do you do?",
+        "scenario": "?? BREAKING UPDATE #2: You log into the classroom with the Grade 3 students. Half the students cannot open Scratch because the school firewall blocks the online editor!\n\nYou have 40 minutes left in the session. What do you do?",
         "options": [
           {
             "id": "A",
@@ -172,7 +172,7 @@
     "title": "Game 3: Oops! I Did It Again",
     "subtitle": "Ownership, accountability, and escalating recurring mistakes",
     "topic": "Ownership + Mistakes",
-    "description": "Walks instructors through the Notice → Inform → Fix → Prevent framework when mistakes occur.",
+    "description": "Walks instructors through the Notice ? Inform ? Fix ? Prevent framework when mistakes occur.",
     "category": "Ownership",
     "order": 3,
     "questions": [
@@ -203,7 +203,7 @@
         "points": 1000,
         "timeLimit": 35,
         "explanation": "Mistakes happen to everyone. Hiding mistakes destroys trust; owning them with humor and speed builds immense professional respect.",
-        "learningObjective": "Framework: Notice → Inform → Fix → Prevent.",
+        "learningObjective": "Framework: Notice ? Inform ? Fix ? Prevent.",
         "discussionQuestion": "Why is hiding a small mistake 10x more dangerous than the mistake itself?"
       },
       {
@@ -251,15 +251,15 @@
         "id": "g4-q1",
         "type": "voting",
         "title": "WhatsApp Case #1: The Blunt Rejection",
-        "scenario": "📱 Saturday 8:00 PM. Mentor pings instructor:\n'Hey Omar! Could you cover tomorrow's 9:00 AM session at School X?'\n\nInstructor replies at 11:30 PM:\n'مش هقدر.' (Can't.)\n\nIs this message PROFESSIONAL or UNPROFESSIONAL?",
+        "scenario": "?? Saturday 8:00 PM. Mentor pings instructor:\n'Hey Omar! Could you cover tomorrow's 9:00 AM session at School X?'\n\nInstructor replies at 11:30 PM:\n'?? ????.' (Can't.)\n\nIs this message PROFESSIONAL or UNPROFESSIONAL?",
         "options": [
           {
             "id": "YES",
-            "text": "👍 Professional (Short, clear, direct)"
+            "text": "?? Professional (Short, clear, direct)"
           },
           {
             "id": "NO",
-            "text": "👎 Unprofessional (Blunt, lacks context, late, no alternative)"
+            "text": "?? Unprofessional (Blunt, lacks context, late, no alternative)"
           }
         ],
         "correctAnswer": "NO",
@@ -273,15 +273,15 @@
         "id": "g4-q2",
         "type": "voting",
         "title": "WhatsApp Case #2: The Ghosting Over-Explainer",
-        "scenario": "📱 Mentor sends a message at 2:00 PM asking for session feedback.\nInstructor reads it immediately (blue double checks), disappears for 24 hours, then sends a 4-minute voice note explaining their personal internet issues, grocery run, and family lunch.\n\nIs this PROFESSIONAL or UNPROFESSIONAL?",
+        "scenario": "?? Mentor sends a message at 2:00 PM asking for session feedback.\nInstructor reads it immediately (blue double checks), disappears for 24 hours, then sends a 4-minute voice note explaining their personal internet issues, grocery run, and family lunch.\n\nIs this PROFESSIONAL or UNPROFESSIONAL?",
         "options": [
           {
             "id": "YES",
-            "text": "👍 Professional (They explained everything in detail)"
+            "text": "?? Professional (They explained everything in detail)"
           },
           {
             "id": "NO",
-            "text": "👎 Unprofessional (Over-explaining personal life + delayed communication)"
+            "text": "?? Unprofessional (Over-explaining personal life + delayed communication)"
           }
         ],
         "correctAnswer": "NO",
@@ -295,15 +295,15 @@
         "id": "g4-q3",
         "type": "voting",
         "title": "WhatsApp Case #3: The Proactive Boundary",
-        "scenario": "📱 Mentor: 'Can you take an extra 3 sessions this week in Alexandria?'\n\nInstructor: 'Thanks for thinking of me! I can commit to 1 session on Wednesday, but my university exam schedule prevents me from taking the other two. Let me know if Wednesday works so I can lock it in.'\n\nIs this message PROFESSIONAL?",
+        "scenario": "?? Mentor: 'Can you take an extra 3 sessions this week in Alexandria?'\n\nInstructor: 'Thanks for thinking of me! I can commit to 1 session on Wednesday, but my university exam schedule prevents me from taking the other two. Let me know if Wednesday works so I can lock it in.'\n\nIs this message PROFESSIONAL?",
         "options": [
           {
             "id": "YES",
-            "text": "👍 Professional (Clear, appreciative, realistic boundaries)"
+            "text": "?? Professional (Clear, appreciative, realistic boundaries)"
           },
           {
             "id": "NO",
-            "text": "👎 Unprofessional (Should say yes to all sessions)"
+            "text": "?? Unprofessional (Should say yes to all sessions)"
           }
         ],
         "correctAnswer": "YES",
@@ -317,7 +317,7 @@
         "id": "g4-q4",
         "type": "slack-scenario",
         "title": "Slack Case #1: The Professional Update",
-        "scenario": "Mentor: Hey Ahmed, just checking — are you ready for the 11:00 AM session?\n\nTutor: Hi, yes. I noticed that I have an issue with one part of the session material. I've checked what I can, but I may need clarification on the activity before the session.\n\nMentor: Okay. What exactly do you need?\n\nTutor: I need confirmation about which activity version we should use. If you can confirm that, I'll finish preparing it before the session.",
+        "scenario": "Mentor: Hey Ahmed, just checking - are you ready for the 11:00 AM session?\n\nTutor: Hi, yes. I noticed that I have an issue with one part of the session material. I've checked what I can, but I may need clarification on the activity before the session.\n\nMentor: Okay. What exactly do you need?\n\nTutor: I need confirmation about which activity version we should use. If you can confirm that, I'll finish preparing it before the session.",
         "options": [
           {
             "id": "A",
@@ -384,15 +384,15 @@
         "options": [
           {
             "id": "OWN",
-            "text": "🟢 OWN IT"
+            "text": "?? OWN IT"
           },
           {
             "id": "SUPPORT",
-            "text": "🟡 SUPPORT IT"
+            "text": "?? SUPPORT IT"
           },
           {
             "id": "ESCALATE",
-            "text": "🔴 ESCALATE IT"
+            "text": "?? ESCALATE IT"
           }
         ],
         "correctAnswer": "OWN",
@@ -410,15 +410,15 @@
         "options": [
           {
             "id": "OWN",
-            "text": "🟢 OWN IT"
+            "text": "?? OWN IT"
           },
           {
             "id": "SUPPORT",
-            "text": "🟡 SUPPORT IT"
+            "text": "?? SUPPORT IT"
           },
           {
             "id": "ESCALATE",
-            "text": "🔴 ESCALATE IT"
+            "text": "?? ESCALATE IT"
           }
         ],
         "correctAnswer": "SUPPORT",
@@ -436,15 +436,15 @@
         "options": [
           {
             "id": "OWN",
-            "text": "🟢 OWN IT"
+            "text": "?? OWN IT"
           },
           {
             "id": "SUPPORT",
-            "text": "🟡 SUPPORT IT"
+            "text": "?? SUPPORT IT"
           },
           {
             "id": "ESCALATE",
-            "text": "🔴 ESCALATE IT"
+            "text": "?? ESCALATE IT"
           }
         ],
         "correctAnswer": "ESCALATE",
@@ -509,8 +509,8 @@
       {
         "id": "g7-q1",
         "type": "multiple-choice",
-        "title": "🚨 The 45-Minute Emergency: Clue Sequence",
-        "scenario": "Time is 8:15 AM. A flagship B2B partner school session begins at 9:00 AM sharp (45 mins away).\n\n• CLUE 1: The assigned instructor just called in sick with acute food poisoning.\n• CLUE 2: The class has 24 Grade 6 students expecting Robotics.\n• CLUE 3: The school lab has internet, but robotics kits are locked in a cabinet.\n• CLUE 4: You have another meeting scheduled at 10:00 AM.\n• CLUE 5: Teammate Nour is free until 11:00 AM and lives 10 mins away.\n\nWhat is your team's optimal coordinated action plan?",
+        "title": "?? The 45-Minute Emergency: Clue Sequence",
+        "scenario": "Time is 8:15 AM. A flagship B2B partner school session begins at 9:00 AM sharp (45 mins away).\n\n. CLUE 1: The assigned instructor just called in sick with acute food poisoning.\n. CLUE 2: The class has 24 Grade 6 students expecting Robotics.\n. CLUE 3: The school lab has internet, but robotics kits are locked in a cabinet.\n. CLUE 4: You have another meeting scheduled at 10:00 AM.\n. CLUE 5: Teammate Nour is free until 11:00 AM and lives 10 mins away.\n\nWhat is your team's optimal coordinated action plan?",
         "options": [
           {
             "id": "A",
@@ -533,7 +533,7 @@
         "points": 1200,
         "timeLimit": 60,
         "explanation": "Outstanding leadership! You protect the student experience, mobilize available team capacity (Nour), communicate with Ops, and honor your 10:00 AM commitment.",
-        "learningObjective": "Triage → Mobilize Team → Protect Client Experience → Honor Commitments.",
+        "learningObjective": "Triage ? Mobilize Team ? Protect Client Experience ? Honor Commitments.",
         "discussionQuestion": "How do great teams act like a relay race rather than isolated islands?"
       }
     ]

@@ -160,6 +160,23 @@ router.post('/games', (req, res) => {
 });
 
 /**
+ * POST /api/games/bulk
+ * Overwrite all games
+ */
+router.post('/games/bulk', (req, res) => {
+  try {
+    const games = req.body;
+    if (!Array.isArray(games)) {
+      return res.status(400).json({ success: false, error: 'Expected an array of games' });
+    }
+    db.saveGames(games);
+    res.json({ success: true, count: games.length });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
  * PUT /api/games/:id
  * Update game or its questions
  */
