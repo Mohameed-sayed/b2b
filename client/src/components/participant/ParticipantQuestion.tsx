@@ -104,29 +104,41 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
               </div>
 
               {/* Chat Canvas with Wallpaper look */}
-              <div className="p-3.5 space-y-3 bg-[#efeae2] text-xs">
-                {/* Incoming Message Bubble */}
-                <div className="bg-white text-slate-800 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm space-y-1 relative">
-                  <p className="whitespace-pre-line text-xs">
-                    {question.scenario.split('\n\n')[0] || question.scenario}
-                  </p>
-                  <div className="text-[10px] text-slate-400 text-right">
-                    8:00 PM
-                  </div>
-                </div>
+              <div className="p-3.5 space-y-3 bg-[#efeae2] text-xs max-h-[45vh] overflow-y-auto">
+                {question.scenario.split(/\\n\\n|\n\n|\n/).map((block, idx) => {
+                  const lowerBlock = block.trim().toLowerCase();
+                  const isMentor = lowerBlock.startsWith('mentor:');
+                  const isTutor = lowerBlock.startsWith('tutor:') || lowerBlock.startsWith('instructor:');
+                  
+                  if (!block.trim()) return null;
 
-                {/* Outgoing Message Bubble */}
-                {question.scenario.includes('\n\n') && (
-                  <div className="ml-auto bg-[#d9fdd3] text-slate-800 p-2.5 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm space-y-1 relative">
-                    <p className="whitespace-pre-line text-xs font-medium">
-                      {question.scenario.split('\n\n')[1]}
-                    </p>
-                    <div className="flex items-center justify-end gap-1 text-[10px] text-slate-500">
-                      <span>11:30 PM</span>
-                      <CheckCheck className="w-3.5 h-3.5 text-blue-500" />
-                    </div>
-                  </div>
-                )}
+                  if (isMentor) {
+                    const text = block.trim().replace(/^(Mentor|Tutor|Instructor):\s*/i, '');
+                    return (
+                      <div key={idx} className="bg-white text-slate-800 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm space-y-1 relative">
+                        <p className="whitespace-pre-wrap text-[13px] leading-relaxed font-medium">{text}</p>
+                        <div className="text-[10px] text-slate-400 text-right mt-1">8:00 PM</div>
+                      </div>
+                    );
+                  } else if (isTutor) {
+                    const text = block.trim().replace(/^(Mentor|Tutor|Instructor):\s*/i, '');
+                    return (
+                      <div key={idx} className="ml-auto bg-[#d9fdd3] text-slate-800 p-2.5 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm space-y-1 relative">
+                        <p className="whitespace-pre-wrap text-[13px] leading-relaxed font-medium">{text}</p>
+                        <div className="flex items-center justify-end gap-1 text-[10px] text-slate-500 mt-1">
+                          <span>11:30 PM</span>
+                          <CheckCheck className="w-3.5 h-3.5 text-blue-500" />
+                        </div>
+                      </div>
+                    );
+                  } else {
+                    return (
+                      <div key={idx} className="text-center text-[10px] font-bold text-slate-500 bg-[#e1d8c9] px-2 py-1 rounded-lg mx-auto w-fit max-w-[90%]">
+                        {block.trim()}
+                      </div>
+                    );
+                  }
+                })}
               </div>
             </div>
 

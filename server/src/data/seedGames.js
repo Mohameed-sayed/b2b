@@ -167,7 +167,7 @@ export const defaultGames = [
         id: "g4-q1",
         type: "voting",
         title: "WhatsApp Case #1: The Blunt Rejection",
-        scenario: "📱 Saturday 8:00 PM. Mentor pings instructor:\n'Hey Omar! Could you cover tomorrow's 9:00 AM session at School X?'\n\nInstructor replies at 11:30 PM:\n'مش هقدر.' (Can't.)\n\nIs this message PROFESSIONAL or UNPROFESSIONAL?",
+        scenario: "Mentor: Hey Omar! Could you cover tomorrow's 9:00 AM session at School X?\n\nTutor: ?? ????.\n\nIs this message PROFESSIONAL or UNPROFESSIONAL?",
         options: [
           { id: "YES", text: "👍 Professional (Short, clear, direct)" },
           { id: "NO", text: "👎 Unprofessional (Blunt, lacks context, late, no alternative)" }
@@ -183,7 +183,7 @@ export const defaultGames = [
         id: "g4-q2",
         type: "voting",
         title: "WhatsApp Case #2: The Ghosting Over-Explainer",
-        scenario: "📱 Mentor sends a message at 2:00 PM asking for session feedback.\nInstructor reads it immediately (blue double checks), disappears for 24 hours, then sends a 4-minute voice note explaining their personal internet issues, grocery run, and family lunch.\n\nIs this PROFESSIONAL or UNPROFESSIONAL?",
+        scenario: "Mentor: Could you please send me the session feedback from earlier today?\n\nTutor: ? ??------ 04:00\nSorry for the delay, my internet was down and I went to the grocery store then had lunch with my family...\n\nIs this PROFESSIONAL or UNPROFESSIONAL?",
         options: [
           { id: "YES", text: "👍 Professional (They explained everything in detail)" },
           { id: "NO", text: "👎 Unprofessional (Over-explaining personal life + delayed communication)" }
@@ -199,7 +199,7 @@ export const defaultGames = [
         id: "g4-q3",
         type: "voting",
         title: "WhatsApp Case #3: The Proactive Boundary",
-        scenario: "📱 Mentor: 'Can you take an extra 3 sessions this week in Alexandria?'\n\nInstructor: 'Thanks for thinking of me! I can commit to 1 session on Wednesday, but my university exam schedule prevents me from taking the other two. Let me know if Wednesday works so I can lock it in.'\n\nIs this message PROFESSIONAL?",
+        scenario: "Mentor: Can you take an extra 3 sessions this week in Alexandria?\n\nTutor: Thanks for thinking of me! I can commit to 1 session on Wednesday, but my university exam schedule prevents me from taking the other two. Let me know if Wednesday works so I can lock it in.\n\nIs this message PROFESSIONAL?",
         options: [
           { id: "YES", text: "👍 Professional (Clear, appreciative, realistic boundaries)" },
           { id: "NO", text: "👎 Unprofessional (Should say yes to all sessions)" }
@@ -215,7 +215,7 @@ export const defaultGames = [
           id: "g4-q4",
           type: "slack-scenario",
           title: "Slack Case #1: The Professional Update",
-          scenario: "Mentor: Hey Ahmed, just checking � are you ready for the 11:00 AM session?\n\nTutor: Hi, yes. I noticed that I have an issue with one part of the session material. I've checked what I can, but I may need clarification on the activity before the session.\n\nMentor: Okay. What exactly do you need?\n\nTutor: I need confirmation about which activity version we should use. If you can confirm that, I'll finish preparing it before the session.",
+          scenario: "Mentor: Hey Ahmed, just checking � are you ready for the 11:00 AM session?\n\nTutor: Hi, yes. I noticed that I have an issue with one part of the session material. I've checked what I can, but I may need clarification on the activity before the session.\n\nMentor: Okay. What exactly do you need?\n\nTutor: I need confirmation about which activity version we should use. If you can confirm that, I'll finish preparing it before the session.",
           options: [
             { id: "A", text: "Professional (Clear, asks for specific help, takes ownership)" },
             { id: "B", text: "Unprofessional (Should have figured it out alone)" },
