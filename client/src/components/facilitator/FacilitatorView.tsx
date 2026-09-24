@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Game, Room, Participant, OptionDistributionStats, ReflectionSubmission, RoomStatus } from '../../types/game';
-import { defaultGames } from '../../data/defaultGames';
 import { socketService } from '../../services/socket';
 import { sound } from '../../utils/audio';
 import { LobbyView } from './LobbyView';
@@ -17,8 +16,9 @@ interface FacilitatorViewProps {
 }
 
 export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCode }) => {
-  const [games, setGames] = useState<Game[]>(defaultGames);
-  const [selectedGameId, setSelectedGameId] = useState<string>(defaultGames[0].id);
+  const [games, setGames] = useState<Game[]>([]);
+  const [selectedGameId, setSelectedGameId] = useState<string>('');
+  const [isLoadingGames, setIsLoadingGames] = useState<boolean>(true);
   const [roomCode, setRoomCode] = useState<string>(initialRoomCode || '');
   const [networkIp, setNetworkIp] = useState<string>('');
   const [status, setStatus] = useState<RoomStatus>('lobby');
@@ -37,7 +37,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
 
   // Current active game and question
   const currentGame = games.find((g) => g.id === selectedGameId) || games[0];
-  const currentQuestion = currentGame.questions[currentQuestionIndex] || currentGame.questions[0];
+  const currentQuestion = currentGame?.questions?.[currentQuestionIndex] || currentGame?.questions?.[0];
 
   // Helper to generate local 5-char code if offline
   const generateRandomCode = () => {
@@ -84,13 +84,19 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
       .then(data => {
         if (data.success && data.games && data.games.length > 0) {
           setGames(data.games);
-          if (data.games.find((g: Game) => g.id === selectedGameId) === undefined) {
-            setSelectedGameId(data.games[0].id);
-          }
+          setSelectedGameId(prev => {
+            if (!prev || !data.games.some((g: Game) => g.id === prev)) {
+              return data.games[0].id;
+            }
+            return prev;
+          });
         }
       })
-      .catch(() => {
-        // Fallback to default games is already set
+      .catch((err) => {
+        console.error('Failed to load games from server:', err);
+      })
+      .finally(() => {
+        setIsLoadingGames(false);
       });
   }, []);
 
@@ -518,7 +524,16 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [handleKeyDown]);
 
-  const isLastQuestion = currentQuestionIndex >= currentGame.questions.length - 1;
+  if (isLoadingGames || !currentGame) {
+    return (
+      <div className="min-h-screen bg-brand-light flex flex-col items-center justify-center p-6 space-y-4">
+        <div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-slate-600 font-semibold text-base">Loading workshop games from server...</p>
+      </div>
+    );
+  }
+
+  const isLastQuestion = currentQuestionIndex >= (currentGame?.questions?.length || 0) - 1;
 
   return (
     <div className="min-h-screen bg-brand-light text-brand-dark font-sans selection:bg-brand-accent selection:text-brand-dark relative overflow-x-hidden">

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Game, Question, QuestionOption, QuestionType } from '../../types/game';
-import { defaultGames } from '../../data/defaultGames';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
 import { sound } from '../../utils/audio';
@@ -27,7 +26,7 @@ interface AdminEditorProps {
 }
 
 export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
-  const [games, setGames] = useState<Game[]>(defaultGames);
+  const [games, setGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   const [selectedGameId, setSelectedGameId] = useState<string>('');
@@ -42,23 +41,17 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
           setGames(data.games);
           setSelectedGameId(data.games[0].id);
           setSelectedQuestionId(data.games[0].questions[0]?.id || '');
-        } else {
-          setGames(defaultGames);
-          setSelectedGameId(defaultGames[0].id);
-          setSelectedQuestionId(defaultGames[0].questions[0]?.id || '');
         }
       })
-      .catch(() => {
-        setGames(defaultGames);
-        setSelectedGameId(defaultGames[0].id);
-        setSelectedQuestionId(defaultGames[0].questions[0]?.id || '');
+      .catch((err) => {
+        console.error('Failed to load games from server:', err);
       })
       .finally(() => setIsLoading(false));
   }, []);
 
   const activeGame = games.find((g) => g.id === selectedGameId) || games[0];
   const activeQuestion =
-    activeGame?.questions.find((q) => q.id === selectedQuestionId) || activeGame?.questions[0];
+    activeGame?.questions?.find((q) => q.id === selectedQuestionId) || activeGame?.questions?.[0];
 
   // Save changes locally & sync
   const handleSaveAll = () => {
@@ -76,12 +69,25 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
   };
 
   const handleResetDefaults = () => {
-    if (window.confirm('Reset all workshop games to default content? Any unsaved edits will be discarded.')) {
+    if (window.confirm('Reset all workshop games to default content on the server? Any unsaved edits will be discarded.')) {
       sound.playPop();
-      setGames(defaultGames);
-      localStorage.removeItem('ischool_admin_games');
-      setSelectedGameId(defaultGames[0].id);
-      setSelectedQuestionId(defaultGames[0].questions[0].id);
+      setIsLoading(true);
+      fetch(`${socketService.getBackendUrl()}/api/games/reset`, {
+        method: 'POST',
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success && data.games && data.games.length > 0) {
+            setGames(data.games);
+            localStorage.removeItem('ischool_admin_games');
+            setSelectedGameId(data.games[0].id);
+            setSelectedQuestionId(data.games[0].questions[0]?.id || '');
+          }
+        })
+        .catch((err) => {
+          console.error('Failed to reset games on server:', err);
+        })
+        .finally(() => setIsLoading(false));
     }
   };
 
@@ -207,6 +213,15 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
     );
     setSelectedQuestionId(remaining[0].id);
   };
+
+  if (isLoading || games.length === 0) {
+    return (
+      <div className="min-h-screen bg-brand-light flex flex-col items-center justify-center p-6 space-y-4">
+        <div className="w-12 h-12 border-4 border-brand-primary border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-slate-600 font-semibold text-base">Loading workshop games from server...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-brand-light text-brand-dark font-sans p-6 md:p-10 max-w-7xl mx-auto pb-24">

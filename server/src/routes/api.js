@@ -177,6 +177,19 @@ router.post('/games/bulk', (req, res) => {
 });
 
 /**
+ * POST /api/games/reset
+ * Reset all games to seed defaults
+ */
+router.post('/games/reset', (req, res) => {
+  try {
+    const games = db.resetGames();
+    res.json({ success: true, count: games.length, games });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
+/**
  * PUT /api/games/:id
  * Update game or its questions
  */

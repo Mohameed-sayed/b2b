@@ -72,6 +72,10 @@ export const db = {
   saveGames(games) {
     writeJsonFile(GAMES_FILE, games);
   },
+  resetGames() {
+    writeJsonFile(GAMES_FILE, defaultGames);
+    return defaultGames;
+  },
   getGameById(id) {
     const games = this.getGames();
     return games.find(g => g.id === id) || null;

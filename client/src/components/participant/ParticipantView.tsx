@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Participant, Question, TeamName } from '../../types/game';
-import { defaultGames } from '../../data/defaultGames';
 import { socketService } from '../../services/socket';
 import { ParticipantJoin } from './ParticipantJoin';
 import { ParticipantWaiting } from './ParticipantWaiting';
