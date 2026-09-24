@@ -117,7 +117,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                     return (
                       <div key={idx} className="bg-white text-slate-800 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm space-y-1 relative">
                         <p className="whitespace-pre-wrap text-[13px] leading-relaxed font-medium">{text}</p>
-                        <div className="text-[10px] text-slate-400 text-right mt-1">8:00 PM</div>
+                        
                       </div>
                     );
                   } else if (isTutor) {
@@ -126,7 +126,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                       <div key={idx} className="ml-auto bg-[#d9fdd3] text-slate-800 p-2.5 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm space-y-1 relative">
                         <p className="whitespace-pre-wrap text-[13px] leading-relaxed font-medium">{text}</p>
                         <div className="flex items-center justify-end gap-1 text-[10px] text-slate-500 mt-1">
-                          <span>11:30 PM</span>
+                          
                           <CheckCheck className="w-3.5 h-3.5 text-blue-500" />
                         </div>
                       </div>
