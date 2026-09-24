@@ -169,7 +169,7 @@ export const defaultGames: Game[] = [
         id: "g4-q1",
         type: "voting",
         title: "WhatsApp Case #1: The Blunt Rejection",
-        scenario: "Mentor: Hey Omar! Could you cover tomorrow's 9:00 AM session at School X?\n\nTutor: i can't take this  .\n\nIs this message PROFESSIONAL or UNPROFESSIONAL?",
+        scenario: "Mentor: Hey Omar! Could you cover tomorrow's 9:00 AM session at School X?\n\nTutor: i can't take this.\n\nIs this message PROFESSIONAL or UNPROFESSIONAL?",
         options: [
           { id: "YES", text: "👍 Professional (Short, clear, direct)" },
           { id: "NO", text: "👎 Unprofessional (Blunt, lacks context, late, no alternative)" }
