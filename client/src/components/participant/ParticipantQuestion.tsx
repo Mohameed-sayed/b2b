@@ -116,7 +116,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                     const text = block.trim().replace(/^(Mentor|Tutor|Instructor):\s*/i, '');
                     return (
                       <div key={idx} className="bg-white text-slate-800 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm space-y-1 relative">
-                        <p className="whitespace-pre-wrap text-[13px] leading-relaxed font-medium">{text}</p>
+                        <p dir="auto" className="whitespace-pre-wrap text-[13px] leading-relaxed font-medium">{text}</p>
                         
                       </div>
                     );
@@ -124,7 +124,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                     const text = block.trim().replace(/^(Mentor|Tutor|Instructor):\s*/i, '');
                     return (
                       <div key={idx} className="ml-auto bg-[#d9fdd3] text-slate-800 p-2.5 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm space-y-1 relative">
-                        <p className="whitespace-pre-wrap text-[13px] leading-relaxed font-medium">{text}</p>
+                        <p dir="auto" className="whitespace-pre-wrap text-[13px] leading-relaxed font-medium">{text}</p>
                         <div className="flex items-center justify-end gap-1 text-[10px] text-slate-500 mt-1">
                           
                           <CheckCheck className="w-3.5 h-3.5 text-blue-500" />
@@ -302,7 +302,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                             <span className="font-bold text-slate-200 text-sm">{sender}</span>
                             <span className="text-[10px] md:text-xs text-slate-500">{time}</span>
                           </div>
-                          <div className="text-slate-300 text-[13px] md:text-sm leading-relaxed whitespace-pre-wrap break-words">{content}</div>
+                          <div dir="auto" className="text-slate-300 text-[13px] md:text-sm leading-relaxed whitespace-pre-wrap break-words">{content}</div>
                         </div>
                       </div>
                     )

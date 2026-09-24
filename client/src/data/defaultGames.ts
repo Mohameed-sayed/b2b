@@ -185,7 +185,7 @@ export const defaultGames: Game[] = [
         id: "g4-q2",
         type: "voting",
         title: "WhatsApp Case #2: The Ghosting Over-Explainer",
-        scenario: "Mentor: Could you please send me the session feedback from earlier today?\n\nTutor: ▶ 🔘────── 04:00\nSorry for the delay, my internet was down and I went to the grocery store then had lunch with my family...\n\nIs this PROFESSIONAL or UNPROFESSIONAL?",
+        scenario: "Mentor: Could you please send me the session feedback from earlier today?\n\nTutor: Sorry for the delay, my internet was down and I went to the grocery store then had lunch with my family...\n\nIs this PROFESSIONAL or UNPROFESSIONAL?",
         options: [
           { id: "YES", text: "👍 Professional (They explained everything in detail)" },
           { id: "NO", text: "👎 Unprofessional (Over-explaining personal life + delayed communication)" }
