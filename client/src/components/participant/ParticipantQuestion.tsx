@@ -105,7 +105,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
 
               {/* Chat Canvas with Wallpaper look */}
               <div className="p-3.5 space-y-3 bg-[#efeae2] text-xs max-h-[45vh] overflow-y-auto">
-                {question.scenario.split(/\\n\\n|\n\n|\n/).map((block, idx) => {
+                {question.scenario.split(/\\n\\n|\n\n/).map((block, idx) => {
                   const lowerBlock = block.trim().toLowerCase();
                   const isMentor = lowerBlock.startsWith('mentor:');
                   const isTutor = lowerBlock.startsWith('tutor:') || lowerBlock.startsWith('instructor:');
@@ -289,7 +289,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                 <div className="p-3 md:p-4 space-y-4 bg-[#1a1d21] text-sm max-h-[45vh] overflow-y-auto">
                   {question.scenario.split(/\\n\\n|\n\n/).map((msg, i) => {
                     const isTutor = msg.startsWith('Tutor:');
-                    const content = msg.replace(/^(Mentor|Tutor):\s*/, '').replace(/\\n/g, '\n').replace(/â€”/g, '—').replace(/â€™/g, "'").replace(/\uFFFD/g, '—');
+                    const content = msg.replace(/^(Mentor|Tutor):\s*/, '').replace(/\\n/g, '\n').replace(/—/g, '—').replace(/â€™/g, "'").replace(/—/g, '—');
                     const sender = isTutor ? 'Ahmed' : 'Mentor';
                     const time = `10:${12 + i} AM`; 
                     return (
