@@ -19,6 +19,7 @@ import {
   Clock,
   Sparkles,
   ArrowLeft,
+  Settings,
 } from 'lucide-react';
 
 interface AdminEditorProps {
@@ -372,8 +373,71 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
           </div>
         </div>
 
-        {/* Right Column: Active Question Editor Form */}
-        <div className="lg:col-span-8">
+        {/* Right Column: Game Settings & Active Question Editor Form */}
+        <div className="lg:col-span-8 space-y-6">
+          {/* Active Game Settings / Title Editor */}
+          {activeGame && (
+            <div className="rounded-3xl bg-brand-white border border-slate-200 p-6 shadow-xl space-y-4">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-200">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-brand-primary/10 text-brand-primary flex items-center justify-center font-bold">
+                    <Settings className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-mono font-bold text-brand-primary tracking-wider uppercase block">
+                      Game Configuration
+                    </span>
+                    <h3 className="text-base font-black text-brand-dark">
+                      Edit Game Details
+                    </h3>
+                  </div>
+                </div>
+                <Badge variant="primary" size="sm">Game #{activeGame.order || 1}</Badge>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+                <div className="md:col-span-8">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-brand-secondary mb-1.5">
+                    Game Name / Title
+                  </label>
+                  <input
+                    type="text"
+                    value={activeGame.title}
+                    onChange={(e) => updateGameField('title', e.target.value)}
+                    className="w-full rounded-xl bg-brand-light border border-slate-300 px-4 py-2.5 text-sm font-bold text-brand-dark focus:border-brand-accent focus:outline-none"
+                    placeholder="e.g. Game 4: WhatsApp Court"
+                  />
+                </div>
+
+                <div className="md:col-span-4">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-brand-secondary mb-1.5">
+                    Topic / Category
+                  </label>
+                  <input
+                    type="text"
+                    value={activeGame.topic || ''}
+                    onChange={(e) => updateGameField('topic', e.target.value)}
+                    className="w-full rounded-xl bg-brand-light border border-slate-300 px-4 py-2.5 text-sm font-bold text-brand-dark focus:border-brand-accent focus:outline-none"
+                    placeholder="e.g. Communication"
+                  />
+                </div>
+
+                <div className="md:col-span-12">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-brand-secondary mb-1.5">
+                    Subtitle / Description
+                  </label>
+                  <input
+                    type="text"
+                    value={activeGame.subtitle || ''}
+                    onChange={(e) => updateGameField('subtitle', e.target.value)}
+                    className="w-full rounded-xl bg-brand-light border border-slate-300 px-4 py-2 text-xs font-medium text-brand-dark focus:border-brand-accent focus:outline-none"
+                    placeholder="Brief description of the game..."
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
           {activeQuestion ? (
             <div className="rounded-3xl bg-brand-white border border-slate-200 p-6 md:p-8 shadow-2xl space-y-6">
               <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
