@@ -84,7 +84,7 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="e.g. Mostafa or Nour"
+            placeholder="e.g. Tohamy or ToT"
             maxLength={25}
             required
             className="w-full rounded-2xl bg-brand-light border-2 border-slate-200 px-4 py-3 text-brand-dark font-bold placeholder:text-slate-700 focus:border-brand-accent focus:outline-none text-base transition-all"
