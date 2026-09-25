@@ -155,6 +155,35 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
     updateQuestionField('options', updatedOptions);
   };
 
+  const updateOptionId = (oldId: string, newId: string) => {
+    if (!activeQuestion) return;
+    const trimmed = newId.toUpperCase();
+    
+    if (activeQuestion.options.some((o) => o.id === trimmed && o.id !== oldId)) {
+        return; 
+    }
+    
+    const updatedOptions = activeQuestion.options.map((opt) =>
+      opt.id === oldId ? { ...opt, id: trimmed } : opt
+    );
+    
+    const isCorrect = activeQuestion.correctAnswer === oldId;
+    
+    setGames((prev) =>
+      prev.map((g) => {
+        if (g.id !== selectedGameId) return g;
+        return {
+          ...g,
+          questions: g.questions.map((q) =>
+            q.id === selectedQuestionId 
+              ? { ...q, options: updatedOptions, correctAnswer: isCorrect ? trimmed : q.correctAnswer }
+              : q
+          ),
+        };
+      })
+    );
+  };
+
   // Add Option
   const handleAddOption = () => {
     if (!activeQuestion) return;
@@ -542,31 +571,41 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
                 </div>
 
                 <div className="space-y-2.5">
-                  {activeQuestion.options.map((opt) => {
+                  {activeQuestion.options.map((opt, idx) => {
                     const isCorrect = opt.id === activeQuestion.correctAnswer;
                     return (
                       <div
-                        key={opt.id}
-                        className={`flex items-center gap-3 p-3 rounded-2xl border transition-all ${isCorrect ? 'border-green-600 bg-emerald-950/20' : 'border-slate-200 bg-brand-light'}`}
+                        key={idx}
+                        className={`flex items-center gap-2 p-3 rounded-2xl border transition-all ${isCorrect ? 'border-green-600 bg-emerald-950/20' : 'border-slate-200 bg-brand-light'}`}
                       >
                         <button
                           type="button"
                           onClick={() => updateQuestionField('correctAnswer', opt.id)}
-                          className={`w-9 h-9 rounded-xl font-mono font-black text-xs flex items-center justify-center transition-all ${isCorrect ? 'bg-green-600 text-brand-dark shadow-md' : 'bg-slate-100 text-brand-secondary hover:text-brand-dark'}`}
+                          className={`w-9 h-9 shrink-0 rounded-xl font-black text-lg flex items-center justify-center transition-all ${isCorrect ? 'bg-green-600 text-brand-dark shadow-md' : 'bg-slate-100 text-brand-secondary hover:text-brand-dark'}`}
                           title={isCorrect ? 'Correct answer' : 'Click to set as correct answer'}
                         >
-                          {opt.id}
+                          {isCorrect ? '✓' : '○'}
                         </button>
+
+                        <input
+                          type="text"
+                          value={opt.id}
+                          onChange={(e) => updateOptionId(opt.id, e.target.value)}
+                          className="w-14 shrink-0 bg-brand-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-mono font-bold text-brand-dark focus:outline-none focus:border-brand-accent uppercase text-center"
+                          title="Option ID (e.g. A, YES, NO)"
+                          placeholder="ID"
+                        />
 
                         <input
                           type="text"
                           value={opt.text}
                           onChange={(e) => updateOptionText(opt.id, e.target.value)}
-                          className="flex-1 bg-transparent border-none text-sm text-brand-dark focus:outline-none font-medium"
+                          className="flex-1 min-w-0 bg-transparent border-none text-sm text-brand-dark focus:outline-none font-medium ml-1"
+                          placeholder="Option text..."
                         />
 
                         {isCorrect && (
-                          <span className="text-[10px] font-black uppercase text-emerald-400 bg-green-600/15 px-2 py-0.5 rounded-full border border-green-600/30">
+                          <span className="text-[10px] shrink-0 font-black uppercase text-emerald-400 bg-green-600/15 px-2 py-0.5 rounded-full border border-green-600/30">
                             CORRECT
                           </span>
                         )}
