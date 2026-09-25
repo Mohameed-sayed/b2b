@@ -158,8 +158,21 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
   // Add Option
   const handleAddOption = () => {
     if (!activeQuestion) return;
-    const nextChar = String.fromCharCode(65 + activeQuestion.options.length); // E, F...
-    const newOption: QuestionOption = { id: nextChar, text: `New Option ${nextChar}` };
+    
+    const existingIds = new Set(activeQuestion.options.map(o => o.id));
+    let nextId = '';
+    for (let i = 0; i < 26; i++) {
+      const char = String.fromCharCode(65 + i);
+      if (!existingIds.has(char)) {
+        nextId = char;
+        break;
+      }
+    }
+    if (!nextId) {
+      nextId = `OPT-${Date.now()}`;
+    }
+
+    const newOption: QuestionOption = { id: nextId, text: `New Option ${nextId}` };
     updateQuestionField('options', [...activeQuestion.options, newOption]);
   };
 
