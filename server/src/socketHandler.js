@@ -425,6 +425,55 @@ export function setupSocketHandlers(io) {
     socket.on('participant:submit_answer', handleSubmitAnswer);
 
     // ==========================================
+    // REVEAL PLAYERS ANSWERS
+    // ==========================================
+    const handleRevealPlayersAnswers = ({ code, roomCode }, callback) => {
+      const targetCode = (code || roomCode || socket.roomCode || '').toUpperCase().trim();
+      console.log(`👁️ [REVEAL PLAYERS ANSWERS] Room: ${targetCode}`);
+      stopRoomTimer(targetCode);
+
+      try {
+        const { room, question, distribution, leaderboards } = gameEngine.revealPlayersAnswers(targetCode);
+
+        // distribution = { options: {A:{count,percentage,participants,...}, ...}, totalSubmitted, totalParticipants }
+        const optionsMap = distribution.options || {};
+        const stats = (question.options || []).map(opt => {
+          const entry = optionsMap[opt.id] || { count: 0, percentage: 0, participants: [] };
+          return {
+            optionId: opt.id,
+            text: opt.text,
+            count: entry.count || 0,
+            percentage: entry.percentage || 0,
+            isCorrect: false, // hide correct answer for now
+            participants: entry.participants || []
+          };
+        });
+
+        // 1. Alert Facilitator
+        socket.emit('room:updated', { room: formatClientRoom(room, room.hostSocketId) });
+
+        // 2. Broadcast reveal
+        io.to(targetCode).emit('players-answers:revealed', {
+          correctAnswer: null, // intentionally hide correct answer
+          explanation: '', // hide explanation
+          distributions: optionsMap,
+          stats,
+          learningObjective: '',
+          discussionQuestion: '',
+          leaderboards
+        });
+
+        if (typeof callback === 'function') callback({ success: true });
+      } catch (err) {
+        console.error('Error revealing players answers:', err);
+        if (typeof callback === 'function') callback({ success: false, error: err.message });
+      }
+    };
+
+    socket.on('game:reveal-players-answers', handleRevealPlayersAnswers);
+    socket.on('host:reveal_players_answers', handleRevealPlayersAnswers);
+
+    // ==========================================
     // REVEAL ANSWER (Supports game:reveal-answer & host:reveal_answer)
     // ==========================================
     const handleRevealAnswer = ({ code, roomCode }, callback) => {
@@ -438,13 +487,14 @@ export function setupSocketHandlers(io) {
         // distribution = { options: {A:{count,percentage,...}, ...}, totalSubmitted, totalParticipants }
         const optionsMap = distribution.options || {};
         const stats = (question.options || []).map(opt => {
-          const entry = optionsMap[opt.id] || { count: 0, percentage: 0 };
+          const entry = optionsMap[opt.id] || { count: 0, percentage: 0, participants: [] };
           return {
             optionId: opt.id,
             text: opt.text,
             count: entry.count || 0,
             percentage: entry.percentage || 0,
-            isCorrect: opt.id === (question.correctAnswer || '')
+            isCorrect: opt.id === (question.correctAnswer || ''),
+            participants: entry.participants || []
           };
         });
 

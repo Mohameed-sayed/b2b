@@ -28,6 +28,7 @@ interface FacilitatorControlsBarProps {
   onTogglePause: () => void;
   onToggleTeamMode: () => void;
   onOpenPointsModal: () => void;
+  onRevealPlayersAnswers?: () => void;
   onRevealAnswer?: () => void;
   onShowLeaderboard?: () => void;
   onNextQuestion?: () => void;
@@ -45,6 +46,7 @@ export const FacilitatorControlsBar: React.FC<FacilitatorControlsBarProps> = ({
   onTogglePause,
   onToggleTeamMode,
   onOpenPointsModal,
+  onRevealPlayersAnswers,
   onRevealAnswer,
   onShowLeaderboard,
   onNextQuestion,
@@ -116,7 +118,19 @@ export const FacilitatorControlsBar: React.FC<FacilitatorControlsBarProps> = ({
 
         {/* Center/Right: Primary Action Buttons based on current state */}
         <div className="flex items-center gap-3">
-          {(status === 'question' || status === 'escape-room' || (status as string) === 'question_active') && onRevealAnswer && (
+          {(status === 'question' || status === 'escape-room' || (status as string) === 'question_active') && onRevealPlayersAnswers && (
+            <Button
+              variant="orange"
+              size="md"
+              icon={<Eye className="w-4 h-4" />}
+              onClick={onRevealPlayersAnswers}
+              className="animate-bounce-short"
+            >
+              REVEAL PLAYERS ANSWERS
+            </Button>
+          )}
+
+          {(status === 'answers-displayed' || (status as string) === 'answers_displayed') && onRevealAnswer && (
             <Button
               variant="orange"
               size="md"
@@ -124,7 +138,7 @@ export const FacilitatorControlsBar: React.FC<FacilitatorControlsBarProps> = ({
               onClick={onRevealAnswer}
               className="animate-bounce-short"
             >
-              REVEAL ANSWER
+              REVEAL CORRECT ANSWER
             </Button>
           )}
 

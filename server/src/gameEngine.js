@@ -4,6 +4,7 @@ import { db } from './storage/db.js';
 export const ROOM_STATES = {
   LOBBY: 'LOBBY',
   QUESTION_ACTIVE: 'QUESTION_ACTIVE',
+  ANSWERS_DISPLAYED: 'ANSWERS_DISPLAYED',
   ANSWER_REVEALED: 'ANSWER_REVEALED',
   DEBRIEF: 'DEBRIEF',
   LEADERBOARD: 'LEADERBOARD',
@@ -33,6 +34,10 @@ export function toClientStatus(state, gameId) {
     case 'REFLECTION-WALL':
     case 'REFLECTION_WALL':
       return 'reflection-wall';
+    case ROOM_STATES.ANSWERS_DISPLAYED:
+    case 'ANSWERS_DISPLAYED':
+    case 'ANSWERS-DISPLAYED':
+      return 'answers-displayed';
     case ROOM_STATES.ANSWER_REVEALED:
     case 'ANSWER-REVEALED':
     case ROOM_STATES.DEBRIEF:
@@ -44,7 +49,7 @@ export function toClientStatus(state, gameId) {
       return 'leaderboard';
     default: {
       const lower = s.toLowerCase();
-      if (['lobby', 'question', 'revealing', 'leaderboard', 'escape-room', 'reflection-wall', 'ended'].includes(lower)) {
+      if (['lobby', 'question', 'answers-displayed', 'revealing', 'leaderboard', 'escape-room', 'reflection-wall', 'ended'].includes(lower)) {
         return lower;
       }
       return 'question';
@@ -532,7 +537,8 @@ class GameEngine {
           id: opt.id,
           text: opt.text,
           count: 0,
-          percentage: 0
+          percentage: 0,
+          participants: []
         };
       }
     }
@@ -541,8 +547,9 @@ class GameEngine {
       const optId = ans.optionId;
       if (distribution[optId]) {
         distribution[optId].count++;
+        distribution[optId].participants.push({ name: ans.participantName, team: ans.team });
       } else {
-        distribution[optId] = { id: optId, text: optId, count: 1, percentage: 0 };
+        distribution[optId] = { id: optId, text: optId, count: 1, percentage: 0, participants: [{ name: ans.participantName, team: ans.team }] };
       }
     }
 
@@ -556,6 +563,27 @@ class GameEngine {
       options: distribution,
       totalSubmitted,
       totalParticipants: Object.values(room.participants).length
+    };
+  }
+
+  revealPlayersAnswers(roomCode) {
+    const room = this.getRoom(roomCode);
+    if (!room) throw new Error('Room not found');
+
+    room.state = ROOM_STATES.ANSWERS_DISPLAYED;
+    room.isPaused = false;
+    room.updatedAt = Date.now();
+    this.saveRoomToDb(room);
+
+    const question = this.getCurrentQuestion(room);
+    const distribution = this.calculateAnswerDistribution(room);
+    const leaderboards = this.getLeaderboards(roomCode);
+
+    return {
+      room,
+      question,
+      distribution,
+      leaderboards
     };
   }
 

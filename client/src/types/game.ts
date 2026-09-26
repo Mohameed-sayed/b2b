@@ -87,6 +87,7 @@ export interface OptionDistributionStats {
   count: number;
   percentage: number;
   isCorrect: boolean;
+  participants?: { name: string; team?: string }[];
 }
 
 export interface ReflectionSubmission {
@@ -106,6 +107,7 @@ export interface ReflectionSubmission {
 export type RoomStatus =
   | 'lobby'
   | 'question'
+  | 'answers-displayed'
   | 'revealing'
   | 'leaderboard'
   | 'escape-room'
@@ -150,7 +152,15 @@ export interface ServerToClientEvents {
     discussionQuestion?: string;
     leaderboards?: { individual: Participant[]; team: unknown[] };
   }) => void;
-  // Server emits 'answer:revealed' as an alias of 'question:revealed'
+  'players-answers:revealed': (data: {
+    correctAnswer: string | null;
+    explanation: string;
+    distributions: Record<string, { count: number; percentage: number }>;
+    stats: OptionDistributionStats[];
+    learningObjective?: string;
+    discussionQuestion?: string;
+    leaderboards?: { individual: Participant[]; team: unknown[] };
+  }) => void;
   'answer:revealed': (data: {
     correctAnswer: string | null;
     explanation: string;
@@ -217,6 +227,8 @@ export interface ClientToServerEvents {
   'game:pause-toggle': (data: { code: string }) => void;
   'game:next-question': (data: { code: string }, callback?: (res: { success: boolean; finished?: boolean }) => void) => void;
   'host:next_question': (data: { roomCode: string }, callback?: (res: { success: boolean; finished?: boolean }) => void) => void;
+  'game:reveal-players-answers': (data: { code: string }, callback?: (res: { success: boolean; error?: string }) => void) => void;
+  'host:reveal_players_answers': (data: { roomCode: string }, callback?: (res: { success: boolean; error?: string }) => void) => void;
   'game:reveal-answer': (data: { code: string }, callback?: (res: { success: boolean; error?: string }) => void) => void;
   'host:reveal_answer': (data: { roomCode: string }, callback?: (res: { success: boolean; error?: string }) => void) => void;
   'game:show-leaderboard': (data: { code: string }, callback?: (res: { success: boolean; error?: string }) => void) => void;

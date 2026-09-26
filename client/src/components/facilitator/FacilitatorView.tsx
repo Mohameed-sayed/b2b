@@ -243,6 +243,11 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
       setStatus('revealing');
     };
 
+    const onPlayersAnswersRevealed = (data: any) => {
+      setRevealStats(data.stats || []);
+      setStatus('answers-displayed');
+    };
+
     const onLeaderboardUpdated = (data: any) => {
       if (data.participants) {
         setParticipants(data.participants);
@@ -281,6 +286,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     socket.on('question:tick', onQuestionTick);
     socket.on('question:answered', onQuestionAnswered);
     socket.on('question:revealed', onQuestionRevealed);
+    socket.on('players-answers:revealed', onPlayersAnswersRevealed);
     socket.on('leaderboard:updated', onLeaderboardUpdated);
     socket.on('reflection:added', onReflectionAdded);
     socket.on('room:updated', onRoomUpdated);
@@ -296,6 +302,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
       socket.off('question:tick', onQuestionTick);
       socket.off('question:answered', onQuestionAnswered);
       socket.off('question:revealed', onQuestionRevealed);
+      socket.off('players-answers:revealed', onPlayersAnswersRevealed);
       socket.off('leaderboard:updated', onLeaderboardUpdated);
       socket.off('reflection:added', onReflectionAdded);
       socket.off('room:updated', onRoomUpdated);
@@ -372,6 +379,13 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     const socket = socketService.getSocket();
     if (socket.connected) {
       socket.emit('game:toggle-team-mode', { code: roomCode });
+    }
+  };
+
+  const handleRevealPlayersAnswers = () => {
+    const socket = socketService.getSocket();
+    if (socket.connected) {
+      socket.emit('game:reveal-players-answers', { code: roomCode });
     }
   };
 
@@ -508,6 +522,8 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
       if (e.code === 'Space') {
         e.preventDefault();
         if (status === 'question' || status === 'escape-room' || (status as string) === 'question_active') {
+          handleRevealPlayersAnswers();
+        } else if (status === 'answers-displayed' || (status as string) === 'answers_displayed') {
           handleRevealAnswer();
         } else if (status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief') {
           handleShowLeaderboard();
@@ -585,7 +601,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
         />
       )}
 
-      {(status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief') && (
+      {(status === 'answers-displayed' || (status as string) === 'answers_displayed' || status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief') && (
         <AnswerRevealView
           question={currentQuestion}
           stats={revealStats}
@@ -638,7 +654,8 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
           onTogglePause={handleTogglePause}
           onToggleTeamMode={handleToggleTeamMode}
           onOpenPointsModal={() => setIsPointsModalOpen(true)}
-          onRevealAnswer={status === 'question' || status === 'escape-room' || (status as string) === 'question_active' ? handleRevealAnswer : undefined}
+          onRevealPlayersAnswers={status === 'question' || status === 'escape-room' || (status as string) === 'question_active' ? handleRevealPlayersAnswers : undefined}
+          onRevealAnswer={status === 'answers-displayed' || (status as string) === 'answers_displayed' ? handleRevealAnswer : undefined}
           onShowLeaderboard={status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief' ? handleShowLeaderboard : undefined}
           onNextQuestion={status === 'leaderboard' || (status as string) === 'completed' || status === 'revealing' || (status as string) === 'answer_revealed' || (status as string) === 'debrief' ? handleNextQuestion : undefined}
           onEndWorkshop={handleEndWorkshop}

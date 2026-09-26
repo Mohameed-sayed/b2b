@@ -104,6 +104,16 @@ export const AnswerRevealView: React.FC<AnswerRevealViewProps> = ({
                         </div>
                       </div>
                     </div>
+                    {/* Participants List */}
+                    {item.participants && item.participants.length > 0 && (
+                      <div className="relative z-10 mt-3 flex flex-wrap gap-1.5 pt-3 border-t border-slate-200/50">
+                        {item.participants.map((p, idx) => (
+                          <div key={idx} className="text-xs font-bold bg-white/60 px-2 py-1 rounded-md text-slate-600 shadow-sm border border-slate-200/50">
+                            {p.name} {p.team && <span className="opacity-60 text-[10px]">({p.team})</span>}
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 );
               })}
