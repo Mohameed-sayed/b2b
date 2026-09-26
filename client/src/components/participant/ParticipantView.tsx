@@ -8,6 +8,7 @@ import { ParticipantAnswered } from './ParticipantAnswered';
 import { ParticipantResult } from './ParticipantResult';
 import { ParticipantLeaderboard } from './ParticipantLeaderboard';
 import { ReconnectingScreen } from './ReconnectingScreen';
+import { ReactionBar } from './ReactionBar';
 
 interface ParticipantViewProps {
   initialCode?: string;
@@ -563,6 +564,11 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
           currentParticipant={participant}
           allParticipants={allParticipants.length > 0 ? allParticipants : [participant]}
         />
+      )}
+
+      {/* Show Reaction Bar for active participants */}
+      {subState !== 'join' && subState !== 'reconnecting' && (
+        <ReactionBar roomCode={roomCode} />
       )}
     </div>
   );

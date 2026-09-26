@@ -10,6 +10,7 @@ import { EscapeRoomView } from './EscapeRoomView';
 import { ReflectionWallView } from './ReflectionWallView';
 import { FacilitatorControlsBar } from './FacilitatorControlsBar';
 import { PointsAdjustModal } from './PointsAdjustModal';
+import { FloatingReactions } from './FloatingReactions';
 
 interface FacilitatorViewProps {
   initialRoomCode?: string;
@@ -671,6 +672,9 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
         teamMode={teamMode}
         onAdjustPoints={handleAdjustPoints}
       />
+
+      {/* Live Room Reactions */}
+      <FloatingReactions />
     </div>
   );
 };

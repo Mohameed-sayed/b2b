@@ -210,6 +210,7 @@ export interface ServerToClientEvents {
   'host:sync': (data: { success: boolean; room: Room }) => void;
   'host:question_active': (data: { question: Question; questionIndex: number; totalQuestions: number; timeLimit: number; distribution: unknown }) => void;
   'error': (data: { success?: false; error?: string; message?: string }) => void;
+  'room:reaction': (data: { emoji: string; participantId?: string }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -239,5 +240,6 @@ export interface ClientToServerEvents {
   'reflection:submit': (data: { roomCode: string; participantId: string; behaviorText?: string; text?: string; category?: string }) => void;
   'participant:submit_reflection': (data: { roomCode?: string; code?: string; participantId?: string; behaviorText?: string; text?: string; category?: string }, callback?: (res: { success: boolean; error?: string }) => void) => void;
   'game:toggle-team-mode': (data: { code: string }) => void;
+  'participant:react': (data: { roomCode: string; emoji: string }) => void;
 }
 

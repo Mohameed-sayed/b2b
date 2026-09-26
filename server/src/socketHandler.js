@@ -675,6 +675,15 @@ export function setupSocketHandlers(io) {
     socket.on('participant:submit_reflection', handleSubmitReflection);
 
     // ==========================================
+    // PARTICIPANT REACTION
+    // ==========================================
+    socket.on('participant:react', ({ roomCode, emoji }) => {
+      const targetCode = (roomCode || socket.roomCode || '').toUpperCase().trim();
+      if (!targetCode || !emoji) return;
+      io.to(targetCode).emit('room:reaction', { emoji });
+    });
+
+    // ==========================================
     // ADJUST POINTS & TOGGLE TEAM MODE
     // ==========================================
     socket.on('game:adjust-points', ({ code, targetId, isTeam, pointsDelta }) => {
