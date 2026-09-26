@@ -441,7 +441,7 @@ class GameEngine {
       return {
         alreadyAnswered: true,
         answer: room.answers[qIndex][participantId],
-        distribution: this.calculateAnswerDistribution(room)
+        distribution: this.calculateAnswerDistribution(room, false)
       };
     }
 
@@ -507,7 +507,7 @@ class GameEngine {
     room.updatedAt = now;
     this.saveRoomToDb(room);
 
-    const distribution = this.calculateAnswerDistribution(room);
+    const distribution = this.calculateAnswerDistribution(room, false);
     const totalParticipants = Object.values(room.participants).filter(p => p.isOnline).length;
     const totalSubmitted = Object.keys(room.answers[qIndex]).length;
     const allAnswered = totalSubmitted >= totalParticipants && totalParticipants > 0;
@@ -522,7 +522,7 @@ class GameEngine {
     };
   }
 
-  calculateAnswerDistribution(room) {
+  calculateAnswerDistribution(room, includeParticipants = true) {
     const question = this.getCurrentQuestion(room);
     if (!question) return {};
 
@@ -545,11 +545,12 @@ class GameEngine {
 
     for (const ans of Object.values(currentAnswers)) {
       const optId = ans.optionId;
-      if (distribution[optId]) {
-        distribution[optId].count++;
+      if (!distribution[optId]) {
+        distribution[optId] = { id: optId, text: optId, count: 0, percentage: 0, participants: [] };
+      }
+      distribution[optId].count++;
+      if (includeParticipants) {
         distribution[optId].participants.push({ name: ans.participantName, team: ans.team });
-      } else {
-        distribution[optId] = { id: optId, text: optId, count: 1, percentage: 0, participants: [{ name: ans.participantName, team: ans.team }] };
       }
     }
 
