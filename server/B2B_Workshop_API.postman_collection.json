@@ -1,0 +1,204 @@
+{
+  "info": {
+    "name": "B2B Workshop Platform API",
+    "description": "API endpoints for the B2B Workshop Game Platform",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health & System",
+      "item": [
+        {
+          "name": "Root Details",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            }
+          }
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "Network IP",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/network-ip",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "network-ip"]
+            }
+          }
+        },
+        {
+          "name": "Teams",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/teams",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "teams"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Games (Content Admin)",
+      "item": [
+        {
+          "name": "Get All Games",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/games",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games"]
+            }
+          }
+        },
+        {
+          "name": "Get Game By ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/games/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games", ":id"],
+              "variable": [{"key": "id", "value": "game-1"}]
+            }
+          }
+        },
+        {
+          "name": "Create Game",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"New Custom Game\",\n  \"description\": \"A fun new workshop game\",\n  \"topic\": \"Onboarding\",\n  \"questions\": []\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/games",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games"]
+            }
+          }
+        },
+        {
+          "name": "Update Game",
+          "request": {
+            "method": "PUT",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Updated Game Title\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/games/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games", ":id"],
+              "variable": [{"key": "id", "value": "game-1"}]
+            }
+          }
+        },
+        {
+          "name": "Delete Game",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/games/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games", ":id"],
+              "variable": [{"key": "id", "value": "game-1"}]
+            }
+          }
+        },
+        {
+          "name": "Bulk Override Games",
+          "request": {
+            "method": "POST",
+            "header": [{"key": "Content-Type", "value": "application/json"}],
+            "body": {
+              "mode": "raw",
+              "raw": "[\n  {\n    \"title\": \"Only Game Remaining\",\n    \"questions\": []\n  }\n]"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/games/bulk",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games", "bulk"]
+            }
+          }
+        },
+        {
+          "name": "Reset Games (Restore Seed Defaults)",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{baseUrl}}/api/games/reset",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "games", "reset"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Live Rooms",
+      "item": [
+        {
+          "name": "Get Active Room",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/active-room",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "active-room"]
+            }
+          }
+        },
+        {
+          "name": "Get Room By Code",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms/:code",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rooms", ":code"],
+              "variable": [{"key": "code", "value": "ABCD"}]
+            }
+          }
+        },
+        {
+          "name": "Get Room Reflections",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/rooms/:code/reflections",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rooms", ":code", "reflections"],
+              "variable": [{"key": "code", "value": "ABCD"}]
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3001"
+    }
+  ]
+}

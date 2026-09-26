@@ -176,15 +176,15 @@ export function setupSocketHandlers(io) {
           count: Object.values(updatedRoom.participants).length
         });
 
-        io.to(targetCode).emit('participant:joined', {
+        io.to(`${targetCode}:host`).emit('participant:joined', {
           participant,
           isReconnect,
           totalParticipants: Object.values(updatedRoom.participants).length,
           participantsList: Object.values(updatedRoom.participants)
         });
 
-        // Also update full room state
-        io.to(targetCode).emit('room:updated', { room: clientRoom });
+        // Also update full room state to host
+        io.to(`${targetCode}:host`).emit('room:updated', { room: clientRoom });
 
         if (typeof callback === 'function') {
           callback(response);
@@ -396,13 +396,13 @@ export function setupSocketHandlers(io) {
         const totalParticipants = Object.keys(room?.participants || {}).length;
 
         // Broadcast answered update to host
-        io.to(targetCode).emit('question:answered', {
+        io.to(`${targetCode}:host`).emit('question:answered', {
           participantId: pid,
           answeredCount,
           totalParticipants
         });
 
-        io.to(targetCode).emit('distribution:update', result.distribution);
+        io.to(`${targetCode}:host`).emit('distribution:update', result.distribution);
 
         const response = {
           success: true,
