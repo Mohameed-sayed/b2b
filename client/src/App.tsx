@@ -4,6 +4,7 @@ import { ParticipantView } from './components/participant/ParticipantView';
 import { AdminEditor } from './components/admin/AdminEditor';
 import { socketService } from './services/socket';
 import { Monitor, Smartphone, Settings, Wifi, WifiOff } from 'lucide-react';
+import { LoadingSplash } from './components/common/LoadingSplash';
 
 type AppMode = 'host' | 'participant' | 'admin';
 
@@ -11,6 +12,7 @@ export const App: React.FC = () => {
   const [mode, setMode] = useState<AppMode>('host');
   const [joinCode, setJoinCode] = useState<string>('');
   const [isConnected, setIsConnected] = useState<boolean>(false);
+  const [showSplash, setShowSplash] = useState<boolean>(true);
 
   // Parse path or hash on load and popstate
   useEffect(() => {
@@ -97,6 +99,8 @@ export const App: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-brand-light text-brand-dark selection:bg-brand-accent selection:text-brand-dark">
+      {showSplash && <LoadingSplash onComplete={() => setShowSplash(false)} />}
+      
       {/* Top Floating App Bar: View Switcher (Only shown on Facilitator & Admin screens) */}
       {mode !== 'participant' && (
         <nav className="fixed top-3 right-4 z-50 flex items-center gap-2 bg-brand-white backdrop-blur-md border border-slate-200 p-1.5 rounded-2xl shadow-2xl text-xs">
