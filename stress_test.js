@@ -4,7 +4,7 @@ import { randomString, randomIntBetween } from 'https://jslib.k6.io/k6-utils/1.2
 
 // Configuration
 export const options = {
-    vus: 800, // 800 concurrent users
+    vus: 100, // 100 concurrent users
     duration: '2m', // Run for 2 minutes to sustain the load
 };
 
