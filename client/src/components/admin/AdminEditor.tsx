@@ -244,6 +244,22 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
     setSelectedQuestionId(newQId);
   };
 
+  // Delete Game
+  const handleDeleteGame = (gId: string) => {
+    if (games.length <= 1) {
+      alert('You cannot delete the last game.');
+      return;
+    }
+    if (window.confirm('Are you sure you want to delete this entire game?')) {
+      const remainingGames = games.filter(g => g.id !== gId);
+      setGames(remainingGames);
+      if (selectedGameId === gId) {
+        setSelectedGameId(remainingGames[0].id);
+        setSelectedQuestionId(remainingGames[0].questions[0]?.id || '');
+      }
+    }
+  };
+
   // Delete Question
   const handleDeleteQuestion = (qId: string) => {
     if (!activeGame || activeGame.questions.length <= 1) {
@@ -353,19 +369,27 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
               {games.map((g) => {
                 const isSelected = g.id === selectedGameId;
                 return (
-                  <button
-                    key={g.id}
-                    onClick={() => {
-                      setSelectedGameId(g.id);
-                      setSelectedQuestionId(g.questions[0]?.id || '');
-                    }}
-                    className={`w-full text-left p-3 rounded-2xl border text-xs font-bold transition-all flex items-center justify-between ${isSelected ? 'border-brand-accent bg-brand-accent/15 text-orange-300' : 'border-slate-200 bg-brand-light/60 text-brand-dark hover:bg-slate-100'}`}
-                  >
-                    <span className="truncate">{g.title}</span>
-                    <span className="font-mono text-[10px] text-brand-secondary shrink-0 ml-2">
-                      {g.questions.length} Qs
-                    </span>
-                  </button>
+                  <div key={g.id} className="flex gap-2 items-stretch">
+                    <button
+                      onClick={() => {
+                        setSelectedGameId(g.id);
+                        setSelectedQuestionId(g.questions[0]?.id || '');
+                      }}
+                      className={`flex-1 text-left p-3 rounded-2xl border text-xs font-bold transition-all flex items-center justify-between ${isSelected ? 'border-brand-accent bg-brand-accent/15 text-orange-300' : 'border-slate-200 bg-brand-light/60 text-brand-dark hover:bg-slate-100'}`}
+                    >
+                      <span className="truncate">{g.title}</span>
+                      <span className="font-mono text-[10px] text-brand-secondary shrink-0 ml-2">
+                        {g.questions.length} Qs
+                      </span>
+                    </button>
+                    <button
+                      onClick={() => handleDeleteGame(g.id)}
+                      className="p-3 rounded-2xl border border-slate-200 bg-brand-light/60 text-slate-400 hover:text-rose-500 hover:bg-rose-50 hover:border-rose-200 transition-colors flex items-center justify-center shrink-0"
+                      title="Delete Game"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 );
               })}
             </div>
