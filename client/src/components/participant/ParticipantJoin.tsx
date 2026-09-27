@@ -71,7 +71,7 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
             placeholder="e.g. B2B7X"
             maxLength={8}
             required
-            className="w-full rounded-2xl bg-brand-light border-2 border-slate-200 px-4 py-3 text-center text-xl font-mono font-black text-orange-400 placeholder:text-slate-700 focus:border-brand-accent focus:outline-none tracking-widest uppercase transition-all"
+            className="w-full rounded-2xl bg-brand-light border-2 border-slate-200 px-4 py-3 text-center text-xl font-mono font-black text-orange-400 placeholder:text-slate-400 focus:border-brand-accent focus:outline-none tracking-widest uppercase transition-all"
           />
         </div>
 
@@ -87,7 +87,7 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
             placeholder="e.g. Tohamy or ToT"
             maxLength={25}
             required
-            className="w-full rounded-2xl bg-brand-light border-2 border-slate-200 px-4 py-3 text-brand-dark font-bold placeholder:text-slate-700 focus:border-brand-accent focus:outline-none text-base transition-all"
+            className="w-full rounded-2xl bg-brand-light border-2 border-slate-200 px-4 py-3 text-brand-dark font-bold placeholder:text-slate-400 focus:border-brand-accent focus:outline-none text-base transition-all"
           />
         </div>
 
