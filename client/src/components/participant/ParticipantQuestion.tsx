@@ -57,7 +57,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-4 md:p-6 w-full max-w-4xl mx-auto animate-fade-in pb-32">
+    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-4 md:p-8 lg:p-12 w-full max-w-7xl mx-auto animate-fade-in pb-32">
       {/* Top Header: Question Index & Countdown */}
       <div>
         <div className="flex items-center justify-between pb-3 border-b border-slate-200">
@@ -81,7 +81,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
       {/* Main Question Content Area */}
       <div className="my-auto py-4 space-y-4">
         {/* Title */}
-        <h2 className="text-lg md:text-xl font-black text-brand-dark font-display text-center leading-snug">
+        <h2 className="text-xl md:text-3xl lg:text-4xl font-black text-brand-dark font-display text-center leading-snug px-4 md:px-12">
           {question.title}
         </h2>
 
@@ -181,7 +181,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                     <span className="w-8 h-8 rounded-xl font-black font-mono flex items-center justify-center shrink-0 text-xs shadow bg-slate-100">
                       {opt.id}
                     </span>
-                    <span className="text-xs md:text-sm font-bold text-brand-dark mt-1 leading-snug flex-1">
+                    <span className="text-sm md:text-base lg:text-lg font-bold text-brand-dark mt-1 leading-snug flex-1">
                       {opt.text}
                     </span>
                   </button>
@@ -315,7 +315,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                     const time = `10:${12 + i} AM`; 
                     return (
                       <div key={i} className="flex items-start gap-2.5 md:gap-3">
-                        <div className={`w-8 h-8 md:w-9 md:h-9 rounded shrink-0 flex items-center justify-center text-xs md:text-sm font-bold text-white ${isTutor ? 'bg-blue-600' : 'bg-emerald-700'}`}>
+                        <div className={`w-8 h-8 md:w-9 md:h-9 rounded shrink-0 flex items-center justify-center text-sm md:text-base lg:text-lg font-bold text-white ${isTutor ? 'bg-blue-600' : 'bg-emerald-700'}`}>
                           {sender[0]}
                         </div>
                         <div className="flex-1 space-y-0.5 min-w-0">
@@ -331,7 +331,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 text-xs md:text-sm text-brand-dark font-medium leading-relaxed max-h-36 md:max-h-64 overflow-y-auto">
+              <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 text-sm md:text-base lg:text-lg text-brand-dark font-medium leading-relaxed max-h-36 md:max-h-64 overflow-y-auto">
                 {question.scenario}
               </div>
             )}
@@ -353,7 +353,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                     >
                       {opt.id}
                     </span>
-                    <span className="text-xs md:text-sm font-bold text-brand-dark mt-1 leading-snug flex-1">
+                    <span className="text-sm md:text-base lg:text-lg font-bold text-brand-dark mt-1 leading-snug flex-1">
                       {opt.text}
                     </span>
                   </button>

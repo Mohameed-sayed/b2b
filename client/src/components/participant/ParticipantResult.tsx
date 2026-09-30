@@ -31,7 +31,7 @@ export const ParticipantResult: React.FC<ParticipantResultProps> = ({
   }, [isCorrect, streak]);
 
   return (
-    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-6 w-full max-w-2xl mx-auto text-center animate-fade-in pb-32">
+    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-6 w-full max-w-7xl mx-auto text-center animate-fade-in pb-32">
       {/* Top Banner */}
       <div className="flex items-center justify-between">
         <Badge variant={isCorrect ? 'success' : 'danger'} size="sm">

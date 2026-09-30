@@ -16,7 +16,7 @@ export const ParticipantLeaderboard: React.FC<ParticipantLeaderboardProps> = ({
   const topPlayers = sorted.slice(0, 5);
 
   return (
-    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-6 w-full max-w-2xl mx-auto animate-fade-in pb-32">
+    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-6 w-full max-w-7xl mx-auto animate-fade-in pb-32">
       {/* Top Brand */}
       <div className="text-center space-y-1">
         <h2 className="text-xl font-black text-brand-dark font-display flex items-center justify-center gap-2">
