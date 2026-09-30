@@ -63,6 +63,9 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     if (str === 'answer_revealed' || str === 'debrief' || str === 'revealing') {
       return 'revealing';
     }
+    if (str === 'answers_displayed' || str === 'answers-displayed') {
+      return 'answers-displayed';
+    }
     if (str === 'leaderboard' || str === 'completed') {
       return 'leaderboard';
     }
