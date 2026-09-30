@@ -24,6 +24,42 @@ function startRoomTimer(io, roomCode, timeLimit) {
 
     if (remaining <= 0) {
       stopRoomTimer(roomCode);
+      
+      // AUTO REVEAL PLAYERS ANSWERS
+      try {
+        console.log(`⏱️ [AUTO REVEAL PLAYERS ANSWERS] Timer ended for Room: ${roomCode}`);
+        const { room: updatedRoom, question, distribution } = gameEngine.revealPlayersAnswers(roomCode);
+        
+        const optionsMap = distribution.options || {};
+        const stats = (question.options || []).map(opt => {
+          const entry = optionsMap[opt.id] || { count: 0, percentage: 0, participants: [] };
+          return {
+            optionId: opt.id,
+            text: opt.text,
+            count: entry.count || 0,
+            percentage: entry.percentage || 0,
+            isCorrect: false,
+            participants: entry.participants || []
+          };
+        });
+
+        if (updatedRoom.hostSocketId) {
+          io.to(updatedRoom.hostSocketId).emit('room:updated', { room: formatClientRoom(updatedRoom, updatedRoom.hostSocketId) });
+        } else {
+          io.to(`${roomCode}:host`).emit('room:updated', { room: formatClientRoom(updatedRoom) });
+        }
+
+        io.to(roomCode).emit('players-answers:revealed', {
+          correctAnswer: null,
+          explanation: '',
+          distributions: optionsMap,
+          stats,
+          totalSubmitted: distribution.totalSubmitted,
+          totalParticipants: distribution.totalParticipants
+        });
+      } catch (err) {
+        console.error('Auto reveal error:', err);
+      }
     }
   }, 1000);
 

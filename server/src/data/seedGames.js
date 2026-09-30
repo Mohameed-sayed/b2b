@@ -12,7 +12,7 @@ export const defaultGames = [
         id: "g1-q1",
         type: "multiple-choice",
         title: "The Quadruple Ping",
-        scenario: "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A teammate asks: 'Can you review my Scratch project before my class in 3 hours?'\n🟡 Admin reminder: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to update the slide deck ASAP!!'\n\nWhich task do you address FIRST?",
+        scenario: "It is 10:15 AM. You are preparing your slides for an 11:30 AM school session. Four notifications pop up simultaneously:\n\n🔴 A mentor pings: 'Need urgent confirmation if you can take an extra class at 2:00 PM today.'\n🟠 A mentor asks: 'Can you finish your attendance feedback before your class at 11:00 AM?'\n🟡 Mentor privately: 'Submit your weekly attendance log before 5:00 PM today.'\n🔥 WhatsApp group message: 'URGENT!! Need someone to cover this session ASAP!!'\n\nWhich task do you address FIRST?",
         options: [
           { id: "A", text: "Drop everything and fix the 'URGENT!!' slide deck." },
           { id: "B", text: "Help your teammate review their Scratch project immediately." },

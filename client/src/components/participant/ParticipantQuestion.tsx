@@ -193,7 +193,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
           /* 2. TRIAGE QUESTION TYPE (OWN IT, SUPPORT IT, ESCALATE IT) */
           <div className="space-y-4">
             {/* Scenario snippet */}
-            <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 text-sm text-brand-dark font-medium leading-relaxed">
+            <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 whitespace-pre-wrap text-sm text-brand-dark font-medium leading-relaxed">
               {question.scenario}
             </div>
 
@@ -242,7 +242,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
         ) : question.type === 'reflection' ? (
           /* 3. REFLECTION QUESTION TYPE */
           <form onSubmit={handleReflectionSubmit} className="space-y-4">
-            <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 text-xs text-brand-dark">
+            <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 whitespace-pre-wrap text-xs text-brand-dark">
               {question.scenario}
             </div>
 
@@ -331,7 +331,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 text-sm md:text-base lg:text-lg text-brand-dark font-medium leading-relaxed max-h-36 md:max-h-64 overflow-y-auto">
+              <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 whitespace-pre-wrap text-sm md:text-base lg:text-lg text-brand-dark font-medium leading-relaxed max-h-36 md:max-h-64 overflow-y-auto">
                 {question.scenario}
               </div>
             )}
