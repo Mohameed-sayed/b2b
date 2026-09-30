@@ -135,7 +135,7 @@ export const QuestionView: React.FC<QuestionViewProps> = ({
               </div>
               <div>
                 <div className="text-sm font-bold text-white leading-none">
-                  iSchool B2B Coordinator
+                  Mentor
                 </div>
                 <div className="text-xs text-emerald-100 mt-1">online</div>
               </div>
