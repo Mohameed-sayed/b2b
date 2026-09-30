@@ -32,7 +32,7 @@ export const ParticipantWaiting: React.FC<ParticipantWaitingProps> = ({
   }, []);
 
   return (
-    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-6 max-w-md mx-auto text-center animate-fade-in">
+    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-6 pb-32 max-w-md mx-auto text-center animate-fade-in">
       {/* Top Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">

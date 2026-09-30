@@ -57,7 +57,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-4 md:p-6 max-w-md mx-auto animate-fade-in pb-12">
+    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-4 md:p-6 max-w-md mx-auto animate-fade-in pb-32">
       {/* Top Header: Question Index & Countdown */}
       <div>
         <div className="flex items-center justify-between pb-3 border-b border-slate-200">

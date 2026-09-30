@@ -229,7 +229,15 @@ export function setupSocketHandlers(io) {
 
         const clientRoom = formatClientRoom(room);
 
-        const currentQuestion = gameEngine.getCurrentQuestion(room);
+        let currentQuestion = gameEngine.getCurrentQuestion(room);
+
+        // Case B: Late Joiner Reconnect
+        // If the participant joined AFTER the current question started,
+        // they must remain in the waiting room until the host advances.
+        if (room.questionStartTime && participant.joinedAt > room.questionStartTime) {
+          clientRoom.status = 'waiting';
+          currentQuestion = null;
+        }
 
         const response = {
           success: true,
