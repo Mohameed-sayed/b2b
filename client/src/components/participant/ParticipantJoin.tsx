@@ -34,7 +34,7 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-brand-light flex flex-col justify-center px-4 py-8 max-w-md mx-auto">
+    <div className="min-h-screen bg-brand-light flex flex-col justify-center px-4 py-8 w-full max-w-2xl mx-auto">
       {/* Brand Header */}
       <div className="text-center mb-6 space-y-2">
         <div className="inline-flex items-center justify-center w-16 h-16 rounded-3xl bg-gradient-to-tr from-brand-accent to-brand-accent text-3xl shadow-xl shadow-brand-accent/20 font-black mb-2 animate-bounce-short">
@@ -96,7 +96,7 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
           <label className="block text-xs font-bold uppercase tracking-wider text-brand-secondary mb-2">
             Choose Your Avatar
           </label>
-          <div className="grid grid-cols-6 gap-2">
+          <div className="grid grid-cols-6 md:grid-cols-12 gap-2 md:gap-3">
             {avatars.map((emoji) => (
               <button
                 key={emoji}
@@ -118,7 +118,7 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
           <label className="block text-xs font-bold uppercase tracking-wider text-brand-secondary mb-2">
             Select Your Team
           </label>
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
             {teams.map((t) => (
               <button
                 key={t}

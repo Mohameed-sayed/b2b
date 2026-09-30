@@ -31,7 +31,7 @@ export const ReconnectingScreen: React.FC<ReconnectingScreenProps> = ({
   }, []);
 
   return (
-    <div className="min-h-screen bg-brand-light flex flex-col items-center justify-center px-6 text-center animate-fade-in">
+    <div className="min-h-screen bg-brand-light flex flex-col items-center justify-center px-6 text-center w-full max-w-2xl mx-auto animate-fade-in">
       {/* Animated ring */}
       <div className="relative mb-8">
         <div className="w-28 h-28 rounded-3xl bg-brand-white border-2 border-slate-300 flex items-center justify-center text-5xl shadow-2xl">

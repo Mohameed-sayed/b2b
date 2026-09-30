@@ -9,7 +9,7 @@ export const ParticipantAnswered: React.FC<ParticipantAnsweredProps> = ({
   selectedAnswer,
 }) => {
   return (
-    <div className="min-h-screen bg-brand-light flex flex-col justify-center items-center p-6 text-center max-w-md mx-auto animate-fade-in">
+    <div className="min-h-screen bg-brand-light flex flex-col justify-center items-center p-6 text-center w-full max-w-2xl mx-auto animate-fade-in">
       <div className="w-20 h-20 rounded-3xl bg-green-600/20 text-emerald-400 border-2 border-green-600/40 flex items-center justify-center mb-6 animate-bounce-short shadow-xl shadow-green-600/20">
         <CheckCircle2 className="w-10 h-10" />
       </div>

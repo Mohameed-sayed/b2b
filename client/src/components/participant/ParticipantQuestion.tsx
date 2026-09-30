@@ -57,7 +57,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-4 md:p-6 max-w-md mx-auto animate-fade-in pb-32">
+    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-4 md:p-6 w-full max-w-4xl mx-auto animate-fade-in pb-32">
       {/* Top Header: Question Index & Countdown */}
       <div>
         <div className="flex items-center justify-between pb-3 border-b border-slate-200">
@@ -148,7 +148,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
             </div>
 
             {/* Big YES / NO Verdict Buttons */}
-            <div className={`grid ${question.options.length <= 2 && question.options.some(o => o.id === 'YES' || o.id === 'NO') ? 'grid-cols-2' : 'grid-cols-1'} gap-3 pt-2`}>
+            <div className={`grid ${question.options.length <= 2 && question.options.some(o => o.id === 'YES' || o.id === 'NO') ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2'} gap-3 md:gap-4 pt-2`}>
               {question.options.map((opt) => {
                 const isYes = opt.id === 'YES';
                 const isNo = opt.id === 'NO';
@@ -201,7 +201,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
               Select the appropriate triage action:
             </div>
 
-            <div className="space-y-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
               <button
                 type="button"
                 onClick={() => handleSelectOption('OWN')}
@@ -331,13 +331,13 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 text-xs md:text-sm text-brand-dark font-medium leading-relaxed max-h-36 overflow-y-auto">
+              <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 text-xs md:text-sm text-brand-dark font-medium leading-relaxed max-h-36 md:max-h-64 overflow-y-auto">
                 {question.scenario}
               </div>
             )}
 
             {/* Options */}
-            <div className="grid grid-cols-1 gap-2.5">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
               {question.options.map((opt, idx) => {
                 const style = mcOptionColors[idx % mcOptionColors.length];
                 const isSelected = selectedOption === opt.id;
