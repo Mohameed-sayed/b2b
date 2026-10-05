@@ -44,15 +44,13 @@ export const ParticipantLeaderboard: React.FC<ParticipantLeaderboardProps> = ({
         </div>
 
         <div className="text-right flex items-center gap-4">
-          {(currentParticipant.streak || 0) > 1 && (
-            <div className="flex flex-col items-center">
-              <div className="flex items-center text-orange-500">
-                <Flame className="w-4 h-4 fill-current" />
-                <span className="font-mono text-sm font-black">{currentParticipant.streak}</span>
-              </div>
-              <div className="text-[10px] text-brand-secondary font-mono">STREAK</div>
+          <div className="flex flex-col items-center">
+            <div className="flex items-center text-orange-500">
+              <Flame className="w-4 h-4 fill-current mr-1" />
+              <span className="font-mono text-sm font-black">{currentParticipant.streak || 0}</span>
             </div>
-          )}
+            <div className="text-[10px] text-brand-secondary font-mono">STREAK</div>
+          </div>
           <div>
             <div className="font-mono text-lg font-black text-orange-400">
               {currentParticipant.score.toLocaleString()}
@@ -95,11 +93,9 @@ export const ParticipantLeaderboard: React.FC<ParticipantLeaderboardProps> = ({
                 <div className="font-mono text-xs font-black text-brand-dark">
                   {p.score.toLocaleString()} pts
                 </div>
-                {(p.streak || 0) > 1 && (
-                  <div className="flex items-center text-orange-500 text-[10px] font-bold">
-                    <Flame className="w-3 h-3 fill-current mr-0.5" /> {p.streak} Streak
-                  </div>
-                )}
+                <div className="flex items-center text-orange-500 text-[10px] font-bold">
+                  <Flame className="w-3 h-3 fill-current mr-0.5" /> {p.streak || 0} Streak
+                </div>
               </div>
             </div>
           );
