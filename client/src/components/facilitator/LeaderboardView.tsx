@@ -133,7 +133,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                     <div className="mt-3 font-mono text-xl font-black text-brand-dark">
                       {top2.score.toLocaleString()} <span className="text-xs font-sans text-brand-secondary">pts</span>
                     </div>
-                    {top2.streak > 1 && (
+                    {(top2.streak || 0) >= 0 && (
                       <div className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-orange-400 bg-brand-accent/10 px-2 py-0.5 rounded-full border border-brand-accent/20">
                         <Flame className="w-3 h-3 fill-orange-400" />
                         <span>{top2.streak} STREAK</span>
@@ -157,7 +157,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                     <div className="mt-3 font-mono text-2xl font-black text-amber-300">
                       {top1.score.toLocaleString()} <span className="text-xs font-sans text-amber-400">pts</span>
                     </div>
-                    {top1.streak > 1 && (
+                    {(top1.streak || 0) >= 0 && (
                       <div className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-orange-400 bg-brand-accent/20 px-2.5 py-0.5 rounded-full border border-brand-accent/30">
                         <Flame className="w-3.5 h-3.5 fill-orange-400" />
                         <span>{top1.streak} STREAK 🔥</span>
@@ -180,7 +180,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                     <div className="mt-3 font-mono text-xl font-black text-brand-dark">
                       {top3.score.toLocaleString()} <span className="text-xs font-sans text-brand-secondary">pts</span>
                     </div>
-                    {top3.streak > 1 && (
+                    {(top3.streak || 0) >= 0 && (
                       <div className="mt-2 inline-flex items-center gap-1 text-xs font-bold text-orange-400 bg-brand-accent/10 px-2 py-0.5 rounded-full border border-brand-accent/20">
                         <Flame className="w-3 h-3 fill-orange-400" />
                         <span>{top3.streak} STREAK</span>
@@ -215,7 +215,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                     </div>
 
                     <div className="flex items-center gap-4">
-                      {p.streak > 1 && (
+                      {(p.streak || 0) >= 0 && (
                         <div className="flex items-center gap-1 text-[11px] font-bold text-orange-400">
                           <Flame className="w-3 h-3 fill-orange-400" />
                           <span>{p.streak}</span>
