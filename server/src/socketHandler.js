@@ -609,6 +609,7 @@ export function setupSocketHandlers(io) {
 
         io.to(targetCode).emit('leaderboard:updated', payload);
         io.to(targetCode).emit('leaderboard:update', payload);
+        io.to(targetCode).emit('room:updated', { room: formatClientRoom(room) });
 
         if (typeof callback === 'function') callback({ success: true, leaderboards });
       } catch (err) {
