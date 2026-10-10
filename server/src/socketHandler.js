@@ -725,7 +725,12 @@ export function setupSocketHandlers(io) {
     socket.on('participant:react', ({ roomCode, emoji }) => {
       const targetCode = (roomCode || socket.roomCode || '').toUpperCase().trim();
       if (!targetCode || !emoji) return;
-      io.to(targetCode).emit('room:reaction', { emoji });
+      let participantName = '';
+      const room = gameEngine.getRoom(targetCode);
+      if (room && socket.participantId && room.participants[socket.participantId]) {
+        participantName = room.participants[socket.participantId].name;
+      }
+      io.to(targetCode).emit('room:reaction', { emoji, participantName });
     });
 
     // ==========================================

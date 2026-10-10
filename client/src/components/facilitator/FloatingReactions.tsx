@@ -4,6 +4,7 @@ import { socketService } from '../../services/socket';
 interface Reaction {
   id: string;
   emoji: string;
+  participantName?: string;
   left: number; // percentage from left
 }
 
@@ -13,11 +14,11 @@ export const FloatingReactions: React.FC = () => {
   useEffect(() => {
     const socket = socketService.getSocket();
     
-    const handleReaction = (data: { emoji: string }) => {
+    const handleReaction = (data: { emoji: string, participantName?: string }) => {
       const id = Math.random().toString(36).substr(2, 9);
       const left = 5 + Math.random() * 90; // 5% to 95%
       
-      setReactions(prev => [...prev, { id, emoji: data.emoji, left }]);
+      setReactions(prev => [...prev, { id, emoji: data.emoji, participantName: data.participantName, left }]);
       
       // Remove after 3 seconds (duration of animation)
       setTimeout(() => {
@@ -39,10 +40,15 @@ export const FloatingReactions: React.FC = () => {
       {reactions.map(r => (
         <div
           key={r.id}
-          className="absolute bottom-0 text-4xl md:text-6xl animate-float-up drop-shadow-lg"
+          className="absolute bottom-0 flex flex-col items-center animate-float-up drop-shadow-lg"
           style={{ left: `${r.left}%` }}
         >
-          {r.emoji}
+          <div className="text-4xl md:text-6xl">{r.emoji}</div>
+          {r.participantName && (
+            <div className="mt-2 px-2 py-1 bg-black/60 text-white text-xs rounded-full whitespace-nowrap">
+              {r.participantName}
+            </div>
+          )}
         </div>
       ))}
     </div>
