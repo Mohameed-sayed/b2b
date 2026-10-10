@@ -1,8 +1,26 @@
-import { gameEngine, ROOM_STATES, toClientStatus, formatClientRoom } from './gameEngine.js';
+import { gameEngine, ROOM_STATES, toClientStatus, formatClientRoom, formatPlayerRoom, sanitizeQuestion, sanitizeLeaderboards } from './gameEngine.js';
 import { db } from './storage/db.js';
 
 // Active question interval timers per room: roomCode -> timerId
 const roomTimers = new Map();
+
+const REVEALED_STATES = new Set([ROOM_STATES.ANSWER_REVEALED, ROOM_STATES.DEBRIEF, ROOM_STATES.LEADERBOARD]);
+
+// Host gets full data; players get a version without answers/correctness.
+function emitSplit(io, code, event, hostPayload, playerPayload) {
+  io.to(`${code}:host`).emit(event, hostPayload);
+  io.to(code).except(`${code}:host`).emit(event, playerPayload);
+}
+
+function emitQuestion(io, code, event, payload) {
+  emitSplit(io, code, event, payload, { ...payload, question: sanitizeQuestion(payload.question) });
+}
+
+function broadcastRoom(io, room) {
+  emitSplit(io, room.code, 'room:updated',
+    { room: formatClientRoom(room, room.hostSocketId) },
+    { room: formatPlayerRoom(room) });
+}
 
 function startRoomTimer(io, roomCode, timeLimit) {
   stopRoomTimer(roomCode);
@@ -43,11 +61,7 @@ function startRoomTimer(io, roomCode, timeLimit) {
           };
         });
 
-        if (updatedRoom.hostSocketId) {
-          io.to(updatedRoom.hostSocketId).emit('room:updated', { room: formatClientRoom(updatedRoom, updatedRoom.hostSocketId) });
-        } else {
-          io.to(`${roomCode}:host`).emit('room:updated', { room: formatClientRoom(updatedRoom) });
-        }
+        io.to(`${roomCode}:host`).emit('room:updated', { room: formatClientRoom(updatedRoom, updatedRoom.hostSocketId) });
 
         io.to(roomCode).emit('players-answers:revealed', {
           correctAnswer: null,
@@ -81,11 +95,27 @@ export function setupSocketHandlers(io) {
     socket.participantId = null;
     socket.isHost = false;
 
+    // Host-only events: socket must have created/reconnected as host of this room.
+    const authHost = (code, cb) => {
+      if (socket.isHost && socket.roomCode === code) return true;
+      if (typeof cb === 'function') cb({ success: false, error: 'Not authorized' });
+      return false;
+    };
+
     // ==========================================
     // ROOM CREATION (Supports room:create & host:create_room)
     // ==========================================
-    const handleCreateRoom = async ({ gameId, mode, teamMode, code, customCode, forceNew } = {}, callback) => {
+    const handleCreateRoom = async ({ gameId, mode, teamMode, code, customCode, forceNew, hostToken } = {}, callback) => {
       try {
+        // An existing room may only be (re)claimed by its host, or when no host is connected.
+        const existing = gameEngine.getActiveRoom();
+        if (existing && !(
+          (hostToken && gameEngine.validateHost(existing.code, hostToken)) ||
+          (socket.isHost && socket.roomCode === existing.code) ||
+          !existing.hostSocketId
+        )) {
+          throw new Error('A workshop is already running');
+        }
         const isTeam = teamMode === true || mode === 'team';
         const room = gameEngine.createRoom({
           gameId,
@@ -170,6 +200,11 @@ export function setupSocketHandlers(io) {
           }
         }
 
+        const prior = participantId ? room.participants?.[participantId] : null;
+        if (prior?.socketId && prior.socketId !== socket.id && io.sockets.sockets.has(prior.socketId)) {
+          throw new Error('That player is already connected');
+        }
+
         const { participant, isReconnect, room: updatedRoom } = gameEngine.joinParticipant({
           roomCode: targetCode,
           name,
@@ -191,7 +226,7 @@ export function setupSocketHandlers(io) {
         socket.join(targetCode);
 
         // Format room object matching client Room interface
-        const clientRoom = formatClientRoom(updatedRoom);
+        const clientRoom = formatPlayerRoom(updatedRoom);
 
         const response = {
           success: true,
@@ -220,7 +255,7 @@ export function setupSocketHandlers(io) {
         });
 
         // Also update full room state to host
-        io.to(`${targetCode}:host`).emit('room:updated', { room: clientRoom });
+        io.to(`${targetCode}:host`).emit('room:updated', { room: formatClientRoom(updatedRoom, updatedRoom.hostSocketId) });
 
         if (typeof callback === 'function') {
           callback(response);
@@ -254,6 +289,10 @@ export function setupSocketHandlers(io) {
         }
 
         const participant = room.participants[participantId];
+        if (participant.socketId && participant.socketId !== socket.id && io.sockets.sockets.has(participant.socketId)) {
+          if (typeof callback === 'function') callback({ success: false, error: 'That player is already connected' });
+          return;
+        }
         participant.socketId = socket.id;
         participant.isOnline = true;
         participant.lastActive = Date.now();
@@ -263,9 +302,10 @@ export function setupSocketHandlers(io) {
         socket.participantId = participant.id;
         socket.join(targetCode);
 
-        const clientRoom = formatClientRoom(room);
+        const clientRoom = formatPlayerRoom(room);
 
         let currentQuestion = gameEngine.getCurrentQuestion(room);
+        if (!REVEALED_STATES.has(room.state)) currentQuestion = sanitizeQuestion(currentQuestion);
 
         // Case B: Late Joiner Reconnect
         // If the participant joined AFTER the current question started,
@@ -290,10 +330,10 @@ export function setupSocketHandlers(io) {
 
         // Broadcast to host and room that participant is back online!
         io.to(targetCode).emit('room:participant-reconnected', {
-          participant,
+          participant: clientRoom.participants[participant.id],
           count: Object.values(room.participants).filter(p => p.isOnline).length
         });
-        io.to(targetCode).emit('room:updated', { room: clientRoom });
+        broadcastRoom(io, room);
       } catch (err) {
         console.error('Reconnect error:', err);
         if (typeof callback === 'function') callback({ success: false, error: err.message });
@@ -357,6 +397,7 @@ export function setupSocketHandlers(io) {
     // ==========================================
     socket.on('game:select', ({ code, gameId }) => {
       const targetCode = (code || '').toUpperCase().trim();
+      if (!authHost(targetCode)) return;
       const room = gameEngine.getRoom(targetCode);
       if (!room) return;
       const games = db.getGames ? db.getGames() : [];
@@ -376,6 +417,7 @@ export function setupSocketHandlers(io) {
     const handleStartGame = ({ code, roomCode, hostToken }, callback) => {
       const targetCode = (code || roomCode || socket.roomCode || '').toUpperCase().trim();
       console.log(`🚀 [START GAME] Room: ${targetCode}`);
+      if (!authHost(targetCode, callback)) return;
       try {
         const room = gameEngine.startGame(targetCode);
         const rawQuestion = gameEngine.getCurrentQuestion(room);
@@ -384,7 +426,7 @@ export function setupSocketHandlers(io) {
         startRoomTimer(io, targetCode, room.questionTimeLimit || rawQuestion.timeLimit || 30);
 
         // Broadcast to all participants & host
-        io.to(targetCode).emit('question:started', {
+        emitQuestion(io, targetCode, 'question:started', {
           question: rawQuestion,
           timeLimit: room.questionTimeLimit || rawQuestion.timeLimit || 30,
           index: room.currentQuestionIndex,
@@ -419,11 +461,10 @@ export function setupSocketHandlers(io) {
     // ==========================================
     // SUBMIT ANSWER (Supports game:submit-answer & participant:submit_answer)
     // ==========================================
-    const handleSubmitAnswer = ({ participantId, roomCode, code, questionId, answer, optionId, timeRemaining, responseTimeMs }, callback) => {
+    const handleSubmitAnswer = ({ roomCode, code, answer, optionId } = {}, callback) => {
       const targetCode = (roomCode || code || socket.roomCode || '').toUpperCase().trim();
-      const pid = participantId || socket.participantId;
+      const pid = socket.participantId; // never trust client-supplied id
       const optId = optionId || answer;
-      const respTime = responseTimeMs || ((30 - (timeRemaining || 0)) * 1000);
 
       console.log(`📝 [ANSWER SUBMITTED] Room: ${targetCode}, PID: ${pid}, Choice: ${optId}`);
 
@@ -431,8 +472,7 @@ export function setupSocketHandlers(io) {
         const result = gameEngine.submitAnswer({
           roomCode: targetCode,
           participantId: pid,
-          optionId: optId,
-          responseTimeMs: respTime
+          optionId: optId
         });
 
         const room = gameEngine.getRoom(targetCode);
@@ -474,6 +514,7 @@ export function setupSocketHandlers(io) {
     const handleRevealPlayersAnswers = ({ code, roomCode }, callback) => {
       const targetCode = (code || roomCode || socket.roomCode || '').toUpperCase().trim();
       console.log(`👁️ [REVEAL PLAYERS ANSWERS] Room: ${targetCode}`);
+      if (!authHost(targetCode, callback)) return;
       stopRoomTimer(targetCode);
 
       try {
@@ -497,7 +538,7 @@ export function setupSocketHandlers(io) {
         socket.emit('room:updated', { room: formatClientRoom(room, room.hostSocketId) });
 
         // 2. Broadcast reveal
-        io.to(targetCode).emit('players-answers:revealed', {
+        const revealPayload = {
           correctAnswer: null, // intentionally hide correct answer
           explanation: '', // hide explanation
           distributions: optionsMap,
@@ -505,7 +546,10 @@ export function setupSocketHandlers(io) {
           learningObjective: '',
           discussionQuestion: '',
           leaderboards
-        });
+        };
+        // players get leaderboards without per-question correctness
+        emitSplit(io, targetCode, 'players-answers:revealed', revealPayload,
+          { ...revealPayload, leaderboards: sanitizeLeaderboards(leaderboards) });
 
         if (typeof callback === 'function') callback({ success: true });
       } catch (err) {
@@ -523,6 +567,7 @@ export function setupSocketHandlers(io) {
     const handleRevealAnswer = ({ code, roomCode }, callback) => {
       const targetCode = (code || roomCode || socket.roomCode || '').toUpperCase().trim();
       console.log(`🔍 [REVEAL ANSWER] Room: ${targetCode}`);
+      if (!authHost(targetCode, callback)) return;
       stopRoomTimer(targetCode);
 
       try {
@@ -591,6 +636,7 @@ export function setupSocketHandlers(io) {
     const handleShowLeaderboard = ({ code, roomCode }, callback) => {
       const targetCode = (code || roomCode || socket.roomCode || '').toUpperCase().trim();
       console.log(`🏆 [SHOW LEADERBOARD] Room: ${targetCode}`);
+      if (!authHost(targetCode, callback)) return;
       try {
         const { room, leaderboards } = gameEngine.showLeaderboard(targetCode);
 
@@ -609,7 +655,7 @@ export function setupSocketHandlers(io) {
 
         io.to(targetCode).emit('leaderboard:updated', payload);
         io.to(targetCode).emit('leaderboard:update', payload);
-        io.to(targetCode).emit('room:updated', { room: formatClientRoom(room) });
+        broadcastRoom(io, room);
 
         if (typeof callback === 'function') callback({ success: true, leaderboards });
       } catch (err) {
@@ -631,6 +677,7 @@ export function setupSocketHandlers(io) {
         if (active) targetCode = active.code;
       }
       console.log(`⏩ [NEXT QUESTION] Room: ${targetCode}`);
+      if (!authHost(targetCode, callback)) return;
       try {
         const result = gameEngine.nextQuestion(targetCode);
         const room = result.room;
@@ -647,12 +694,12 @@ export function setupSocketHandlers(io) {
         const question = result.question;
 
         if (question.type === 'reflection' || room.state === ROOM_STATES.REFLECTION) {
-          io.to(targetCode).emit('reflection:active', {
+          emitQuestion(io, targetCode, 'reflection:active', {
             question,
             questionIndex: result.questionIndex,
             totalQuestions: result.totalQuestions
           });
-          io.to(targetCode).emit('question:started', {
+          emitQuestion(io, targetCode, 'question:started', {
             question,
             timeLimit: question.timeLimit || 90,
             index: result.questionIndex,
@@ -661,7 +708,7 @@ export function setupSocketHandlers(io) {
         } else {
           startRoomTimer(io, targetCode, room.questionTimeLimit || question.timeLimit || 30);
 
-          io.to(targetCode).emit('question:started', {
+          emitQuestion(io, targetCode, 'question:started', {
             question,
             timeLimit: room.questionTimeLimit || question.timeLimit || 30,
             index: result.questionIndex,
@@ -690,10 +737,10 @@ export function setupSocketHandlers(io) {
     // ==========================================
     // SUBMIT REFLECTION (Supports reflection:submit & participant:submit_reflection)
     // ==========================================
-    const handleSubmitReflection = ({ roomCode, code, participantId, behaviorText, text, category }, callback) => {
+    const handleSubmitReflection = ({ roomCode, code, behaviorText, text, category }, callback) => {
       const targetCode = (roomCode || code || socket.roomCode || '').toUpperCase().trim();
-      const pid = participantId || socket.participantId;
-      const refText = behaviorText || text;
+      const pid = socket.participantId;
+      const refText = String(behaviorText || text || '').slice(0, 500);
 
       console.log(`💡 [REFLECTION SUBMITTED] Room: ${targetCode}, Text: "${refText}"`);
 
@@ -726,7 +773,7 @@ export function setupSocketHandlers(io) {
       const targetCode = (roomCode || socket.roomCode || '').toUpperCase().trim();
       if (!targetCode || !emoji) return;
       let name = (participantName || '').trim();
-      const pid = participantId || socket.participantId;
+      const pid = socket.participantId;
       const room = gameEngine.getRoom(targetCode);
       if (!name && room && pid && room.participants && room.participants[pid]) {
         name = room.participants[pid].name;
@@ -743,6 +790,7 @@ export function setupSocketHandlers(io) {
     // ==========================================
     socket.on('game:adjust-points', ({ code, targetId, isTeam, pointsDelta }) => {
       const targetCode = (code || socket.roomCode || '').toUpperCase().trim();
+      if (!authHost(targetCode)) return;
       try {
         const room = gameEngine.getRoom(targetCode);
         if (!room) return;
@@ -776,13 +824,12 @@ export function setupSocketHandlers(io) {
 
     socket.on('game:toggle-team-mode', ({ code }) => {
       const targetCode = (code || socket.roomCode || '').toUpperCase().trim();
+      if (!authHost(targetCode)) return;
       const room = gameEngine.getRoom(targetCode);
         if (room) {
           room.mode = room.mode === 'team' ? 'individual' : 'team';
           gameEngine.saveRoomToDb(room);
-          io.to(targetCode).emit('room:updated', { 
-            room: formatClientRoom(room)
-          });
+          broadcastRoom(io, room);
         }
     });
 
@@ -792,15 +839,18 @@ export function setupSocketHandlers(io) {
     const handleShuffleTeams = ({ code, roomCode, teamCount }, callback) => {
       const targetCode = (code || roomCode || socket.roomCode || '').toUpperCase().trim();
       console.log(`🔀 [SHUFFLE TEAMS] Room: ${targetCode}, Team Count: ${teamCount}`);
+      if (!authHost(targetCode, callback)) return;
       try {
         const room = gameEngine.shuffleTeams(targetCode, teamCount);
         const clientRoom = formatClientRoom(room, room.hostSocketId);
 
-        io.to(targetCode).emit('room:updated', { room: clientRoom });
-        io.to(targetCode).emit('teams:shuffled', {
+        broadcastRoom(io, room);
+        const shuffled = {
           teamCount: room.selectedTeamCount || teamCount || 4,
           participants: Object.values(room.participants)
-        });
+        };
+        emitSplit(io, targetCode, 'teams:shuffled', shuffled,
+          { ...shuffled, participants: Object.values(formatPlayerRoom(room).participants) });
 
         if (typeof callback === 'function') {
           callback({ success: true, room: clientRoom });
@@ -819,6 +869,7 @@ export function setupSocketHandlers(io) {
     socket.on('game:pause-toggle', ({ code }) => {
       const targetCode = (code || socket.roomCode || '').toUpperCase().trim();
       console.log(`⏸️ [PAUSE TOGGLED] Room: ${targetCode}`);
+      if (!authHost(targetCode)) return;
       const room = gameEngine.getRoom(targetCode);
       if (!room) return;
 
@@ -841,16 +892,15 @@ export function setupSocketHandlers(io) {
         console.log(`▶ Room ${targetCode} resumed`);
       }
 
-      io.to(targetCode).emit('room:updated', {
-        room: formatClientRoom(room)
-      });
+      broadcastRoom(io, room);
     });
 
     // ==========================================
     // END / RESET WORKSHOP (Single Room Engine)
     // ==========================================
-    const handleEndRoom = ({ code, roomCode }) => {
+    const handleEndRoom = ({ code, roomCode } = {}) => {
       const targetCode = (code || roomCode || socket.roomCode || '').toUpperCase().trim();
+      if (!authHost(targetCode)) return;
       console.log(`🛑 [END WORKSHOP] Room: ${targetCode}`);
       stopRoomTimer(targetCode);
       io.to(targetCode).emit('room:ended', {
@@ -880,12 +930,7 @@ export function setupSocketHandlers(io) {
               participantId: item.participant.id,
               count: onlineCount
             });
-            io.to(item.room.code).emit('room:updated', {
-              room: {
-                code: item.room.code,
-                participants: item.room.participants
-              }
-            });
+            broadcastRoom(io, item.room);
           }
         }
       } catch (err) {

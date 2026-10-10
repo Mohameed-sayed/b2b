@@ -26,6 +26,24 @@ interface AdminEditorProps {
   onBackToHost?: () => void;
 }
 
+// Sends x-admin-token (prompts once on 401). Token kept in sessionStorage only.
+async function adminFetch(path: string, init: RequestInit = {}): Promise<Response> {
+  const send = (token: string) =>
+    fetch(`${socketService.getBackendUrl()}${path}`, {
+      ...init,
+      headers: { ...(init.headers || {}), ...(token ? { 'x-admin-token': token } : {}) },
+    });
+  let token = '';
+  try { token = sessionStorage.getItem('ischool_admin_token') || ''; } catch {}
+  let res = await send(token);
+  if (res.status === 401) {
+    token = window.prompt('Admin token:') || '';
+    try { sessionStorage.setItem('ischool_admin_token', token); } catch {}
+    res = await send(token);
+  }
+  return res;
+}
+
 export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
   const [games, setGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -35,7 +53,7 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
   const [saveSuccess, setSaveSuccess] = useState<boolean>(false);
 
   useEffect(() => {
-    fetch(`${socketService.getBackendUrl()}/api/games`)
+    adminFetch('/api/games')
       .then(res => res.json())
       .then(data => {
         if (data.success && data.games && data.games.length > 0) {
@@ -57,23 +75,26 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
   // Save changes locally & sync
   const handleSaveAll = () => {
     sound.playPop();
-    setSaveSuccess(true);
-    setTimeout(() => setSaveSuccess(false), 2500);
-
-    fetch(`${socketService.getBackendUrl()}/api/games/bulk`, {
+    adminFetch('/api/games/bulk', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(games),
-    }).catch(() => {
-      // Backend not running
-    });
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        setSaveSuccess(true);
+        setTimeout(() => setSaveSuccess(false), 2500);
+      })
+      .catch((err) => {
+        window.alert(`Save failed: ${err.message}`);
+      });
   };
 
   const handleResetDefaults = () => {
     if (window.confirm('Reset all workshop games to default content on the server? Any unsaved edits will be discarded.')) {
       sound.playPop();
       setIsLoading(true);
-      fetch(`${socketService.getBackendUrl()}/api/games/reset`, {
+      adminFetch('/api/games/reset', {
         method: 'POST',
       })
         .then(res => res.json())

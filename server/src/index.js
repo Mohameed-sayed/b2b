@@ -76,6 +76,10 @@ setupSocketHandlers(io);
 // Initialize database
 db.init();
 
+if (!process.env.ADMIN_TOKEN) {
+  console.warn('⚠️  ADMIN_TOKEN not set: game editing API is open and /api/games exposes correct answers.');
+}
+
 const PORT = process.env.PORT || 3001;
 const HOST = '0.0.0.0';
 

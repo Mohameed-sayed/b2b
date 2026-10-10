@@ -78,6 +78,42 @@ export function formatClientRoom(room, hostSocketId = null) {
   };
 }
 
+/** Room view safe for players: no answers, correctness, socket ids. */
+export function formatPlayerRoom(room) {
+  const c = formatClientRoom(room);
+  c.hostSocketId = null;
+  c.submissions = {};
+  c.participants = Object.fromEntries(
+    Object.entries(room.participants || {}).map(([id, p]) => [id, {
+      id: p.id, name: p.name, avatar: p.avatar, team: p.team,
+      score: p.score, streak: p.streak, isOnline: p.isOnline, joinedAt: p.joinedAt
+    }])
+  );
+  return c;
+}
+
+const SECRET_QUESTION_FIELDS = ['correctAnswer', 'explanation', 'learningObjective', 'discussionQuestion', 'facilitatorTips'];
+
+/** Strip answer-revealing fields from a question before sending to players. */
+export function sanitizeQuestion(q) {
+  if (!q) return q;
+  const out = { ...q };
+  for (const f of SECRET_QUESTION_FIELDS) delete out[f];
+  // later rounds carry their own answers
+  if (Array.isArray(out.dynamicUpdate)) out.dynamicUpdate = out.dynamicUpdate.map(sanitizeQuestion);
+  else if (out.dynamicUpdate && typeof out.dynamicUpdate === 'object') out.dynamicUpdate = sanitizeQuestion(out.dynamicUpdate);
+  return out;
+}
+
+/** Strip per-question correctness from leaderboards sent to players. */
+export function sanitizeLeaderboards(lb) {
+  if (!lb) return lb;
+  return {
+    ...lb,
+    individual: (lb.individual || []).map(({ isCorrectLast, lastPointsEarned, ...rest }) => rest)
+  };
+}
+
 export const TEAMS = [
   { id: 'Team Alpha', name: 'Team Alpha', color: '#F59E0B', badge: '🦁' },
   { id: 'Team Beta', name: 'Team Beta', color: '#3B82F6', badge: '🦅' },
@@ -480,6 +516,10 @@ class GameEngine {
     }
 
     const question = this.getCurrentQuestion(room);
+    if (Array.isArray(question.options) && question.options.length > 0 &&
+        !question.options.some(o => String(o.id) === String(optionId))) {
+      throw new Error('Invalid option');
+    }
     const timeLimitMs = (room.questionTimeLimit || 30) * 1000;
     const now = Date.now();
     const actualResponseTime = responseTimeMs !== null ? responseTimeMs : (now - (room.questionStartTime || now));

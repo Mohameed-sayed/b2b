@@ -1,9 +1,16 @@
 import express from 'express';
 import os from 'os';
 import { db } from '../storage/db.js';
-import { gameEngine, TEAMS } from '../gameEngine.js';
+import { gameEngine, TEAMS, sanitizeQuestion } from '../gameEngine.js';
 
 const router = express.Router();
+
+// Admin auth: when ADMIN_TOKEN is set, writes and full (answer-bearing) game reads need header x-admin-token.
+const isAdmin = (req) => !process.env.ADMIN_TOKEN || req.get('x-admin-token') === process.env.ADMIN_TOKEN;
+const requireAdmin = (req, res, next) =>
+  isAdmin(req) ? next() : res.status(401).json({ success: false, error: 'Admin token required' });
+const publicGame = (g) => ({ ...g, questions: (g.questions || []).map(sanitizeQuestion) });
+const viewGame = (req, g) => (isAdmin(req) ? g : publicGame(g));
 
 // Helper to get local machine IP address
 function getLocalIpAddress() {
@@ -103,7 +110,7 @@ router.get('/active-room', (req, res) => {
  */
 router.get('/games', (req, res) => {
   try {
-    const games = db.getGames();
+    const games = db.getGames().map(g => viewGame(req, g));
     res.json({
       success: true,
       count: games.length,
@@ -124,7 +131,7 @@ router.get('/games/:id', (req, res) => {
     if (!game) {
       return res.status(404).json({ success: false, error: 'Game not found' });
     }
-    res.json({ success: true, game });
+    res.json({ success: true, game: viewGame(req, game) });
   } catch (err) {
     res.status(500).json({ success: false, error: err.message });
   }
@@ -134,7 +141,7 @@ router.get('/games/:id', (req, res) => {
  * POST /api/games
  * Create a new game
  */
-router.post('/games', (req, res) => {
+router.post('/games', requireAdmin, (req, res) => {
   try {
     const gameData = req.body;
     if (!gameData || !gameData.title) {
@@ -163,7 +170,7 @@ router.post('/games', (req, res) => {
  * POST /api/games/bulk
  * Overwrite all games
  */
-router.post('/games/bulk', (req, res) => {
+router.post('/games/bulk', requireAdmin, (req, res) => {
   try {
     const games = req.body;
     if (!Array.isArray(games)) {
@@ -180,7 +187,7 @@ router.post('/games/bulk', (req, res) => {
  * POST /api/games/reset
  * Reset all games to seed defaults
  */
-router.post('/games/reset', (req, res) => {
+router.post('/games/reset', requireAdmin, (req, res) => {
   try {
     const games = db.resetGames();
     res.json({ success: true, count: games.length, games });
@@ -193,16 +200,18 @@ router.post('/games/reset', (req, res) => {
  * PUT /api/games/:id
  * Update game or its questions
  */
-router.put('/games/:id', (req, res) => {
+router.put('/games/:id', requireAdmin, (req, res) => {
   try {
     const existing = db.getGameById(req.params.id);
     if (!existing) {
       return res.status(404).json({ success: false, error: 'Game not found' });
     }
 
+    const { title, subtitle, topic, description, category, order, questions } = req.body || {};
     const updated = {
       ...existing,
-      ...req.body,
+      ...Object.fromEntries(Object.entries({ title, subtitle, topic, description, category, order, questions })
+        .filter(([, v]) => v !== undefined)),
       id: existing.id // protect ID
     };
 
@@ -217,7 +226,7 @@ router.put('/games/:id', (req, res) => {
  * DELETE /api/games/:id
  * Delete a game
  */
-router.delete('/games/:id', (req, res) => {
+router.delete('/games/:id', requireAdmin, (req, res) => {
   try {
     const deleted = db.deleteGame(req.params.id);
     if (!deleted) {
