@@ -92,6 +92,11 @@ export function formatPlayerRoom(room) {
   return c;
 }
 
+export function isCorrectOption(question, optionId) {
+  if (question?.correctAnswer === null || question?.correctAnswer === undefined) return true; // voting / reflection
+  return String(question.correctAnswer).trim().toUpperCase() === String(optionId).trim().toUpperCase();
+}
+
 const SECRET_QUESTION_FIELDS = ['correctAnswer', 'explanation', 'learningObjective', 'discussionQuestion', 'facilitatorTips'];
 
 /** Strip answer-revealing fields from a question before sending to players. */
@@ -343,6 +348,8 @@ class GameEngine {
 
     const newParticipant = {
       id: pid,
+      // secret for reclaiming the seat from a new socket; id alone is visible to all players
+      token: crypto.randomBytes(16).toString('hex'),
       socketId,
       name: cleanName,
       avatar: avatar || randomAvatar,
@@ -509,9 +516,7 @@ class GameEngine {
     const clampedResponseTime = Math.max(100, Math.min(timeLimitMs, actualResponseTime));
 
     // Scoring Engine
-    const isCorrect = question.correctAnswer === null || question.correctAnswer === undefined
-      ? true // Reflection or voting without single correct answer
-      : String(question.correctAnswer).trim().toUpperCase() === String(optionId).trim().toUpperCase();
+    const isCorrect = isCorrectOption(question, optionId);
 
     const basePoints = question.points || 1000;
     let speedBonus = 0;

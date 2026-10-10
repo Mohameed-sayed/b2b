@@ -135,6 +135,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
             if (res.room.currentQuestionIndex !== undefined) setCurrentQuestionIndex(res.room.currentQuestionIndex);
             if (res.room.isPaused !== undefined) setIsPaused(res.room.isPaused);
             if (res.room.timeRemaining !== undefined) setTimeRemaining(res.room.timeRemaining);
+            setAnsweredCount(Object.keys(res.room.submissions || {}).length);
             if (res.room.participants) {
               const pVal = res.room.participants;
               setParticipants(Array.isArray(pVal) ? pVal : Object.values(pVal));
@@ -243,12 +244,19 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
       setAnsweredCount(data.answeredCount);
     };
 
+    // reveal payloads carry fresh scores; without this the host only sees them on the leaderboard
+    const syncScores = (data: any) => {
+      if (Array.isArray(data.leaderboards?.individual)) setParticipants(data.leaderboards.individual);
+    };
+
     const onQuestionRevealed = (data: any) => {
+      syncScores(data);
       setRevealStats(data.stats || []);
       setStatus('revealing');
     };
 
     const onPlayersAnswersRevealed = (data: any) => {
+      syncScores(data);
       setRevealStats(data.stats || []);
       setStatus('answers-displayed');
     };
@@ -312,6 +320,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     socket.on('teams:shuffled', onTeamsShuffled);
 
     return () => {
+      socket.off('connect', initOrReconnect);
       socket.off('connect', onSocketReconnect);
       socket.off('room:created', onRoomCreated);
       socket.off('room:participant-joined', onParticipantJoined);

@@ -8,59 +8,48 @@ import { LoadingSplash } from './components/common/LoadingSplash';
 
 type AppMode = 'host' | 'participant' | 'admin';
 
+// Resolved synchronously: rendering host mode even for one frame on a /join page
+// mounts FacilitatorView, which fires room:create from the player's phone.
+function parseRoute(): { mode: AppMode; code: string } {
+  const path = window.location.pathname.toLowerCase();
+  const hash = window.location.hash.toLowerCase();
+
+  // Check if URL has /join/:code or #/join/:code
+  const joinMatch = path.match(/\/join\/([a-z0-9]+)/) || hash.match(/#\/join\/([a-z0-9]+)/);
+  if (joinMatch) return { mode: 'participant', code: joinMatch[1].toUpperCase() };
+
+  if (path.startsWith('/join') || hash.startsWith('#/join') || path.startsWith('/play') || hash.startsWith('#/play')) {
+    return { mode: 'participant', code: '' };
+  }
+  if (path.startsWith('/admin') || hash.startsWith('#/admin')) return { mode: 'admin', code: '' };
+  if (path.startsWith('/host') || hash.startsWith('#/host')) return { mode: 'host', code: '' };
+
+  // On mobile devices, default to participant mode so joining on phones never mounts facilitator host
+  const isMobile = window.innerWidth < 768 || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  // Default to host mode for desktop presentation screens
+  return { mode: isMobile ? 'participant' : 'host', code: '' };
+}
+
 export const App: React.FC = () => {
-  const [mode, setMode] = useState<AppMode>('host');
-  const [joinCode, setJoinCode] = useState<string>('');
+  const [mode, setMode] = useState<AppMode>(() => parseRoute().mode);
+  const [joinCode, setJoinCode] = useState<string>(() => parseRoute().code);
   const [isConnected, setIsConnected] = useState<boolean>(false);
   const [showSplash, setShowSplash] = useState<boolean>(true);
 
-  // Parse path or hash on load and popstate
+  // Re-parse on back/forward and hash changes
   useEffect(() => {
-    const parseRoute = () => {
-      const path = window.location.pathname.toLowerCase();
-      const hash = window.location.hash.toLowerCase();
-
-      // Check if URL has /join/:code or #/join/:code
-      const joinMatch = path.match(/\/join\/([a-z0-9]+)/) || hash.match(/#\/join\/([a-z0-9]+)/);
-      if (joinMatch) {
-        setMode('participant');
-        setJoinCode(joinMatch[1].toUpperCase());
-        return;
-      }
-
-      if (path.startsWith('/join') || hash.startsWith('#/join') || path.startsWith('/play') || hash.startsWith('#/play')) {
-        setMode('participant');
-        return;
-      }
-
-      if (path.startsWith('/admin') || hash.startsWith('#/admin')) {
-        setMode('admin');
-        return;
-      }
-
-      if (path.startsWith('/host') || hash.startsWith('#/host')) {
-        setMode('host');
-        return;
-      }
-
-      // On mobile devices, default to participant mode so joining on phones never mounts facilitator host
-      const isMobile = window.innerWidth < 768 || /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-      if (isMobile) {
-        setMode('participant');
-        return;
-      }
-
-      // Default to host mode for desktop presentation screens
-      setMode('host');
+    const onRoute = () => {
+      const r = parseRoute();
+      setMode(r.mode);
+      if (r.code) setJoinCode(r.code);
     };
 
-    parseRoute();
-    window.addEventListener('popstate', parseRoute);
-    window.addEventListener('hashchange', parseRoute);
+    window.addEventListener('popstate', onRoute);
+    window.addEventListener('hashchange', onRoute);
 
     return () => {
-      window.removeEventListener('popstate', parseRoute);
-      window.removeEventListener('hashchange', parseRoute);
+      window.removeEventListener('popstate', onRoute);
+      window.removeEventListener('hashchange', onRoute);
     };
   }, []);
 

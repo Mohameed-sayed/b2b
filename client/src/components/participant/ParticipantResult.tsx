@@ -6,6 +6,7 @@ import { CheckCircle2, XCircle, Flame, Lightbulb, Trophy } from 'lucide-react';
 
 interface ParticipantResultProps {
   isCorrect: boolean;
+  answered?: boolean;
   pointsAwarded: number;
   totalScore: number;
   streak: number;
@@ -14,6 +15,7 @@ interface ParticipantResultProps {
 
 export const ParticipantResult: React.FC<ParticipantResultProps> = ({
   isCorrect,
+  answered = true,
   pointsAwarded,
   totalScore,
   streak,
@@ -35,7 +37,7 @@ export const ParticipantResult: React.FC<ParticipantResultProps> = ({
       {/* Top Banner */}
       <div className="flex items-center justify-between">
         <Badge variant={isCorrect ? 'success' : 'danger'} size="sm">
-          {isCorrect ? 'CORRECT' : 'NOT QUITE'}
+          {isCorrect ? 'CORRECT' : answered ? 'NOT QUITE' : 'NO ANSWER RECEIVED'}
         </Badge>
 
         {streak > 1 && (

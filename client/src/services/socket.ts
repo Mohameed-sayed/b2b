@@ -143,12 +143,16 @@ class SocketService {
     participantId: string,
     name: string,
     avatar: string = '',
-    team: string = ''
+    team: string = '',
+    token: string = ''
   ): void {
     try {
+      // keep the seat token across saves that don't carry it (team/avatar updates)
+      const prev = this.getParticipantSession();
+      if (!token && prev?.participantId === participantId) token = prev.token || '';
       localStorage.setItem(
         'ischool_session',
-        JSON.stringify({ roomCode, participantId, name, avatar, team, timestamp: Date.now() })
+        JSON.stringify({ roomCode, participantId, name, avatar, team, token, timestamp: Date.now() })
       );
     } catch {
       // Storage access error
@@ -161,6 +165,7 @@ class SocketService {
     name: string;
     avatar: string;
     team: string;
+    token?: string;
   } | null {
     try {
       const data = localStorage.getItem('ischool_session');

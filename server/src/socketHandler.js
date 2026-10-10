@@ -1,4 +1,4 @@
-import { gameEngine, ROOM_STATES, TEAMS, formatClientRoom, formatPlayerRoom, sanitizeQuestion, sanitizeLeaderboards } from './gameEngine.js';
+import { gameEngine, ROOM_STATES, TEAMS, formatClientRoom, formatPlayerRoom, sanitizeQuestion, sanitizeLeaderboards, isCorrectOption } from './gameEngine.js';
 import { db } from './storage/db.js';
 
 // Active question interval timers per room: roomCode -> timerId
@@ -110,6 +110,21 @@ export function setupSocketHandlers(io) {
       if (socket.isHost && socket.roomCode === code) return true;
       if (typeof cb === 'function') cb({ success: false, error: 'Not authorized' });
       return false;
+    };
+
+    // Point a participant's seat at this socket. A still-alive older socket (phones look
+    // alive for up to pingInterval+pingTimeout after dropping) may only be replaced with the seat token.
+    const claimSeat = (code, p, token) => {
+      const old = p.socketId && p.socketId !== socket.id ? io.sockets.sockets.get(p.socketId) : null;
+      if (old && !(p.token && token === p.token)) throw new Error('That player is already connected');
+      p.socketId = socket.id;
+      p.isOnline = true;
+      p.lastActive = Date.now();
+      socket.roomCode = code;
+      socket.participantId = p.id;
+      socket.isHost = false;
+      socket.join(code);
+      old?.disconnect(true);
     };
 
     // ==========================================
@@ -254,7 +269,7 @@ export function setupSocketHandlers(io) {
     // ==========================================
     // RECONNECT (Supports room:reconnect & host:reconnect)
     // ==========================================
-    socket.on('room:reconnect', ({ code, roomCode, participantId }, callback) => {
+    socket.on('room:reconnect', ({ code, roomCode, participantId, token }, callback) => {
       const targetCode = (code || roomCode || '').toUpperCase().trim();
       console.log(`🔄 [RECONNECT ATTEMPT] Room: ${targetCode}, PID: ${participantId}, Socket: ${socket.id}`);
       try {
@@ -266,18 +281,8 @@ export function setupSocketHandlers(io) {
         }
 
         const participant = room.participants[participantId];
-        if (participant.socketId && participant.socketId !== socket.id && io.sockets.sockets.has(participant.socketId)) {
-          if (typeof callback === 'function') callback({ success: false, error: 'That player is already connected' });
-          return;
-        }
-        participant.socketId = socket.id;
-        participant.isOnline = true;
-        participant.lastActive = Date.now();
+        claimSeat(targetCode, participant, token);
         gameEngine.saveRoomToDb(room);
-
-        socket.roomCode = targetCode;
-        socket.participantId = participant.id;
-        socket.join(targetCode);
 
         const clientRoom = formatPlayerRoom(room);
 
@@ -421,14 +426,23 @@ export function setupSocketHandlers(io) {
     // ==========================================
     // SUBMIT ANSWER (Supports game:submit-answer & participant:submit_answer)
     // ==========================================
-    const handleSubmitAnswer = ({ roomCode, code, answer, optionId } = {}, callback) => {
+    const handleSubmitAnswer = ({ roomCode, code, answer, optionId, participantId, token } = {}, callback) => {
       const targetCode = (roomCode || code || socket.roomCode || '').toUpperCase().trim();
-      const pid = socket.participantId; // never trust client-supplied id
       const optId = optionId || answer;
 
-      console.log(`📝 [ANSWER SUBMITTED] Room: ${targetCode}, PID: ${pid}, Choice: ${optId}`);
-
       try {
+        // Answers buffered while offline arrive before room:reconnect; bind via the seat token.
+        if (!socket.participantId && participantId && token) {
+          const room = gameEngine.getRoom(targetCode);
+          const p = room?.participants?.[participantId];
+          if (p?.token && p.token === token) {
+            claimSeat(room.code, p, token);
+            hostRoomUpdate(io, room);
+          }
+        }
+        const pid = socket.participantId; // never trust client-supplied id without its token
+        console.log(`📝 [ANSWER SUBMITTED] Room: ${targetCode}, PID: ${pid}, Choice: ${optId}`);
+
         const result = gameEngine.submitAnswer({
           roomCode: targetCode,
           participantId: pid,
@@ -537,7 +551,7 @@ export function setupSocketHandlers(io) {
             text: opt.text,
             count: entry.count || 0,
             percentage: entry.percentage || 0,
-            isCorrect: opt.id === (question.correctAnswer || ''),
+            isCorrect: question.correctAnswer != null && isCorrectOption(question, opt.id),
             participants: entry.participants || []
           };
         });
@@ -560,6 +574,7 @@ export function setupSocketHandlers(io) {
 
           const scorePayload = {
             participantId: pid,
+            answered: !!userAns,
             isCorrect,
             pointsAwarded: pts,
             totalScore: p.score,
@@ -596,7 +611,7 @@ export function setupSocketHandlers(io) {
         const isTeam = room.mode === 'team';
         const teamScores = {};
         for (const t of leaderboards.team) {
-          teamScores[t.team] = t.totalScore;
+          teamScores[t.name] = t.score;
         }
 
         const payload = {
@@ -750,10 +765,12 @@ export function setupSocketHandlers(io) {
         const leaderboards = gameEngine.getLeaderboards(targetCode);
         const teamScores = {};
         for (const t of leaderboards.team) {
-          teamScores[t.team] = t.totalScore;
+          teamScores[t.name] = t.score;
         }
 
-        io.to(targetCode).emit('leaderboard:updated', {
+        // players jump to the leaderboard screen on this event, so only send it when they are already there
+        const onBoard = room.state === ROOM_STATES.LEADERBOARD || room.state === ROOM_STATES.COMPLETED;
+        io.to(onBoard ? targetCode : `${targetCode}:host`).emit('leaderboard:updated', {
           participants: leaderboards.individual,
           teamScores
         });

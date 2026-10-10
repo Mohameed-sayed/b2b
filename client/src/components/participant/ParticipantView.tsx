@@ -48,12 +48,14 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
     totalScore: number;
     streak: number;
     explanation?: string;
+    answered?: boolean;
   }>({
     isCorrect: false,
     pointsAwarded: 0,
     totalScore: 0,
     streak: 0,
   });
+  const [submitError, setSubmitError] = useState<string>('');
   const [allParticipants, setAllParticipants] = useState<Participant[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -91,6 +93,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
           code,
           roomCode: code,
           participantId: p.id,
+          token: socketService.getParticipantSession()?.token,
         }, (res: any) => {
           if (res?.success && res.participant) {
             console.log('[Participant] Auto-reconnected successfully to room:', code);
@@ -138,6 +141,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
         socket.emit('room:reconnect', {
           code: pendingSession.roomCode,
           participantId: pendingSession.participantId,
+          token: pendingSession.token,
         }, (res: any) => {
           responded = true;
           clearTimeout(fallbackTimer);
@@ -154,7 +158,8 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
               res.participant.id,
               res.participant.name,
               res.participant.avatar || pendingSession.avatar,
-              res.participant.team || pendingSession.team
+              res.participant.team || pendingSession.team,
+              res.participant.token || pendingSession.token
             );
             // Restore correct subState based on room's current status
             const roomStatus: string = res.room?.status || 'lobby';
@@ -214,7 +219,8 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
         data.participant.id,
         data.participant.name,
         data.participant.avatar,
-        data.participant.team
+        data.participant.team,
+        data.participant.token
       );
       if (data.room?.isPaused !== undefined) setIsPaused(data.room.isPaused);
       if (data.room?.teamMode !== undefined) {
@@ -278,12 +284,14 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
       setTimeRemaining(data.timeLimit ?? 30);
       setIsPaused(false);
       setSelectedAnswer('');
+      setSubmitError('');
       setResultData({
         isCorrect: false,
         pointsAwarded: 0,
         totalScore: participantRef.current?.score ?? 0,
         streak: 0,
         explanation: '',
+        answered: false,
       });
       setSubState('question');
     };
@@ -311,6 +319,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
 
       setResultData({
         isCorrect: !!data.isCorrect,
+        answered: data.answered ?? true,
         pointsAwarded: data.pointsAwarded ?? 0,
         totalScore: data.totalScore ?? 0,
         streak: data.streak ?? 0,
@@ -349,6 +358,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
         totalScore: participantRef.current?.score ?? 0,
         streak: 0,
         explanation: '',
+        answered: false,
       });
       setSubState('question');
     };
@@ -456,7 +466,8 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
             res.participant.id,
             res.participant.name,
             res.participant.avatar,
-            res.participant.team
+            res.participant.team,
+            res.participant.token
           );
           setSubState('waiting');
         }
@@ -488,36 +499,31 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
   // ── Submit Answer ──────────────────────────────────────────────
   const handleSubmitAnswer = useCallback((answerId: string) => {
     setSelectedAnswer(answerId);
+    setSubmitError('');
     setSubState('answered');
 
-    const socket = socketService.getSocket();
     const p = participantRef.current;
-    if (socket.connected && p && currentQuestion) {
-      socket.emit('game:submit-answer', {
-        participantId: p.id,
-        roomCode,
-        questionId: currentQuestion.id,
-        answer: answerId,
-        optionId: answerId, // server reads 'optionId || answer'
-        timeRemaining,
-        timeTaken: (currentQuestion.timeLimit || 30) - timeRemaining,
-      });
-    } else if (currentQuestion && p) {
-      // Offline fallback
-      const isCorrect = answerId === currentQuestion.correctAnswer;
-      const pts = isCorrect ? currentQuestion.points : 0;
-      setTimeout(() => {
-        setResultData({
-          isCorrect,
-          pointsAwarded: pts,
-          totalScore: p.score + pts,
-          streak: isCorrect ? p.streak + 1 : 0,
-          explanation: currentQuestion.explanation,
-        });
-        setParticipant({ ...p, score: p.score + pts, streak: isCorrect ? p.streak + 1 : 0 });
-        setSubState('result');
-      }, 1500);
-    }
+    if (!p || !currentQuestion) return;
+    // socket.io buffers this while offline; the token lets the server bind it before room:reconnect lands
+    socketService.getSocket().timeout(10000).emitWithAck('game:submit-answer', {
+      participantId: p.id,
+      token: socketService.getParticipantSession()?.token,
+      roomCode,
+      questionId: currentQuestion.id,
+      answer: answerId,
+      optionId: answerId, // server reads 'optionId || answer'
+      timeRemaining,
+      timeTaken: (currentQuestion.timeLimit || 30) - timeRemaining,
+    }).catch(() => undefined).then((res) => {
+      if (res?.success) return;
+      if (res?.error === 'Question is not currently active') {
+        setSubmitError("Time's up: your answer arrived too late and was not counted.");
+        return;
+      }
+      // never show a made-up result; let them tap again
+      setSubmitError('Your answer did not reach the host. Please tap it again.');
+      setSubState(prev => (prev === 'answered' ? 'question' : prev));
+    });
   }, [currentQuestion, roomCode, timeRemaining]); // timeRemaining must be in deps to avoid stale closure
 
   // ── Submit Reflection ──────────────────────────────────────────
@@ -607,6 +613,12 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
         />
       )}
 
+      {submitError && (subState === 'question' || subState === 'answered') && (
+        <div role="alert" className="fixed top-3 inset-x-3 z-50 rounded-xl bg-red-600 text-white text-sm font-semibold px-4 py-3 text-center shadow-lg">
+          {submitError}
+        </div>
+      )}
+
       {subState === 'answered' && (
         <ParticipantAnswered selectedAnswer={selectedAnswer} />
       )}
@@ -615,6 +627,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
         <ParticipantResult
           key={currentQuestion?.id || questionIndex}
           isCorrect={resultData.isCorrect}
+          answered={resultData.answered}
           pointsAwarded={resultData.pointsAwarded}
           totalScore={resultData.totalScore}
           streak={resultData.streak}

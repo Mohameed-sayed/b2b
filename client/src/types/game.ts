@@ -65,6 +65,7 @@ export type TeamName = 'Team Alpha' | 'Team Beta' | 'Team Gamma' | 'Team Delta';
 
 export interface Participant {
   id: string;
+  token?: string; // seat secret, only sent to the participant themselves
   socketId: string;
   name: string;
   avatar: string;
@@ -187,6 +188,7 @@ export interface ServerToClientEvents {
     pointsAwarded: number;
     totalScore: number;
     isCorrect: boolean;
+    answered?: boolean;
     streak: number;
     explanation?: string;
   }) => void;
@@ -222,7 +224,7 @@ export interface ClientToServerEvents {
   'room:create': (data: { code?: string; gameId?: string; teamMode?: boolean; mode?: string; forceNew?: boolean }, callback?: (res: { success: boolean; code: string; roomCode: string; hostToken: string; room: Room }) => void) => void;
   'room:end': (data: { code: string; roomCode?: string }, callback?: (res: { success: boolean }) => void) => void;
   'room:join': (data: { code?: string; roomCode?: string; name: string; avatar?: string; team?: string; participantId?: string }, callback?: (res: { success: boolean; participant?: Participant; room?: Room; error?: string; message?: string }) => void) => void;
-  'room:reconnect': (data: { code?: string; roomCode?: string; participantId: string }, callback?: (res: { success: boolean; participant?: Participant; room?: Room; currentQuestion?: Question | null; questionIndex?: number; totalQuestions?: number; timeRemaining?: number; error?: string }) => void) => void;
+  'room:reconnect': (data: { code?: string; roomCode?: string; participantId: string; token?: string }, callback?: (res: { success: boolean; participant?: Participant; room?: Room; currentQuestion?: Question | null; questionIndex?: number; totalQuestions?: number; timeRemaining?: number; error?: string }) => void) => void;
   'host:reconnect': (data: { code?: string; roomCode?: string; hostToken?: string }, callback?: (res: { success: boolean; room?: Room; selectedGameId?: string; error?: string }) => void) => void;
   'game:select': (data: { code: string; gameId: string }) => void;
   'game:start': (data: { code: string }, callback?: (res: { success: boolean; error?: string }) => void) => void;
@@ -232,7 +234,7 @@ export interface ClientToServerEvents {
   'game:reveal-answer': (data: { code: string }, callback?: (res: { success: boolean; error?: string }) => void) => void;
   'game:show-leaderboard': (data: { code: string }, callback?: (res: { success: boolean; error?: string }) => void) => void;
   'game:adjust-points': (data: { code: string; targetId: string; isTeam: boolean; pointsDelta: number }) => void;
-  'game:submit-answer': (data: AnswerSubmission & { participantId?: string; optionId?: string; responseTimeMs?: number }, callback?: (res: { success: boolean; error?: string }) => void) => void;
+  'game:submit-answer': (data: AnswerSubmission & { participantId?: string; optionId?: string; responseTimeMs?: number; token?: string }, callback?: (res: { success: boolean; error?: string }) => void) => void;
   'reflection:submit': (data: { roomCode: string; participantId: string; behaviorText?: string; text?: string; category?: string }) => void;
   'game:toggle-team-mode': (data: { code: string; teamMode?: boolean; mode?: string }) => void;
   'game:shuffle-teams': (data: { code: string; teamCount?: number }, callback?: (res: { success: boolean; room?: Room; error?: string }) => void) => void;
