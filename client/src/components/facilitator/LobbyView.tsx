@@ -3,7 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Game, Participant } from '../../types/game';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
-import { Users, Play, Copy, Check, Sparkles, BookOpen, Layers, RotateCcw } from 'lucide-react';
+import { Users, Play, Copy, Check, Sparkles, BookOpen, Layers, RotateCcw, Shuffle } from 'lucide-react';
 
 interface LobbyViewProps {
   roomCode: string;
@@ -12,9 +12,11 @@ interface LobbyViewProps {
   games: Game[];
   selectedGameId: string;
   teamMode: boolean;
+  selectedTeamCount?: number;
   onSelectGame: (gameId: string) => void;
   onStartGame: () => void;
   onToggleTeamMode: () => void;
+  onShuffleTeams?: (teamCount: number) => void;
   onResetRoom?: () => void;
 }
 
@@ -25,12 +27,15 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   games,
   selectedGameId,
   teamMode,
+  selectedTeamCount = 3,
   onSelectGame,
   onStartGame,
   onToggleTeamMode,
+  onShuffleTeams,
   onResetRoom,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [teamCount, setTeamCount] = useState<number>(selectedTeamCount || 3);
 
   // Construct join URL
   const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
@@ -225,19 +230,88 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
 
           {/* Participant Real-Time Lobby Wall */}
           <div className="bg-brand-white border border-slate-200 rounded-3xl p-6 flex-1 flex flex-col">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-2">
                 <Users className="w-5 h-5 text-blue-400" />
                 <h2 className="text-base font-bold text-brand-dark uppercase tracking-wider">
                   Instructors in Lobby ({participants.length})
                 </h2>
               </div>
-              <button
-                onClick={onToggleTeamMode}
-                className={`text-xs font-bold px-3 py-1.5 rounded-xl border transition-all ${teamMode ? 'bg-purple-600/30 border-purple-500 text-purple-300' : 'bg-slate-100 border-slate-300 text-brand-secondary hover:text-brand-dark'}`}
-              >
-                {teamMode ? '👥 Team Competition ON' : '👤 Individual Mode'}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={onToggleTeamMode}
+                  className={`text-xs font-bold px-3 py-1.5 rounded-xl border transition-all ${teamMode ? 'bg-purple-600/30 border-purple-500 text-purple-700' : 'bg-slate-100 border-slate-300 text-brand-secondary hover:text-brand-dark'}`}
+                >
+                  {teamMode ? '👥 Team Competition ON' : '👤 Individual Mode'}
+                </button>
+              </div>
+            </div>
+
+            {/* Team Shuffle Controls Toolbar */}
+            <div className="mb-4 p-3 rounded-2xl bg-brand-light border border-slate-200/80 flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-bold text-brand-secondary uppercase tracking-wider">
+                  Teams:
+                </span>
+                <div className="inline-flex rounded-xl bg-white border border-slate-200 p-0.5 shadow-sm">
+                  {[2, 3, 4].map((cnt) => (
+                    <button
+                      key={cnt}
+                      type="button"
+                      onClick={() => {
+                        setTeamCount(cnt);
+                        onShuffleTeams?.(cnt);
+                      }}
+                      className={`px-3 py-1 text-xs font-extrabold rounded-lg transition-all ${
+                        teamCount === cnt
+                          ? 'bg-purple-600 text-white shadow-sm'
+                          : 'text-brand-secondary hover:text-brand-dark'
+                      }`}
+                    >
+                      {cnt} Teams
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => onShuffleTeams?.(teamCount)}
+                  disabled={participants.length === 0}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-xs shadow-md shadow-purple-500/20 active:scale-95 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                  title="Randomly and evenly distribute all joined instructors into balanced teams"
+                >
+                  <Shuffle className="w-3.5 h-3.5" />
+                  <span>Shuffle Teams</span>
+                </button>
+              </div>
+
+              {/* Live Team Balance Indicator Chips */}
+              {participants.length > 0 && (
+                <div className="w-full pt-1 flex flex-wrap items-center gap-2 text-[11px] border-t border-slate-200/60">
+                  <span className="font-bold text-brand-secondary">Distribution:</span>
+                  {[
+                    { id: 'Team Alpha', label: 'Alpha', badge: '🦁', color: 'bg-amber-100 text-amber-900 border-amber-300' },
+                    { id: 'Team Beta', label: 'Beta', badge: '🦅', color: 'bg-blue-100 text-blue-900 border-blue-300' },
+                    { id: 'Team Gamma', label: 'Gamma', badge: '🐺', color: 'bg-emerald-100 text-emerald-900 border-emerald-300' },
+                    { id: 'Team Delta', label: 'Delta', badge: '🐉', color: 'bg-purple-100 text-purple-900 border-purple-300' },
+                  ]
+                    .slice(0, teamCount)
+                    .map((tm) => {
+                      const count = participants.filter((p) => p.team === tm.id).length;
+                      return (
+                        <span
+                          key={tm.id}
+                          className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full font-bold border ${tm.color}`}
+                        >
+                          <span>{tm.badge}</span>
+                          <span>{tm.label}: {count}</span>
+                        </span>
+                      );
+                    })}
+                </div>
+              )}
             </div>
 
             {participants.length === 0 ? (
@@ -254,22 +328,35 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-64 overflow-y-auto pr-1">
-                {participants.map((p) => (
-                  <div
-                    key={p.id}
-                    className="flex items-center gap-2.5 p-2.5 rounded-xl bg-brand-light/80 border border-slate-200 animate-fade-in"
-                  >
-                    <span className="text-2xl select-none">{p.avatar}</span>
-                    <div className="min-w-0 flex-1">
-                      <div className="text-sm font-bold text-brand-dark truncate">
-                        {p.name}
-                      </div>
-                      <div className="text-[10px] text-brand-secondary truncate">
-                        {p.team}
+                {participants.map((p) => {
+                  const teamBadges: Record<string, { badge: string; color: string }> = {
+                    'Team Alpha': { badge: '🦁', color: 'bg-amber-50 text-amber-700 border-amber-200' },
+                    'Team Beta': { badge: '🦅', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+                    'Team Gamma': { badge: '🐺', color: 'bg-emerald-50 text-emerald-700 border-emerald-200' },
+                    'Team Delta': { badge: '🐉', color: 'bg-purple-50 text-purple-700 border-purple-200' },
+                  };
+                  const tStyle = teamBadges[p.team] || { badge: '⚡', color: 'bg-slate-100 text-slate-700 border-slate-200' };
+
+                  return (
+                    <div
+                      key={p.id}
+                      className="flex items-center gap-2.5 p-2.5 rounded-xl bg-brand-light/80 border border-slate-200 animate-fade-in"
+                    >
+                      <span className="text-2xl select-none">{p.avatar}</span>
+                      <div className="min-w-0 flex-1">
+                        <div className="text-sm font-bold text-brand-dark truncate">
+                          {p.name}
+                        </div>
+                        <div className="mt-0.5">
+                          <span className={`inline-flex items-center gap-1 text-[10px] font-extrabold px-1.5 py-0.5 rounded-md border ${tStyle.color}`}>
+                            <span>{tStyle.badge}</span>
+                            <span className="truncate">{p.team || 'Unassigned'}</span>
+                          </span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

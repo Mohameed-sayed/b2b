@@ -210,7 +210,8 @@ export interface ServerToClientEvents {
   'host:sync': (data: { success: boolean; room: Room }) => void;
   'host:question_active': (data: { question: Question; questionIndex: number; totalQuestions: number; timeLimit: number; distribution: unknown }) => void;
   'error': (data: { success?: false; error?: string; message?: string }) => void;
-  'room:reaction': (data: { emoji: string; participantId?: string }) => void;
+  'room:reaction': (data: { emoji: string; participantId?: string; participantName?: string }) => void;
+  'teams:shuffled': (data: { teamCount: number; participants: Participant[] }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -240,6 +241,8 @@ export interface ClientToServerEvents {
   'reflection:submit': (data: { roomCode: string; participantId: string; behaviorText?: string; text?: string; category?: string }) => void;
   'participant:submit_reflection': (data: { roomCode?: string; code?: string; participantId?: string; behaviorText?: string; text?: string; category?: string }, callback?: (res: { success: boolean; error?: string }) => void) => void;
   'game:toggle-team-mode': (data: { code: string }) => void;
-  'participant:react': (data: { roomCode: string; emoji: string }) => void;
+  'game:shuffle-teams': (data: { code: string; teamCount?: number }, callback?: (res: { success: boolean; room?: Room; error?: string }) => void) => void;
+  'host:shuffle_teams': (data: { code?: string; roomCode?: string; teamCount?: number }, callback?: (res: { success: boolean; room?: Room; error?: string }) => void) => void;
+  'participant:react': (data: { roomCode: string; emoji: string; participantName?: string; participantId?: string }) => void;
 }
 

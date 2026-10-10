@@ -73,6 +73,7 @@ export function formatClientRoom(room, hostSocketId = null) {
     participants: room.participants || {},
     submissions: room.submissions || room.answers?.[room.currentQuestionIndex] || {},
     teamMode: room.mode === 'team',
+    selectedTeamCount: room.selectedTeamCount || 4,
     reflections: room.reflections || []
   };
 }
@@ -278,24 +279,21 @@ class GameEngine {
       return { participant: existing, isReconnect: true, room };
     }
 
-    // Assign team if in team mode or round-robin balance
-    const availableTeams = TEAMS.map(t => t.name);
-    let assignedTeam = null;
-    if (room.mode === 'team') {
-      // Find team with least members
-      const teamCounts = availableTeams.reduce((acc, t) => {
-        acc[t] = 0;
-        return acc;
-      }, {});
-      for (const p of Object.values(room.participants)) {
-        if (p.team && teamCounts[p.team] !== undefined) {
-          teamCounts[p.team]++;
-        }
+    // Auto-balance participant across teams upon joining
+    const teamCount = Math.max(2, Math.min(room.selectedTeamCount || 4, TEAMS.length));
+    const availableTeams = TEAMS.slice(0, teamCount).map(t => t.name);
+    const teamCounts = availableTeams.reduce((acc, t) => {
+      acc[t] = 0;
+      return acc;
+    }, {});
+    for (const p of Object.values(room.participants)) {
+      if (p.team && teamCounts[p.team] !== undefined) {
+        teamCounts[p.team]++;
       }
-      assignedTeam = availableTeams.reduce((minTeam, currentTeam) => {
-        return teamCounts[currentTeam] < teamCounts[minTeam] ? currentTeam : minTeam;
-      }, availableTeams[0]);
     }
+    const assignedTeam = availableTeams.reduce((minTeam, currentTeam) => {
+      return teamCounts[currentTeam] < teamCounts[minTeam] ? currentTeam : minTeam;
+    }, availableTeams[0]);
 
     const randomAvatar = DEFAULT_AVATARS[Math.floor(Math.random() * DEFAULT_AVATARS.length)];
 
@@ -342,6 +340,42 @@ class GameEngine {
     room.mode = mode === 'team' ? 'team' : 'individual';
     room.updatedAt = Date.now();
     this.saveRoomToDb(room);
+    return room;
+  }
+
+  shuffleTeams(roomCode, teamCount = 4) {
+    const room = this.getRoom(roomCode);
+    if (!room) throw new Error('Room not found');
+
+    const count = Math.max(2, Math.min(Number(teamCount) || 4, TEAMS.length));
+    room.selectedTeamCount = count;
+    const availableTeams = TEAMS.slice(0, count).map(t => t.name);
+
+    const participantList = Object.values(room.participants || {});
+    if (participantList.length === 0) {
+      room.updatedAt = Date.now();
+      this.saveRoomToDb(room);
+      return room;
+    }
+
+    // Fisher-Yates shuffle
+    const shuffled = [...participantList];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    // Perfectly balanced round-robin distribution across chosen teams
+    shuffled.forEach((p, idx) => {
+      const assignedTeam = availableTeams[idx % availableTeams.length];
+      if (room.participants[p.id]) {
+        room.participants[p.id].team = assignedTeam;
+      }
+    });
+
+    room.updatedAt = Date.now();
+    this.saveRoomToDb(room);
+    console.log(`🔀 [BALANCED SHUFFLE] Room ${room.code}: ${participantList.length} instructors split into ${count} teams`);
     return room;
   }
 

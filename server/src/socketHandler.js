@@ -722,15 +722,20 @@ export function setupSocketHandlers(io) {
     // ==========================================
     // PARTICIPANT REACTION
     // ==========================================
-    socket.on('participant:react', ({ roomCode, emoji }) => {
+    socket.on('participant:react', ({ roomCode, emoji, participantName, participantId }) => {
       const targetCode = (roomCode || socket.roomCode || '').toUpperCase().trim();
       if (!targetCode || !emoji) return;
-      let participantName = '';
+      let name = (participantName || '').trim();
+      const pid = participantId || socket.participantId;
       const room = gameEngine.getRoom(targetCode);
-      if (room && socket.participantId && room.participants[socket.participantId]) {
-        participantName = room.participants[socket.participantId].name;
+      if (!name && room && pid && room.participants && room.participants[pid]) {
+        name = room.participants[pid].name;
       }
-      io.to(targetCode).emit('room:reaction', { emoji, participantName });
+      if (!name && room && room.participants) {
+        const found = Object.values(room.participants).find(p => p.socketId === socket.id);
+        if (found) name = found.name;
+      }
+      io.to(targetCode).emit('room:reaction', { emoji, participantName: name });
     });
 
     // ==========================================
@@ -780,6 +785,36 @@ export function setupSocketHandlers(io) {
           });
         }
     });
+
+    // ==========================================
+    // SHUFFLE TEAMS (Balanced Partitioning)
+    // ==========================================
+    const handleShuffleTeams = ({ code, roomCode, teamCount }, callback) => {
+      const targetCode = (code || roomCode || socket.roomCode || '').toUpperCase().trim();
+      console.log(`🔀 [SHUFFLE TEAMS] Room: ${targetCode}, Team Count: ${teamCount}`);
+      try {
+        const room = gameEngine.shuffleTeams(targetCode, teamCount);
+        const clientRoom = formatClientRoom(room, room.hostSocketId);
+
+        io.to(targetCode).emit('room:updated', { room: clientRoom });
+        io.to(targetCode).emit('teams:shuffled', {
+          teamCount: room.selectedTeamCount || teamCount || 4,
+          participants: Object.values(room.participants)
+        });
+
+        if (typeof callback === 'function') {
+          callback({ success: true, room: clientRoom });
+        }
+      } catch (err) {
+        console.error('Shuffle teams error:', err);
+        if (typeof callback === 'function') {
+          callback({ success: false, error: err.message });
+        }
+      }
+    };
+
+    socket.on('game:shuffle-teams', handleShuffleTeams);
+    socket.on('host:shuffle_teams', handleShuffleTeams);
 
     socket.on('game:pause-toggle', ({ code }) => {
       const targetCode = (code || socket.roomCode || '').toUpperCase().trim();

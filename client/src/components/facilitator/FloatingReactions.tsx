@@ -40,15 +40,18 @@ export const FloatingReactions: React.FC = () => {
       {reactions.map(r => (
         <div
           key={r.id}
-          className="absolute bottom-0 flex flex-col items-center animate-float-up drop-shadow-lg"
+          className="absolute bottom-10 animate-float-up pointer-events-none select-none"
           style={{ left: `${r.left}%` }}
         >
-          <div className="text-4xl md:text-6xl">{r.emoji}</div>
-          {r.participantName && (
-            <div className="mt-2 px-2 py-1 bg-black/60 text-white text-xs rounded-full whitespace-nowrap">
-              {r.participantName}
-            </div>
-          )}
+          {/* Google Meet Style Reaction Pill */}
+          <div className="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/95 border border-slate-200/90 shadow-[0_8px_30px_rgb(0,0,0,0.16)] backdrop-blur-md">
+            <span className="text-2xl md:text-3xl leading-none">{r.emoji}</span>
+            {r.participantName && (
+              <span className="text-xs md:text-sm font-bold text-slate-800 tracking-tight max-w-[140px] truncate">
+                {r.participantName}
+              </span>
+            )}
+          </div>
         </div>
       ))}
     </div>

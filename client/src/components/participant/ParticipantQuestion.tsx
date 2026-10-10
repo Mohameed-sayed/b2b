@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Question } from '../../types/game';
 import { TimerBar } from '../common/TimerBar';
+import { Badge } from '../common/Badge';
 import { Button } from '../common/Button';
 import { sound } from '../../utils/audio';
 import { Check, Send, CheckCheck, ThumbsUp, ThumbsDown } from 'lucide-react';
@@ -57,19 +58,25 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
   };
 
   return (
-    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-4 md:p-8 lg:p-12 w-full max-w-7xl mx-auto animate-fade-in pb-32">
-      {/* Top Header: Question Index & Countdown */}
+    <div className="min-h-screen bg-brand-light flex flex-col justify-between p-6 md:p-10 max-w-7xl mx-auto animate-fade-in pb-28">
+      {/* Top Header: Question Index, Badges, and Countdown */}
       <div>
-        <div className="flex items-center justify-between pb-3 border-b border-slate-200">
-          <span className="font-mono text-xs font-black text-orange-400">
-            QUESTION {questionIndex + 1} OF {totalQuestions}
-          </span>
-          <span className="text-xs font-bold text-brand-secondary">
-            +{question.points} PTS
-          </span>
+        <div className="flex flex-wrap items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-sm font-extrabold text-orange-400 tracking-wider">
+              QUESTION {questionIndex + 1} OF {totalQuestions}
+            </span>
+            <Badge variant="primary" size="sm">
+              {question.type.toUpperCase()}
+            </Badge>
+            <Badge variant="orange" size="sm">
+              +{question.points} PTS
+            </Badge>
+          </div>
         </div>
 
-        <div className="mt-3">
+        {/* Dynamic Countdown Timer */}
+        <div className="mt-4">
           <TimerBar
             timeRemaining={timeRemaining}
             totalTime={question.timeLimit}
@@ -78,33 +85,33 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
         </div>
       </div>
 
-      {/* Main Question Content Area */}
-      <div className="my-auto py-4 space-y-4">
+      {/* Main Question Content Area matching Host Screen Spacing */}
+      <div className="my-6 space-y-6">
         {/* Title */}
-        <h2 className="text-xl md:text-3xl lg:text-4xl font-black text-brand-dark font-display text-center leading-snug px-4 md:px-12">
+        <h2 className="text-2xl md:text-4xl font-black text-brand-dark tracking-tight font-display">
           {question.title}
         </h2>
 
         {/* 1. WHATSAPP COURT QUESTION TYPE */}
         {question.type === 'voting' ? (
-          <div className="space-y-4">
-            {/* Realistic WhatsApp Chat Box Mockup */}
-            <div className="rounded-2xl bg-[#efeae2] border border-slate-200 overflow-hidden shadow-xl">
+          <div className="space-y-6">
+            {/* Realistic WhatsApp Chat Box Mockup matching Host */}
+            <div className="rounded-3xl bg-[#efeae2] border border-slate-200 overflow-hidden shadow-2xl mb-8 max-w-2xl mx-auto">
               {/* WhatsApp Header */}
-              <div className="bg-[#008069] px-3 py-2.5 flex items-center gap-2.5 shadow-sm relative z-10">
-                <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center text-sm font-bold text-slate-700">
+              <div className="bg-[#008069] px-4 py-3 flex items-center gap-3 shadow-sm relative z-10">
+                <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-lg font-bold text-slate-700">
                   M
                 </div>
                 <div>
-                  <div className="text-xs font-bold text-white leading-none">
+                  <div className="text-sm font-bold text-white leading-none">
                     iSchool B2B Coordinator
                   </div>
-                  <div className="text-[10px] text-emerald-100 mt-0.5">online</div>
+                  <div className="text-xs text-emerald-100 mt-1">online</div>
                 </div>
               </div>
 
               {/* Chat Canvas with Wallpaper look */}
-              <div className="p-3.5 space-y-3 bg-[#efeae2] text-xs max-h-[45vh] overflow-y-auto">
+              <div className="p-6 space-y-4 bg-[#efeae2] text-sm max-h-[50vh] overflow-y-auto">
                 {question.scenario.split(/\\n\\n|\n\n/).map((block, idx) => {
                   const lowerBlock = block.trim().toLowerCase();
                   const isMentor = lowerBlock.startsWith('mentor:');
@@ -115,25 +122,23 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                   if (isMentor) {
                     const text = block.trim().replace(/^(Mentor|Tutor|Instructor):\s*/i, '');
                     return (
-                      <div key={idx} className="bg-white text-slate-800 p-2.5 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm space-y-1 relative">
-                        <p dir="auto" className="whitespace-pre-wrap text-[13px] leading-relaxed font-medium">{text}</p>
-                        
+                      <div key={idx} className="bg-white text-slate-800 p-4 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm space-y-1 relative">
+                        <p dir="auto" className="whitespace-pre-wrap text-base leading-relaxed font-medium">{text}</p>
                       </div>
                     );
                   } else if (isTutor) {
                     const text = block.trim().replace(/^(Mentor|Tutor|Instructor):\s*/i, '');
                     return (
-                      <div key={idx} className="ml-auto bg-[#d9fdd3] text-slate-800 p-2.5 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm space-y-1 relative">
-                        <p dir="auto" className="whitespace-pre-wrap text-[13px] leading-relaxed font-medium">{text}</p>
-                        <div className="flex items-center justify-end gap-1 text-[10px] text-slate-500 mt-1">
-                          
-                          <CheckCheck className="w-3.5 h-3.5 text-blue-500" />
+                      <div key={idx} className="ml-auto bg-[#d9fdd3] text-slate-800 p-4 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm space-y-1 relative">
+                        <p dir="auto" className="whitespace-pre-wrap text-base leading-relaxed font-medium">{text}</p>
+                        <div className="flex items-center justify-end gap-1 text-xs text-slate-500 mt-1">
+                          <CheckCheck className="w-4 h-4 text-blue-500" />
                         </div>
                       </div>
                     );
                   } else {
                     return (
-                      <div key={idx} className="text-center text-[10px] font-bold text-slate-500 bg-[#e1d8c9] px-2 py-1 rounded-lg mx-auto w-fit max-w-[90%]">
+                      <div key={idx} className="text-center text-xs font-bold text-slate-500 bg-[#e1d8c9] px-3 py-1.5 rounded-lg mx-auto w-fit max-w-[90%]">
                         {block.trim()}
                       </div>
                     );
@@ -143,12 +148,12 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
             </div>
 
             {/* Verdict Prompt */}
-            <div className="text-center text-xs font-black uppercase tracking-wider text-brand-dark">
+            <div className="text-center text-sm font-black uppercase tracking-wider text-brand-dark">
               Judge this message: Is it professional?
             </div>
 
             {/* Big YES / NO Verdict Buttons */}
-            <div className={`grid ${question.options.length <= 2 && question.options.some(o => o.id === 'YES' || o.id === 'NO') ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2'} gap-3 md:gap-4 pt-2`}>
+            <div className={`grid ${question.options.length <= 2 && question.options.some(o => o.id === 'YES' || o.id === 'NO') ? 'grid-cols-2' : 'grid-cols-1 md:grid-cols-2'} gap-4 pt-2`}>
               {question.options.map((opt) => {
                 const isYes = opt.id === 'YES';
                 const isNo = opt.id === 'NO';
@@ -159,14 +164,14 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                       key={opt.id}
                       type="button"
                       onClick={() => handleSelectOption(opt.id)}
-                      className={`py-4 px-3 rounded-2xl font-black text-sm flex flex-col items-center justify-center gap-1.5 shadow-lg border transition-all active:scale-95 text-brand-dark ${
+                      className={`py-5 px-4 rounded-2xl font-black text-base flex flex-col items-center justify-center gap-2 shadow-xl border transition-all active:scale-95 text-white ${
                         isYes 
-                          ? 'bg-gradient-to-b from-emerald-600 to-emerald-700 hover:from-green-600 hover:to-emerald-600 shadow-emerald-600/20 border-emerald-400/30' 
-                          : 'bg-gradient-to-b from-rose-600 to-rose-700 hover:from-red-600 hover:to-rose-600 shadow-rose-600/20 border-rose-400/30'
+                          ? 'bg-gradient-to-b from-emerald-600 to-emerald-700 hover:from-green-600 hover:to-emerald-600 shadow-emerald-600/25 border-emerald-400/40' 
+                          : 'bg-gradient-to-b from-rose-600 to-rose-700 hover:from-red-600 hover:to-rose-600 shadow-rose-600/25 border-rose-400/40'
                       }`}
                     >
-                      {isYes ? <ThumbsUp className="w-6 h-6" /> : <ThumbsDown className="w-6 h-6" />}
-                      <span>{opt.text}</span>
+                      {isYes ? <ThumbsUp className="w-7 h-7" /> : <ThumbsDown className="w-7 h-7" />}
+                      <span className="tracking-wide">{opt.text}</span>
                     </button>
                   );
                 }
@@ -176,12 +181,12 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                     key={opt.id}
                     type="button"
                     onClick={() => handleSelectOption(opt.id)}
-                    className="p-3.5 rounded-2xl border-2 text-left transition-all active:scale-98 flex items-start gap-3 bg-brand-white border-slate-200 hover:bg-slate-50 text-slate-500"
+                    className="p-5 rounded-2xl border-2 text-left transition-all active:scale-[0.98] hover:border-brand-accent/50 flex items-start gap-4 bg-brand-white border-slate-200 hover:bg-slate-50 text-slate-500 shadow-sm"
                   >
-                    <span className="w-8 h-8 rounded-xl font-black font-mono flex items-center justify-center shrink-0 text-xs shadow bg-slate-100">
+                    <span className="w-10 h-10 rounded-xl font-black font-mono flex items-center justify-center shrink-0 text-base shadow-md bg-slate-100 text-slate-600">
                       {opt.id}
                     </span>
-                    <span className="text-sm md:text-base lg:text-lg font-bold text-brand-dark mt-1 leading-snug flex-1">
+                    <span className="text-base md:text-lg font-bold text-brand-dark leading-snug mt-1.5 flex-1">
                       {opt.text}
                     </span>
                   </button>
@@ -190,25 +195,24 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
             </div>
           </div>
         ) : question.type === 'categorization' ? (
-          /* 2. TRIAGE QUESTION TYPE (OWN IT, SUPPORT IT, ESCALATE IT) */
-          <div className="space-y-4">
-            {/* Scenario snippet */}
-            <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 whitespace-pre-wrap text-sm text-brand-dark font-medium leading-relaxed">
+          /* 2. TRIAGE QUESTION TYPE */
+          <div className="space-y-6">
+            <div className="p-6 md:p-8 rounded-3xl bg-brand-white border-2 border-slate-300/60 shadow-2xl text-brand-dark text-lg md:text-xl font-medium leading-relaxed whitespace-pre-line mb-8">
               {question.scenario}
             </div>
 
-            <div className="text-center text-xs font-black uppercase tracking-wider text-brand-secondary">
+            <div className="text-center text-sm font-black uppercase tracking-wider text-brand-secondary">
               Select the appropriate triage action:
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 md:gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <button
                 type="button"
                 onClick={() => handleSelectOption('OWN')}
-                className="w-full py-4 px-4 rounded-2xl bg-emerald-950/40 hover:bg-emerald-950/70 active:scale-95 border-2 border-green-600/50 text-emerald-300 font-black text-base flex items-center justify-between shadow-lg shadow-green-600/10 transition-all"
+                className="w-full py-5 px-5 rounded-2xl bg-emerald-950/40 hover:bg-emerald-950/70 active:scale-95 border-2 border-green-600/50 text-emerald-300 font-black text-lg flex items-center justify-between shadow-xl shadow-green-600/10 transition-all"
               >
                 <span className="flex items-center gap-3">
-                  <span className="text-xl">🟢</span>
+                  <span className="text-2xl">🟢</span>
                   <span>OWN IT</span>
                 </span>
                 <span className="text-xs text-emerald-400 font-normal">Personal responsibility</span>
@@ -217,10 +221,10 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectOption('SUPPORT')}
-                className="w-full py-4 px-4 rounded-2xl bg-amber-950/40 hover:bg-amber-950/70 active:scale-95 border-2 border-brand-accent/50 text-amber-300 font-black text-base flex items-center justify-between shadow-lg shadow-brand-accent/10 transition-all"
+                className="w-full py-5 px-5 rounded-2xl bg-amber-950/40 hover:bg-amber-950/70 active:scale-95 border-2 border-brand-accent/50 text-amber-300 font-black text-lg flex items-center justify-between shadow-xl shadow-brand-accent/10 transition-all"
               >
                 <span className="flex items-center gap-3">
-                  <span className="text-xl">🟡</span>
+                  <span className="text-2xl">🟡</span>
                   <span>SUPPORT IT</span>
                 </span>
                 <span className="text-xs text-amber-400 font-normal">Help a colleague</span>
@@ -229,10 +233,10 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
               <button
                 type="button"
                 onClick={() => handleSelectOption('ESCALATE')}
-                className="w-full py-4 px-4 rounded-2xl bg-rose-950/40 hover:bg-rose-950/70 active:scale-95 border-2 border-red-600/50 text-rose-300 font-black text-base flex items-center justify-between shadow-lg shadow-red-600/10 transition-all"
+                className="w-full py-5 px-5 rounded-2xl bg-rose-950/40 hover:bg-rose-950/70 active:scale-95 border-2 border-red-600/50 text-rose-300 font-black text-lg flex items-center justify-between shadow-xl shadow-red-600/10 transition-all"
               >
                 <span className="flex items-center gap-3">
-                  <span className="text-xl">🔴</span>
+                  <span className="text-2xl">🔴</span>
                   <span>ESCALATE IT</span>
                 </span>
                 <span className="text-xs text-rose-400 font-normal">Inform leadership</span>
@@ -241,39 +245,38 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
           </div>
         ) : question.type === 'reflection' ? (
           /* 3. REFLECTION QUESTION TYPE */
-          <form onSubmit={handleReflectionSubmit} className="space-y-4">
-            <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 whitespace-pre-wrap text-xs text-brand-dark">
+          <form onSubmit={handleReflectionSubmit} className="space-y-6">
+            <div className="p-6 md:p-8 rounded-3xl bg-brand-white border-2 border-slate-300/60 shadow-2xl text-brand-dark text-lg md:text-xl font-medium leading-relaxed whitespace-pre-line mb-8">
               {question.scenario}
             </div>
 
             {/* Quick Suggestion Chips */}
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-brand-secondary mb-1.5">
-                Quick Commitments (Tap to use)
-              </label>
-              <div className="flex flex-col gap-2">
+              <span className="block text-xs font-bold uppercase tracking-wider text-brand-secondary mb-2">
+                Quick commitments (tap to select):
+              </span>
+              <div className="flex flex-wrap gap-2">
                 {[
-                  "I will clarify requirements and constraints before committing blindly.",
-                  "I will own mistakes early instead of hiding them.",
-                  "I will stay calm and switch to Plan B when classroom tech fails.",
-                  "I will communicate prompt ETAs instead of ghosting messages."
-                ].map((chip, idx) => (
+                  'I will always acknowledge tickets within 15 minutes',
+                  'I will test every lab environment 30 minutes before session start',
+                  'I will proactively post Slack updates when a parent reaches out',
+                  'I will never cancel a live class without lead approval',
+                ].map((chip) => (
                   <button
-                    key={idx}
+                    key={chip}
                     type="button"
                     onClick={() => handleSelectSuggestion(chip)}
-                    className="p-2.5 rounded-xl border border-slate-200 bg-brand-white hover:bg-slate-850 text-left text-xs font-semibold text-brand-dark hover:text-brand-dark transition-colors"
+                    className="text-xs font-semibold px-3 py-1.5 rounded-xl border border-slate-200 bg-brand-white text-slate-700 hover:border-brand-accent hover:text-brand-accent transition-all"
                   >
-                    "{chip}"
+                    {chip}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Custom Input */}
             <div>
-              <label className="block text-[11px] font-bold uppercase tracking-wider text-brand-secondary mb-1.5">
-                Or write your own commitment:
+              <label className="block text-xs font-bold uppercase tracking-wider text-brand-secondary mb-1.5">
+                Your Commitment Pledge
               </label>
               <textarea
                 value={reflectionText}
@@ -281,49 +284,48 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                 placeholder="In one clear sentence, what will you do differently starting tomorrow?"
                 rows={3}
                 required
-                className="w-full rounded-xl bg-brand-light border border-slate-300 p-3 text-xs text-brand-dark placeholder:text-slate-600 focus:border-brand-accent focus:outline-none"
+                className="w-full rounded-2xl bg-brand-white border-2 border-slate-300/80 p-4 text-sm md:text-base text-brand-dark placeholder:text-slate-400 focus:border-brand-accent focus:outline-none shadow-sm"
               />
             </div>
 
             <Button
               type="submit"
               variant="orange"
-              size="lg"
-              icon={<Send className="w-4 h-4" />}
+              size="xl"
+              icon={<Send className="w-5 h-5" />}
               iconPosition="right"
               disabled={!reflectionText.trim()}
-              className="w-full"
+              className="w-full shadow-xl shadow-brand-accent/25"
             >
               PLEDGE COMMITMENT 🚀
             </Button>
           </form>
         ) : (
-          /* 4. STANDARD MULTIPLE CHOICE / RAPID RESPONSE */
-          <div className="space-y-4">
-            {/* Scenario snippet */}
+          /* 4. STANDARD MULTIPLE CHOICE & SLACK SCENARIO */
+          <div className="space-y-6">
             {question.type === 'slack-scenario' ? (
-              <div className="rounded-2xl bg-[#1a1d21] border border-[#35373b] overflow-hidden shadow-xl">
-                <div className="bg-[#1a1d21] px-3 md:px-4 py-2 border-b border-[#35373b] flex items-center gap-2">
-                  <span className="text-slate-400 font-bold text-sm">#</span>
-                  <span className="text-slate-200 font-bold text-xs tracking-wide">b2b-support</span>
+              <div className="rounded-3xl bg-[#1a1d21] border border-[#35373b] overflow-hidden shadow-2xl mb-8">
+                <div className="bg-[#1a1d21] px-6 py-4 border-b border-[#35373b] flex items-center gap-3">
+                  <span className="text-slate-400 font-bold text-xl">#</span>
+                  <span className="text-slate-200 font-bold text-lg tracking-wide">b2b-support</span>
                 </div>
-                <div className="p-3 md:p-4 space-y-4 bg-[#1a1d21] text-sm max-h-[45vh] overflow-y-auto">
+                <div className="p-6 md:p-8 space-y-6 bg-[#1a1d21] text-base max-h-96 overflow-y-auto">
                   {question.scenario.split(/\\n\\n|\n\n/).map((msg, i) => {
                     const isTutor = msg.startsWith('Tutor:');
                     const content = msg.replace(/^(Mentor|Tutor):\s*/, '').replace(/\\n/g, '\n').replace(/—/g, '—').replace(/â€™/g, "'").replace(/—/g, '—');
                     const sender = isTutor ? 'Ahmed' : 'Mentor';
                     const time = `10:${12 + i} AM`; 
                     return (
-                      <div key={i} className="flex items-start gap-2.5 md:gap-3">
-                        <div className={`w-8 h-8 md:w-9 md:h-9 rounded shrink-0 flex items-center justify-center text-sm md:text-base lg:text-lg font-bold text-white ${isTutor ? 'bg-blue-600' : 'bg-emerald-700'}`}>
+                      <div key={i} className="flex items-start gap-4">
+                        <div className={`w-12 h-12 rounded shrink-0 flex items-center justify-center text-xl font-bold text-white ${isTutor ? 'bg-blue-600' : 'bg-emerald-700'}`}>
                           {sender[0]}
                         </div>
-                        <div className="flex-1 space-y-0.5 min-w-0">
-                          <div className="flex items-baseline gap-2">
-                            <span className="font-bold text-slate-200 text-sm">{sender}</span>
-                            <span className="text-[10px] md:text-xs text-slate-500">{time}</span>
+                        <div className="flex-1 space-y-1 min-w-0">
+                          <div className="flex items-baseline gap-3">
+                            <span className="font-bold text-slate-200 text-lg">{sender}</span>
+                            <span className="text-xs text-slate-500">{time}</span>
                           </div>
-                          <div dir="auto" className="text-slate-300 text-[13px] md:text-sm leading-relaxed whitespace-pre-wrap break-words">{content}</div>
+                          <div dir="auto" className="text-slate-300 text-base leading-relaxed whitespace-pre-wrap break-words">{content}</div>
                         </div>
                       </div>
                     )
@@ -331,13 +333,13 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                 </div>
               </div>
             ) : (
-              <div className="p-4 rounded-2xl bg-brand-white border border-slate-200 whitespace-pre-wrap text-sm md:text-base lg:text-lg text-brand-dark font-medium leading-relaxed max-h-36 md:max-h-64 overflow-y-auto">
+              <div className="p-6 md:p-8 rounded-3xl bg-brand-white border-2 border-slate-300/60 shadow-2xl text-brand-dark text-lg md:text-xl font-medium leading-relaxed whitespace-pre-line mb-8">
                 {question.scenario}
               </div>
             )}
 
-            {/* Options */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4">
+            {/* Question Options Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {question.options.map((opt, idx) => {
                 const style = mcOptionColors[idx % mcOptionColors.length];
                 const isSelected = selectedOption === opt.id;
@@ -346,14 +348,14 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
                     key={opt.id}
                     type="button"
                     onClick={() => handleSelectOption(opt.id)}
-                    className={`p-3.5 rounded-2xl border-2 text-left transition-all active:scale-98 flex items-start gap-3 ${style.bg} ${isSelected ? 'ring-2 ring-brand-accent scale-[1.02]' : ''}`}
+                    className={`p-5 rounded-2xl border-2 text-left transition-all active:scale-[0.98] hover:border-brand-accent/50 flex items-start gap-4 ${style.bg} ${isSelected ? 'ring-2 ring-brand-accent border-brand-accent scale-[1.01] shadow-xl' : 'shadow-sm hover:shadow-md'}`}
                   >
                     <span
-                      className={`w-8 h-8 rounded-xl font-black font-mono flex items-center justify-center shrink-0 text-xs shadow ${style.badge}`}
+                      className={`w-10 h-10 rounded-xl font-black font-mono flex items-center justify-center shrink-0 text-base shadow-md ${style.badge}`}
                     >
                       {opt.id}
                     </span>
-                    <span className="text-sm md:text-base lg:text-lg font-bold text-brand-dark mt-1 leading-snug flex-1">
+                    <span className="text-base md:text-lg font-bold text-brand-dark leading-snug mt-1.5 flex-1">
                       {opt.text}
                     </span>
                   </button>
@@ -364,8 +366,8 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
         )}
       </div>
 
-      <div className="text-center pt-2">
-        <span className="text-[10px] text-brand-secondary">
+      <div className="text-center pt-4">
+        <span className="text-xs text-brand-secondary font-medium">
           Select carefully · Answer cannot be modified once submitted
         </span>
       </div>

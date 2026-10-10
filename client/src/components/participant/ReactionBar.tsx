@@ -3,7 +3,13 @@ import { socketService } from '../../services/socket';
 
 const EMOJIS = ['💡', '❓', '🤯', '👏', '🔥'];
 
-export const ReactionBar: React.FC<{ roomCode: string }> = ({ roomCode }) => {
+interface ReactionBarProps {
+  roomCode: string;
+  participantName?: string;
+  participantId?: string;
+}
+
+export const ReactionBar: React.FC<ReactionBarProps> = ({ roomCode, participantName, participantId }) => {
   const [cooldown, setCooldown] = useState(false);
 
   const handleReact = (emoji: string) => {
@@ -11,7 +17,12 @@ export const ReactionBar: React.FC<{ roomCode: string }> = ({ roomCode }) => {
     
     const socket = socketService.getSocket();
     if (socket.connected && roomCode) {
-      socket.emit('participant:react', { roomCode, emoji });
+      socket.emit('participant:react', {
+        roomCode,
+        emoji,
+        participantName,
+        participantId
+      });
     }
     
     // Tiny local visual feedback

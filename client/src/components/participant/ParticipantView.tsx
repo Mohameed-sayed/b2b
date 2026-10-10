@@ -217,6 +217,36 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
       if (data.room?.timeRemaining !== undefined && data.room.isPaused) {
         setTimeRemaining(data.room.timeRemaining);
       }
+      if (data.room?.participants && participantRef.current) {
+        const me = data.room.participants[participantRef.current.id];
+        if (me && me.team !== participantRef.current.team) {
+          setParticipant(prev => prev ? { ...prev, team: me.team } : prev);
+          socketService.saveParticipantSession(
+            data.room.code || roomCodeRef.current,
+            me.id,
+            me.name,
+            me.avatar,
+            me.team
+          );
+        }
+      }
+    };
+
+    const onTeamsShuffled = (data: any) => {
+      const myId = participantRef.current?.id;
+      if (myId && Array.isArray(data.participants)) {
+        const me = data.participants.find((p: any) => p.id === myId);
+        if (me && me.team) {
+          setParticipant(prev => prev ? { ...prev, team: me.team } : prev);
+          socketService.saveParticipantSession(
+            roomCodeRef.current,
+            me.id,
+            me.name,
+            me.avatar,
+            me.team
+          );
+        }
+      }
     };
 
     // ── New question received ──────────────────────────────────
@@ -321,6 +351,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
 
     socket.on('room:joined', onRoomJoined);
     socket.on('room:updated', onRoomUpdated);
+    socket.on('teams:shuffled', onTeamsShuffled);
     socket.on('question:started', onQuestionStarted);
     socket.on('question:tick', onQuestionTick);
     socket.on('question:revealed', onQuestionRevealed);
@@ -337,6 +368,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
       socket.off('connect', onSocketConnect);
       socket.off('room:joined', onRoomJoined);
       socket.off('room:updated', onRoomUpdated);
+      socket.off('teams:shuffled', onTeamsShuffled);
       socket.off('question:started', onQuestionStarted);
       socket.off('question:tick', onQuestionTick);
       socket.off('question:revealed', onQuestionRevealed);
@@ -367,7 +399,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
   }, [subState, isPaused]);
 
   // ── Join Room Handler ──────────────────────────────────────────
-  const handleJoin = useCallback((code: string, name: string, avatar: string, team: TeamName) => {
+  const handleJoin = useCallback((code: string, name: string, avatar: string) => {
     setIsLoading(true);
     setErrorMessage('');
     const cleanCode = code.trim().toUpperCase();
@@ -381,7 +413,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
         setErrorMessage('Server took too long to respond. Check room code and try again.');
       }, 8000);
 
-      socket.emit('room:join', { code: cleanCode, roomCode: cleanCode, name, avatar, team }, (res: any) => {
+      socket.emit('room:join', { code: cleanCode, roomCode: cleanCode, name, avatar }, (res: any) => {
         clearTimeout(timer);
         setIsLoading(false);
         if (res && !res.success) {
@@ -568,7 +600,11 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
 
       {/* Show Reaction Bar for active participants */}
       {subState !== 'join' && subState !== 'reconnecting' && (
-        <ReactionBar roomCode={roomCode} />
+        <ReactionBar
+          roomCode={roomCode}
+          participantName={participant?.name}
+          participantId={participant?.id}
+        />
       )}
     </div>
   );

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { TeamName } from '../../types/game';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
 import { sound } from '../../utils/audio';
@@ -7,13 +6,12 @@ import { User, Sparkles, ArrowRight, ShieldCheck } from 'lucide-react';
 
 interface ParticipantJoinProps {
   initialCode?: string;
-  onJoin: (code: string, name: string, avatar: string, team: TeamName) => void;
+  onJoin: (code: string, name: string, avatar: string) => void;
   isLoading?: boolean;
   errorMessage?: string;
 }
 
 const avatars = ['🚀', '💻', '⚡', '🦁', '🤖', '🦄', '🧠', '🎯', '🦅', '🔥', '👑', '👾'];
-const teams: TeamName[] = ['Team Alpha', 'Team Beta', 'Team Gamma', 'Team Delta'];
 
 export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
   initialCode = '',
@@ -24,13 +22,12 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
   const [code, setCode] = useState<string>(initialCode.toUpperCase());
   const [name, setName] = useState<string>('');
   const [selectedAvatar, setSelectedAvatar] = useState<string>(avatars[0]);
-  const [selectedTeam, setSelectedTeam] = useState<TeamName>(teams[0]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!code.trim() || !name.trim()) return;
     sound.playPop();
-    onJoin(code.trim().toUpperCase(), name.trim(), selectedAvatar, selectedTeam);
+    onJoin(code.trim().toUpperCase(), name.trim(), selectedAvatar);
   };
 
   return (
@@ -113,27 +110,6 @@ export const ParticipantJoin: React.FC<ParticipantJoinProps> = ({
           </div>
         </div>
 
-        {/* Team Picker */}
-        <div>
-          <label className="block text-xs font-bold uppercase tracking-wider text-brand-secondary mb-2">
-            Select Your Team
-          </label>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-3">
-            {teams.map((t) => (
-              <button
-                key={t}
-                type="button"
-                onClick={() => {
-                  sound.playPop();
-                  setSelectedTeam(t);
-                }}
-                className={`py-2 px-3 text-xs font-bold rounded-xl border text-left transition-all ${selectedTeam === t ? 'border-purple-500 bg-purple-600/20 text-purple-300 shadow-md' : 'border-slate-200 bg-brand-light text-brand-secondary hover:bg-slate-100'}`}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
-        </div>
 
         {/* Join Submit Button */}
         <Button

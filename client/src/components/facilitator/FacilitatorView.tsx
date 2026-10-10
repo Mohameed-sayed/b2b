@@ -27,6 +27,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
   const [timeRemaining, setTimeRemaining] = useState<number>(30);
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [teamMode, setTeamMode] = useState<boolean>(false);
+  const [selectedTeamCount, setSelectedTeamCount] = useState<number>(3);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [answeredCount, setAnsweredCount] = useState<number>(0);
@@ -270,6 +271,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
         if (data.room.isPaused !== undefined) setIsPaused(data.room.isPaused);
         if (data.room.timeRemaining !== undefined && data.room.isPaused) setTimeRemaining(data.room.timeRemaining);
         if (data.room.teamMode !== undefined) setTeamMode(data.room.teamMode);
+        if (data.room.selectedTeamCount !== undefined) setSelectedTeamCount(data.room.selectedTeamCount);
         if (data.room.participants) {
           const participantsValue = data.room.participants;
           setParticipants(
@@ -278,6 +280,16 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
               : Object.values(participantsValue)
           );
         }
+      }
+    };
+
+    const onTeamsShuffled = (data: any) => {
+      sound.playPop();
+      if (Array.isArray(data.participants)) {
+        setParticipants(data.participants);
+      }
+      if (data.teamCount) {
+        setSelectedTeamCount(data.teamCount);
       }
     };
 
@@ -294,6 +306,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     socket.on('leaderboard:updated', onLeaderboardUpdated);
     socket.on('reflection:added', onReflectionAdded);
     socket.on('room:updated', onRoomUpdated);
+    socket.on('teams:shuffled', onTeamsShuffled);
 
     return () => {
       socket.off('connect', onSocketReconnect);
@@ -310,6 +323,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
       socket.off('leaderboard:updated', onLeaderboardUpdated);
       socket.off('reflection:added', onReflectionAdded);
       socket.off('room:updated', onRoomUpdated);
+      socket.off('teams:shuffled', onTeamsShuffled);
     };
   }, [initialRoomCode]);
 
@@ -383,6 +397,19 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     const socket = socketService.getSocket();
     if (socket.connected) {
       socket.emit('game:toggle-team-mode', { code: roomCode });
+    }
+  };
+
+  const handleShuffleTeams = (count: number) => {
+    setSelectedTeamCount(count);
+    sound.playPop();
+    const socket = socketService.getSocket();
+    if (socket.connected) {
+      socket.emit('game:shuffle-teams', { code: roomCode, teamCount: count }, (res: any) => {
+        if (res?.room?.participants) {
+          setParticipants(Object.values(res.room.participants));
+        }
+      });
     }
   };
 
@@ -569,9 +596,11 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
           games={games}
           selectedGameId={selectedGameId}
           teamMode={teamMode}
+          selectedTeamCount={selectedTeamCount}
           onSelectGame={handleSelectGame}
           onStartGame={handleStartGame}
           onToggleTeamMode={handleToggleTeamMode}
+          onShuffleTeams={handleShuffleTeams}
           onResetRoom={handleResetRoom}
         />
       )}
