@@ -1,4 +1,4 @@
-import { gameEngine, ROOM_STATES, toClientStatus, formatClientRoom, formatPlayerRoom, sanitizeQuestion, sanitizeLeaderboards } from './gameEngine.js';
+import { gameEngine, ROOM_STATES, formatClientRoom, formatPlayerRoom, sanitizeQuestion, sanitizeLeaderboards } from './gameEngine.js';
 import { db } from './storage/db.js';
 
 // Active question interval timers per room: roomCode -> timerId
@@ -117,12 +117,12 @@ export function setupSocketHandlers(io) {
     // ==========================================
     const handleCreateRoom = async ({ gameId, mode, teamMode, code, customCode, forceNew, hostToken } = {}, callback) => {
       try {
-        // An existing room may only be (re)claimed by its host, or when no host is connected.
+        // An existing room may only be (re)claimed by its host, or when it has no host and no players.
         const existing = gameEngine.getActiveRoom();
         if (existing && !(
           (hostToken && gameEngine.validateHost(existing.code, hostToken)) ||
           (socket.isHost && socket.roomCode === existing.code) ||
-          !existing.hostSocketId
+          (!existing.hostSocketId && Object.keys(existing.participants).length === 0)
         )) {
           throw new Error('A workshop is already running');
         }
@@ -156,7 +156,6 @@ export function setupSocketHandlers(io) {
         console.log(`✅ [ROOM CREATED/ATTACHED] Code: ${room.code} by Host Socket: ${socket.id}`);
 
         socket.emit('room:created', { room: clientRoom });
-        socket.emit('host:room_created', response);
 
         if (typeof callback === 'function') callback(response);
       } catch (err) {
@@ -169,26 +168,6 @@ export function setupSocketHandlers(io) {
     };
 
     socket.on('room:create', handleCreateRoom);
-    socket.on('host:create_room', handleCreateRoom);
-
-    // ==========================================
-    // GET ACTIVE ROOM (Single Room Query)
-    // ==========================================
-    socket.on('room:get-active', (callback) => {
-      const active = gameEngine.getActiveRoom();
-      const resp = active ? {
-        success: true,
-        hasActiveRoom: true,
-        roomCode: active.code,
-        gameId: active.gameId,
-        status: active.state
-      } : {
-        success: true,
-        hasActiveRoom: false,
-        roomCode: null
-      };
-      if (typeof callback === 'function') callback(resp);
-    });
 
     // ==========================================
     // PARTICIPANT JOIN (Supports room:join & participant:join)
@@ -263,7 +242,6 @@ export function setupSocketHandlers(io) {
       } catch (err) {
         console.error(`❌ [JOIN ERROR] Room: "${targetCode}":`, err.message);
         const errResp = { success: false, error: err.message, message: err.message };
-        socket.emit('participant:join_error', errResp);
         socket.emit('room:error', { message: err.message });
         if (typeof callback === 'function') {
           callback(errResp);
@@ -272,7 +250,6 @@ export function setupSocketHandlers(io) {
     };
 
     socket.on('room:join', handleJoin);
-    socket.on('participant:join', handleJoin);
 
     // ==========================================
     // RECONNECT (Supports room:reconnect & host:reconnect)
@@ -383,7 +360,6 @@ export function setupSocketHandlers(io) {
         };
 
         console.log(`👑 [HOST RECONNECTED] Room: ${targetCode} to Socket: ${socket.id}`);
-        socket.emit('host:sync', response);
         socket.emit('room:updated', { room: clientRoom });
         if (typeof callback === 'function') callback(response);
       } catch (err) {
@@ -433,21 +409,6 @@ export function setupSocketHandlers(io) {
           total: room.game.questions.length
         });
 
-        io.to(targetCode).emit('game:started', {
-          roomCode: targetCode,
-          state: room.state,
-          currentQuestionIndex: room.currentQuestionIndex,
-          totalQuestions: room.game.questions.length
-        });
-
-        io.to(`${targetCode}:host`).emit('host:question_active', {
-          question: rawQuestion,
-          questionIndex: room.currentQuestionIndex,
-          totalQuestions: room.game.questions.length,
-          timeLimit: room.questionTimeLimit,
-          distribution: gameEngine.calculateAnswerDistribution(room)
-        });
-
         if (typeof callback === 'function') callback({ success: true, room });
       } catch (err) {
         console.error('Start game error:', err);
@@ -456,7 +417,6 @@ export function setupSocketHandlers(io) {
     };
 
     socket.on('game:start', handleStartGame);
-    socket.on('host:start_game', handleStartGame);
 
     // ==========================================
     // SUBMIT ANSWER (Supports game:submit-answer & participant:submit_answer)
@@ -494,18 +454,15 @@ export function setupSocketHandlers(io) {
           answer: result.answer
         };
 
-        socket.emit('answer:submitted', response);
         if (typeof callback === 'function') callback(response);
       } catch (err) {
         console.error('Submit answer error:', err);
         const errResp = { success: false, error: err.message };
-        socket.emit('answer:error', errResp);
         if (typeof callback === 'function') callback(errResp);
       }
     };
 
     socket.on('game:submit-answer', handleSubmitAnswer);
-    socket.on('participant:submit_answer', handleSubmitAnswer);
 
     // ==========================================
     // REVEAL PLAYERS ANSWERS
@@ -558,7 +515,6 @@ export function setupSocketHandlers(io) {
     };
 
     socket.on('game:reveal-players-answers', handleRevealPlayersAnswers);
-    socket.on('host:reveal_players_answers', handleRevealPlayersAnswers);
 
     // ==========================================
     // REVEAL ANSWER (Supports game:reveal-answer & host:reveal_answer)
@@ -626,7 +582,6 @@ export function setupSocketHandlers(io) {
     };
 
     socket.on('game:reveal-answer', handleRevealAnswer);
-    socket.on('host:reveal_answer', handleRevealAnswer);
 
     // ==========================================
     // SHOW LEADERBOARD (Supports game:show-leaderboard & host:show_leaderboard)
@@ -662,7 +617,6 @@ export function setupSocketHandlers(io) {
     };
 
     socket.on('game:show-leaderboard', handleShowLeaderboard);
-    socket.on('host:show_leaderboard', handleShowLeaderboard);
 
     // ==========================================
     // NEXT QUESTION (Supports game:next-question & host:next_question)
@@ -712,13 +666,6 @@ export function setupSocketHandlers(io) {
             total: result.totalQuestions
           });
 
-          io.to(`${targetCode}:host`).emit('host:question_active', {
-            question,
-            questionIndex: result.questionIndex,
-            totalQuestions: result.totalQuestions,
-            timeLimit: room.questionTimeLimit,
-            distribution: gameEngine.calculateAnswerDistribution(room)
-          });
         }
 
         if (typeof callback === 'function') callback({ success: true, finished: false });
@@ -729,12 +676,14 @@ export function setupSocketHandlers(io) {
     };
 
     socket.on('game:next-question', handleNextQuestion);
-    socket.on('host:next_question', handleNextQuestion);
 
     // ==========================================
     // SUBMIT REFLECTION (Supports reflection:submit & participant:submit_reflection)
     // ==========================================
+    let lastReflectionAt = 0;
     const handleSubmitReflection = ({ roomCode, code, behaviorText, text, category }, callback) => {
+      if (Date.now() - lastReflectionAt < 1000) return callback?.({ success: false, error: 'Too fast' });
+      lastReflectionAt = Date.now();
       const targetCode = (roomCode || code || socket.roomCode || '').toUpperCase().trim();
       const pid = socket.participantId;
       const refText = String(behaviorText || text || '').slice(0, 500);
@@ -746,12 +695,10 @@ export function setupSocketHandlers(io) {
           roomCode: targetCode,
           participantId: pid,
           text: refText,
-          category
+          category: typeof category === 'string' ? category.slice(0, 30) : undefined
         });
 
-        socket.emit('reflection:submitted', { success: true, reflection });
         io.to(targetCode).emit('reflection:added', { reflection });
-        io.to(targetCode).emit('reflection:new', reflection);
 
         if (typeof callback === 'function') callback({ success: true, reflection });
       } catch (err) {
@@ -761,25 +708,17 @@ export function setupSocketHandlers(io) {
     };
 
     socket.on('reflection:submit', handleSubmitReflection);
-    socket.on('participant:submit_reflection', handleSubmitReflection);
 
     // ==========================================
     // PARTICIPANT REACTION
     // ==========================================
-    socket.on('participant:react', ({ roomCode, emoji, participantName, participantId }) => {
-      const targetCode = (roomCode || socket.roomCode || '').toUpperCase().trim();
-      if (!targetCode || !emoji) return;
-      let name = (participantName || '').trim();
-      const pid = socket.participantId;
-      const room = gameEngine.getRoom(targetCode);
-      if (!name && room && pid && room.participants && room.participants[pid]) {
-        name = room.participants[pid].name;
-      }
-      if (!name && room && room.participants) {
-        const found = Object.values(room.participants).find(p => p.socketId === socket.id);
-        if (found) name = found.name;
-      }
-      io.to(targetCode).emit('room:reaction', { emoji, participantName: name });
+    let lastReactAt = 0;
+    socket.on('participant:react', ({ emoji } = {}) => {
+      const now = Date.now();
+      if (now - lastReactAt < 300 || typeof emoji !== 'string' || !emoji || !socket.roomCode) return;
+      lastReactAt = now;
+      const name = gameEngine.getRoom(socket.roomCode)?.participants?.[socket.participantId]?.name || '';
+      io.to(socket.roomCode).emit('room:reaction', { emoji: emoji.slice(0, 8), participantName: name });
     });
 
     // ==========================================
@@ -788,6 +727,8 @@ export function setupSocketHandlers(io) {
     socket.on('game:adjust-points', ({ code, targetId, isTeam, pointsDelta }) => {
       const targetCode = (code || socket.roomCode || '').toUpperCase().trim();
       if (!authHost(targetCode)) return;
+      pointsDelta = Math.trunc(Number(pointsDelta));
+      if (!Number.isFinite(pointsDelta) || Math.abs(pointsDelta) > 100000) return;
       try {
         const room = gameEngine.getRoom(targetCode);
         if (!room) return;
@@ -861,7 +802,6 @@ export function setupSocketHandlers(io) {
     };
 
     socket.on('game:shuffle-teams', handleShuffleTeams);
-    socket.on('host:shuffle_teams', handleShuffleTeams);
 
     socket.on('game:pause-toggle', ({ code }) => {
       const targetCode = (code || socket.roomCode || '').toUpperCase().trim();
@@ -907,7 +847,6 @@ export function setupSocketHandlers(io) {
     };
 
     socket.on('room:end', handleEndRoom);
-    socket.on('host:end_workshop', handleEndRoom);
 
     // ==========================================
     // DISCONNECT

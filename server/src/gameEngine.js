@@ -363,30 +363,6 @@ class GameEngine {
     return { participant: newParticipant, isReconnect: false, room };
   }
 
-  setParticipantTeam(roomCode, participantId, teamName) {
-    const room = this.getRoom(roomCode);
-    if (!room) return null;
-    const participant = room.participants[participantId];
-    if (!participant) return null;
-
-    const validTeam = TEAMS.find(t => t.name.toLowerCase() === teamName.toLowerCase());
-    if (!validTeam) return null;
-
-    participant.team = validTeam.name;
-    room.updatedAt = Date.now();
-    this.saveRoomToDb(room);
-    return participant;
-  }
-
-  setRoomMode(roomCode, mode) {
-    const room = this.getRoom(roomCode);
-    if (!room) return null;
-    room.mode = mode === 'team' ? 'team' : 'individual';
-    room.updatedAt = Date.now();
-    this.saveRoomToDb(room);
-    return room;
-  }
-
   shuffleTeams(roomCode, teamCount = 4) {
     const room = this.getRoom(roomCode);
     if (!room) throw new Error('Room not found');
@@ -499,10 +475,10 @@ class GameEngine {
     return room;
   }
 
-  submitAnswer({ roomCode, participantId, optionId, responseTimeMs = null }) {
+  submitAnswer({ roomCode, participantId, optionId }) {
     const room = this.getRoom(roomCode);
     if (!room) throw new Error('Room not found');
-    if (room.state !== ROOM_STATES.QUESTION_ACTIVE) {
+    if (room.state !== ROOM_STATES.QUESTION_ACTIVE || room.isPaused) {
       throw new Error('Question is not currently active');
     }
 
@@ -518,8 +494,7 @@ class GameEngine {
     if (room.answers[qIndex][participantId]) {
       return {
         alreadyAnswered: true,
-        answer: room.answers[qIndex][participantId],
-        distribution: this.calculateAnswerDistribution(room, false)
+        answer: room.answers[qIndex][participantId]
       };
     }
 
@@ -530,7 +505,7 @@ class GameEngine {
     }
     const timeLimitMs = (room.questionTimeLimit || 30) * 1000;
     const now = Date.now();
-    const actualResponseTime = responseTimeMs !== null ? responseTimeMs : (now - (room.questionStartTime || now));
+    const actualResponseTime = now - (room.questionStartTime || now);
     const clampedResponseTime = Math.max(100, Math.min(timeLimitMs, actualResponseTime));
 
     // Scoring Engine
@@ -589,22 +564,10 @@ class GameEngine {
     room.updatedAt = now;
     this.saveRoomToDb(room);
 
-    const distribution = this.calculateAnswerDistribution(room, false);
-    const totalParticipants = Object.values(room.participants).filter(p => p.isOnline).length;
-    const totalSubmitted = Object.keys(room.answers[qIndex]).length;
-    const allAnswered = totalSubmitted >= totalParticipants && totalParticipants > 0;
-
-    return {
-      success: true,
-      answer: answerRecord,
-      distribution,
-      totalSubmitted,
-      totalParticipants,
-      allAnswered
-    };
+    return { success: true, answer: answerRecord };
   }
 
-  calculateAnswerDistribution(room, includeParticipants = true) {
+  calculateAnswerDistribution(room) {
     const question = this.getCurrentQuestion(room);
     if (!question) return {};
 
@@ -631,9 +594,7 @@ class GameEngine {
         distribution[optId] = { id: optId, text: optId, count: 0, percentage: 0, participants: [] };
       }
       distribution[optId].count++;
-      if (includeParticipants) {
-        distribution[optId].participants.push({ name: ans.participantName, team: ans.team });
-      }
+      distribution[optId].participants.push({ name: ans.participantName, team: ans.team });
     }
 
     for (const key of Object.keys(distribution)) {
@@ -688,26 +649,6 @@ class GameEngine {
       question,
       distribution,
       leaderboards
-    };
-  }
-
-  showDebrief(roomCode) {
-    const room = this.getRoom(roomCode);
-    if (!room) throw new Error('Room not found');
-
-    room.state = ROOM_STATES.DEBRIEF;
-    room.updatedAt = Date.now();
-    this.saveRoomToDb(room);
-
-    const question = this.getCurrentQuestion(room);
-    return {
-      room,
-      debrief: {
-        learningObjective: question?.learningObjective || '',
-        discussionQuestion: question?.discussionQuestion || '',
-        facilitatorTips: question?.facilitatorTips || '',
-        explanation: question?.explanation || ''
-      }
     };
   }
 
@@ -777,22 +718,6 @@ class GameEngine {
       const leaderboards = this.getLeaderboards(roomCode);
       return { room, finished: true, leaderboards };
     }
-  }
-
-  adjustPoints({ roomCode, participantId, pointsDelta, reason }) {
-    const room = this.getRoom(roomCode);
-    if (!room) throw new Error('Room not found');
-
-    const participant = room.participants[participantId];
-    if (!participant) throw new Error('Participant not found');
-
-    const delta = parseInt(pointsDelta, 10) || 0;
-    participant.score = Math.max(0, participant.score + delta);
-    room.updatedAt = Date.now();
-    this.saveRoomToDb(room);
-
-    const leaderboards = this.getLeaderboards(roomCode);
-    return { participant, delta, reason, leaderboards };
   }
 
   submitReflection({ roomCode, participantId, text, category = 'commitment' }) {
@@ -890,73 +815,6 @@ class GameEngine {
       .map((t, index) => ({ rank: index + 1, ...t }));
 
     return { individual, team };
-  }
-
-  /**
-   * Sanitizes room state for participant view:
-   * Masks correctAnswer, explanation, discussionQuestion before answer is revealed.
-   */
-  getSanitizedRoomForParticipant(roomCode, participantId) {
-    const room = this.getRoom(roomCode);
-    if (!room) return null;
-
-    const qIndex = room.currentQuestionIndex;
-    const rawQuestion = this.getCurrentQuestion(room);
-    let sanitizedQuestion = null;
-
-    if (rawQuestion) {
-      if (room.state === ROOM_STATES.ANSWER_REVEALED || room.state === ROOM_STATES.DEBRIEF || room.state === ROOM_STATES.LEADERBOARD) {
-        // Participant can see explanation and correct answer
-        sanitizedQuestion = {
-          id: rawQuestion.id,
-          type: rawQuestion.type,
-          title: rawQuestion.title,
-          scenario: rawQuestion.scenario,
-          options: rawQuestion.options,
-          points: rawQuestion.points,
-          timeLimit: rawQuestion.timeLimit,
-          correctAnswer: rawQuestion.correctAnswer,
-          explanation: rawQuestion.explanation,
-          learningObjective: rawQuestion.learningObjective,
-          dynamicUpdate: rawQuestion.dynamicUpdate
-        };
-      } else {
-        // Question is active or in lobby: MASK correct answer & explanation
-        sanitizedQuestion = {
-          id: rawQuestion.id,
-          type: rawQuestion.type,
-          title: rawQuestion.title,
-          scenario: rawQuestion.scenario,
-          options: rawQuestion.options,
-          points: rawQuestion.points,
-          timeLimit: rawQuestion.timeLimit,
-          dynamicUpdate: rawQuestion.dynamicUpdate
-        };
-      }
-    }
-
-    const participant = room.participants[participantId] || null;
-    const myAnswer = participant && rawQuestion ? participant.answers[rawQuestion.id] : null;
-
-    return {
-      code: room.code,
-      state: room.state,
-      mode: room.mode,
-      gameTitle: room.game?.title,
-      currentQuestionIndex: room.currentQuestionIndex,
-      totalQuestions: room.game?.questions?.length || 0,
-      question: sanitizedQuestion,
-      questionStartTime: room.questionStartTime,
-      questionTimeLimit: room.questionTimeLimit,
-      hasAnswered: !!myAnswer,
-      myAnswer: myAnswer || null,
-      myScore: participant ? participant.score : 0,
-      myStreak: participant ? participant.streak : 0,
-      myTeam: participant ? participant.team : null,
-      distribution: (room.state === ROOM_STATES.ANSWER_REVEALED || room.state === ROOM_STATES.DEBRIEF)
-        ? this.calculateAnswerDistribution(room)
-        : null
-    };
   }
 
   getFullRoomForHost(roomCode) {

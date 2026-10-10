@@ -23,13 +23,13 @@ assert(joined.success);
 assert(!Object.values(joined.room.participants)[0].socketId, 'player view hides socket ids');
 
 // non-host cannot drive the game
-assert((await ask(player, 'host:start_game', { code })).success === false, 'player start rejected');
-evil.emit('host:end_workshop', { code });
+assert((await ask(player, 'game:start', { code })).success === false, 'player start rejected');
+evil.emit('room:end', { code });
 
 // question payloads
 const pq = once(player, 'question:started');
 const hq = once(host, 'question:started');
-assert((await ask(host, 'host:start_game', { code })).success, 'host starts');
+assert((await ask(host, 'game:start', { code })).success, 'host starts');
 const [pp, hp] = await Promise.all([pq, hq]);
 assert(pp.question.correctAnswer === undefined && pp.question.explanation === undefined, 'player question has no answer');
 assert(hp.question.correctAnswer, 'host question has answer');
