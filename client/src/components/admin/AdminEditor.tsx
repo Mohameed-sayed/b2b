@@ -27,22 +27,9 @@ interface AdminEditorProps {
   onBackToHost?: () => void;
 }
 
-// Sends x-admin-token (prompts once on 401). Token kept in sessionStorage only.
+// Direct fetch helper for Admin operations without token prompts
 async function adminFetch(path: string, init: RequestInit = {}): Promise<Response> {
-  const send = (token: string) =>
-    fetch(`${socketService.getBackendUrl()}${path}`, {
-      ...init,
-      headers: { ...(init.headers || {}), ...(token ? { 'x-admin-token': token } : {}) },
-    });
-  let token = '';
-  try { token = sessionStorage.getItem('ischool_admin_token') || ''; } catch {}
-  let res = await send(token);
-  if (res.status === 401) {
-    token = window.prompt('Admin token:') || '';
-    try { sessionStorage.setItem('ischool_admin_token', token); } catch {}
-    res = await send(token);
-  }
-  return res;
+  return fetch(`${socketService.getBackendUrl()}${path}`, init);
 }
 
 export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
