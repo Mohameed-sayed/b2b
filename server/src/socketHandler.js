@@ -122,7 +122,7 @@ export function setupSocketHandlers(io) {
         if (existing && !(
           (hostToken && gameEngine.validateHost(existing.code, hostToken)) ||
           (socket.isHost && socket.roomCode === existing.code) ||
-          (!existing.hostSocketId && Object.keys(existing.participants).length === 0)
+          !existing.hostSocketId
         )) {
           throw new Error('A workshop is already running');
         }
