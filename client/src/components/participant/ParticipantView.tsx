@@ -57,6 +57,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
   const [allParticipants, setAllParticipants] = useState<Participant[]>([]);
   const [errorMessage, setErrorMessage] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [teamMode, setTeamMode] = useState<boolean>(false);
 
   const localTimerRef = useRef<number | null>(null);
   // Keep refs so socket closures always have fresh data
@@ -94,6 +95,11 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
           if (res?.success && res.participant) {
             console.log('[Participant] Auto-reconnected successfully to room:', code);
             setParticipant(res.participant);
+            if (res.room?.teamMode !== undefined) {
+              setTeamMode(res.room.teamMode);
+            } else if (res.room?.mode !== undefined) {
+              setTeamMode(res.room.mode === 'team');
+            }
             const roomStatus: string = res.room?.status || 'lobby';
             if (roomStatus === 'leaderboard') {
               setSubState('leaderboard');
@@ -137,6 +143,11 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
           clearTimeout(fallbackTimer);
           if (res?.success && res.participant) {
             setParticipant(res.participant);
+            if (res.room?.teamMode !== undefined) {
+              setTeamMode(res.room.teamMode);
+            } else if (res.room?.mode !== undefined) {
+              setTeamMode(res.room.mode === 'team');
+            }
             // Re-save with full data (server may have updated avatar/team)
             socketService.saveParticipantSession(
               pendingSession.roomCode,
@@ -206,6 +217,11 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
         data.participant.team
       );
       if (data.room?.isPaused !== undefined) setIsPaused(data.room.isPaused);
+      if (data.room?.teamMode !== undefined) {
+        setTeamMode(data.room.teamMode);
+      } else if (data.room?.mode !== undefined) {
+        setTeamMode(data.room.mode === 'team');
+      }
       setSubState('waiting');
       setIsLoading(false);
     };
@@ -213,6 +229,11 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
     const onRoomUpdated = (data: any) => {
       if (data.room?.isPaused !== undefined) {
         setIsPaused(data.room.isPaused);
+      }
+      if (data.room?.teamMode !== undefined) {
+        setTeamMode(data.room.teamMode);
+      } else if (data.room?.mode !== undefined) {
+        setTeamMode(data.room.mode === 'team');
       }
       if (data.room?.timeRemaining !== undefined && data.room.isPaused) {
         setTimeRemaining(data.room.timeRemaining);
@@ -305,6 +326,11 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
       setAllParticipants(list);
       const me = list.find(p => p.id === participantRef.current?.id);
       if (me) setParticipant(me);
+      if (data.teamMode !== undefined) {
+        setTeamMode(data.teamMode);
+      } else if (data.mode !== undefined) {
+        setTeamMode(data.mode === 'team');
+      }
       setSubState('leaderboard');
     };
 
@@ -420,6 +446,11 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
           setErrorMessage(res.error || res.message || 'Failed to join. Please check the room code.');
         } else if (res?.participant) {
           setParticipant(res.participant);
+          if (res.room?.teamMode !== undefined) {
+            setTeamMode(res.room.teamMode);
+          } else if (res.room?.mode !== undefined) {
+            setTeamMode(res.room.mode === 'team');
+          }
           socketService.saveParticipantSession(
             cleanCode,
             res.participant.id,
@@ -595,6 +626,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
         <ParticipantLeaderboard
           currentParticipant={participant}
           allParticipants={allParticipants.length > 0 ? allParticipants : [participant]}
+          teamMode={teamMode}
         />
       )}
 

@@ -269,8 +269,11 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
       if (data.room) {
         if (data.room.status) setStatus(normalizeStatus(data.room.status, data.room.currentGameId));
         if (data.room.isPaused !== undefined) setIsPaused(data.room.isPaused);
-        if (data.room.timeRemaining !== undefined && data.room.isPaused) setTimeRemaining(data.room.timeRemaining);
-        if (data.room.teamMode !== undefined) setTeamMode(data.room.teamMode);
+        if (data.room.teamMode !== undefined) {
+          setTeamMode(data.room.teamMode);
+        } else if (data.room.mode !== undefined) {
+          setTeamMode(data.room.mode === 'team');
+        }
         if (data.room.selectedTeamCount !== undefined) setSelectedTeamCount(data.room.selectedTeamCount);
         if (data.room.participants) {
           const participantsValue = data.room.participants;
@@ -393,10 +396,11 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
   };
 
   const handleToggleTeamMode = () => {
-    setTeamMode((prev) => !prev);
+    const nextMode = !teamMode;
+    setTeamMode(nextMode);
     const socket = socketService.getSocket();
     if (socket.connected) {
-      socket.emit('game:toggle-team-mode', { code: roomCode });
+      socket.emit('game:toggle-team-mode', { code: roomCode, teamMode: nextMode });
     }
   };
 

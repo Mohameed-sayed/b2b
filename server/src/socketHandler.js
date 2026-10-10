@@ -593,6 +593,7 @@ export function setupSocketHandlers(io) {
       try {
         const { room, leaderboards } = gameEngine.showLeaderboard(targetCode);
 
+        const isTeam = room.mode === 'team';
         const teamScores = {};
         for (const t of leaderboards.team) {
           teamScores[t.team] = t.totalScore;
@@ -603,13 +604,14 @@ export function setupSocketHandlers(io) {
           teamScores,
           individualLeaderboard: leaderboards.individual,
           teamLeaderboard: leaderboards.team,
-          mode: room.mode
+          mode: room.mode,
+          teamMode: isTeam
         };
 
         io.to(targetCode).emit('leaderboard:updated', payload);
         broadcastRoom(io, room);
 
-        if (typeof callback === 'function') callback({ success: true, leaderboards });
+        if (typeof callback === 'function') callback({ success: true, leaderboards, teamMode: isTeam, mode: room.mode });
       } catch (err) {
         console.error('Show leaderboard error:', err);
         if (typeof callback === 'function') callback({ success: false, error: err.message });
@@ -760,15 +762,21 @@ export function setupSocketHandlers(io) {
       }
     });
 
-    socket.on('game:toggle-team-mode', ({ code }) => {
+    socket.on('game:toggle-team-mode', ({ code, teamMode, mode }) => {
       const targetCode = (code || socket.roomCode || '').toUpperCase().trim();
       if (!authHost(targetCode)) return;
       const room = gameEngine.getRoom(targetCode);
-        if (room) {
+      if (room) {
+        if (typeof teamMode === 'boolean') {
+          room.mode = teamMode ? 'team' : 'individual';
+        } else if (mode === 'individual' || mode === 'team') {
+          room.mode = mode;
+        } else {
           room.mode = room.mode === 'team' ? 'individual' : 'team';
-          gameEngine.saveRoomToDb(room);
-          broadcastRoom(io, room);
         }
+        gameEngine.saveRoomToDb(room);
+        broadcastRoom(io, room);
+      }
     });
 
     // ==========================================

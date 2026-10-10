@@ -196,6 +196,7 @@ export interface ServerToClientEvents {
     individualLeaderboard?: Participant[];
     teamLeaderboard?: unknown[];
     mode?: string;
+    teamMode?: boolean;
   }) => void;
   // Server emits 'leaderboard:update' as alias
   'leaderboard:update': (data: {
@@ -204,6 +205,7 @@ export interface ServerToClientEvents {
     individualLeaderboard?: Participant[];
     teamLeaderboard?: unknown[];
     mode?: string;
+    teamMode?: boolean;
   }) => void;
   'reflection:added': (data: { reflection: ReflectionSubmission }) => void;
   'reflection:submitted': (data: { success: boolean; reflection: ReflectionSubmission }) => void;
@@ -232,7 +234,7 @@ export interface ClientToServerEvents {
   'game:adjust-points': (data: { code: string; targetId: string; isTeam: boolean; pointsDelta: number }) => void;
   'game:submit-answer': (data: AnswerSubmission & { participantId?: string; optionId?: string; responseTimeMs?: number }, callback?: (res: { success: boolean; error?: string }) => void) => void;
   'reflection:submit': (data: { roomCode: string; participantId: string; behaviorText?: string; text?: string; category?: string }) => void;
-  'game:toggle-team-mode': (data: { code: string }) => void;
+  'game:toggle-team-mode': (data: { code: string; teamMode?: boolean; mode?: string }) => void;
   'game:shuffle-teams': (data: { code: string; teamCount?: number }, callback?: (res: { success: boolean; room?: Room; error?: string }) => void) => void;
   'team:move': (data: { code: string; participantId: string; team: string }) => void;
   'participant:react': (data: { roomCode: string; emoji: string; participantName?: string; participantId?: string }) => void;

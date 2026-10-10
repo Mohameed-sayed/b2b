@@ -5,11 +5,13 @@ import { Trophy, Flame, User, Users } from 'lucide-react';
 interface ParticipantLeaderboardProps {
   currentParticipant: Participant;
   allParticipants: Participant[];
+  teamMode?: boolean;
 }
 
 export const ParticipantLeaderboard: React.FC<ParticipantLeaderboardProps> = ({
   currentParticipant,
   allParticipants,
+  teamMode = false,
 }) => {
   const sorted = [...allParticipants].sort((a, b) => b.score - a.score);
   const myRank = sorted.findIndex((p) => p.id === currentParticipant.id) + 1;
@@ -23,7 +25,9 @@ export const ParticipantLeaderboard: React.FC<ParticipantLeaderboardProps> = ({
           <Trophy className="w-5 h-5 text-amber-400" />
           <span>Workshop Standings</span>
         </h2>
-        <p className="text-xs text-brand-secondary">Current ranks after this round</p>
+        <p className="text-xs text-brand-secondary">
+          {teamMode ? 'Team & individual standings' : 'Individual instructor standings'}
+        </p>
       </div>
 
       {/* Current Player's Highlight Card */}
@@ -37,9 +41,11 @@ export const ParticipantLeaderboard: React.FC<ParticipantLeaderboardProps> = ({
               <span>{currentParticipant.avatar}</span>
               <span>{currentParticipant.name} (YOU)</span>
             </div>
-            <div className="text-xs text-brand-secondary">
-              {currentParticipant.team}
-            </div>
+            {teamMode && (
+              <div className="text-xs text-brand-secondary">
+                {currentParticipant.team}
+              </div>
+            )}
           </div>
         </div>
 
@@ -85,7 +91,7 @@ export const ParticipantLeaderboard: React.FC<ParticipantLeaderboardProps> = ({
                   <div className={`text-xs font-bold ${isMe ? 'text-orange-300' : 'text-brand-dark'}`}>
                     {p.name} {isMe ? '⭐' : ''}
                   </div>
-                  <div className="text-[10px] text-brand-secondary">{p.team}</div>
+                  {teamMode && <div className="text-[10px] text-brand-secondary">{p.team}</div>}
                 </div>
               </div>
 

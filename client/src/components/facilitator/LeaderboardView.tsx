@@ -24,18 +24,24 @@ interface LeaderboardViewProps {
 
 export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
   participants,
-  teamMode: initialTeamMode,
+  teamMode,
   isLastQuestion,
   onNextQuestion,
 }) => {
   const [activeTab, setActiveTab] = useState<'individual' | 'teams'>(
-    initialTeamMode ? 'teams' : 'individual'
+    teamMode ? 'teams' : 'individual'
   );
 
   useEffect(() => {
     sound.playCelebration();
     firePodiumConfetti();
   }, []);
+
+  useEffect(() => {
+    if (!teamMode) {
+      setActiveTab('individual');
+    }
+  }, [teamMode]);
 
   // Sorted participants
   const sortedParticipants = [...participants].sort((a, b) => b.score - a.score);
@@ -76,28 +82,32 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
               Leaderboard & Rankings
               <Sparkles className="w-5 h-5 text-amber-400" />
             </h1>
-            <p className="text-xs text-brand-secondary">Real-time workshop scores</p>
+            <p className="text-xs text-brand-secondary">
+              {teamMode ? 'Real-time team & instructor scores' : 'Real-time individual instructor scores'}
+            </p>
           </div>
         </div>
 
         {/* Tab Switcher & Next Button */}
         <div className="flex items-center gap-4">
-          <div className="flex rounded-xl bg-brand-white border border-slate-200 p-1">
-            <button
-              onClick={() => setActiveTab('individual')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'individual' ? 'bg-blue-600 text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark'}`}
-            >
-              <User className="w-3.5 h-3.5" />
-              <span>Instructors</span>
-            </button>
-            <button
-              onClick={() => setActiveTab('teams')}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'teams' ? 'bg-purple-600 text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark'}`}
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span>Teams</span>
-            </button>
-          </div>
+          {teamMode && (
+            <div className="flex rounded-xl bg-brand-white border border-slate-200 p-1">
+              <button
+                onClick={() => setActiveTab('individual')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'individual' ? 'bg-blue-600 text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark'}`}
+              >
+                <User className="w-3.5 h-3.5" />
+                <span>Instructors</span>
+              </button>
+              <button
+                onClick={() => setActiveTab('teams')}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === 'teams' ? 'bg-purple-600 text-brand-dark shadow-md' : 'text-brand-secondary hover:text-brand-dark'}`}
+              >
+                <Users className="w-3.5 h-3.5" />
+                <span>Teams</span>
+              </button>
+            </div>
+          )}
 
           {onNextQuestion && (
             <Button
@@ -129,7 +139,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                       2
                     </div>
                     <h3 className="text-base font-bold text-brand-dark truncate">{top2.name}</h3>
-                    <p className="text-xs text-brand-secondary">{top2.team}</p>
+                    {teamMode && <p className="text-xs text-brand-secondary">{top2.team}</p>}
                     <div className="mt-3 font-mono text-xl font-black text-brand-dark">
                       {top2.score.toLocaleString()} <span className="text-xs font-sans text-brand-secondary">pts</span>
                     </div>
@@ -153,7 +163,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                       👑 1
                     </div>
                     <h3 className="text-lg font-black text-brand-dark truncate">{top1.name}</h3>
-                    <p className="text-xs text-amber-300/80 font-medium">{top1.team}</p>
+                    {teamMode && <p className="text-xs text-amber-300/80 font-medium">{top1.team}</p>}
                     <div className="mt-3 font-mono text-2xl font-black text-amber-300">
                       {top1.score.toLocaleString()} <span className="text-xs font-sans text-amber-400">pts</span>
                     </div>
@@ -176,7 +186,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                       3
                     </div>
                     <h3 className="text-base font-bold text-brand-dark truncate">{top3.name}</h3>
-                    <p className="text-xs text-brand-secondary">{top3.team}</p>
+                    {teamMode && <p className="text-xs text-brand-secondary">{top3.team}</p>}
                     <div className="mt-3 font-mono text-xl font-black text-brand-dark">
                       {top3.score.toLocaleString()} <span className="text-xs font-sans text-brand-secondary">pts</span>
                     </div>
@@ -210,7 +220,7 @@ export const LeaderboardView: React.FC<LeaderboardViewProps> = ({
                       <span className="text-xl">{p.avatar}</span>
                       <div>
                         <div className="text-sm font-bold text-brand-dark">{p.name}</div>
-                        <div className="text-[11px] text-brand-secondary">{p.team}</div>
+                        {teamMode && <div className="text-[11px] text-brand-secondary">{p.team}</div>}
                       </div>
                     </div>
 
