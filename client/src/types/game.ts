@@ -21,11 +21,23 @@ export interface DynamicUpdate {
   explanation: string;
 }
 
+export type ChatApp = 'whatsapp' | 'slack';
+export type NotificationApp = 'slack' | 'whatsapp' | 'mail' | 'sms';
+
+// Structured scenario content. Rendered by ScenarioCard as notifications, chat threads, alerts or plain story.
+export type ScenarioBlock =
+  | { type: 'story'; text: string }
+  | { type: 'alert'; label: string; text: string }
+  | { type: 'notification'; app: NotificationApp; sender: string; text: string; priority?: 'high' | 'medium' | 'low'; clock?: string }
+  | { type: 'chat'; app: ChatApp; from: string; side: 'them' | 'me'; text: string }
+  | { type: 'prompt'; text: string };
+
 export interface Question {
   id: string;
   type: QuestionType;
   title: string;
-  scenario: string;
+  scenario: string; // plain-text fallback; blocks (when present) take precedence
+  blocks?: ScenarioBlock[];
   options: QuestionOption[];
   correctAnswer?: string | null;
   points: number;

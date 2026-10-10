@@ -96,7 +96,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
         {/* 1. WHATSAPP COURT QUESTION TYPE */}
         {question.type === 'voting' ? (
           <div className="space-y-6">
-            <ScenarioCard scenario={question.scenario} type={question.type} />
+            <ScenarioCard scenario={question.scenario} blocks={question.blocks} type={question.type} />
 
             {/* Verdict Prompt */}
             <div className="text-center text-sm font-black uppercase tracking-wider text-brand-dark">
@@ -148,7 +148,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
         ) : question.type === 'categorization' ? (
           /* 2. TRIAGE QUESTION TYPE */
           <div className="space-y-6">
-            <ScenarioCard scenario={question.scenario} type={question.type} />
+            <ScenarioCard scenario={question.scenario} blocks={question.blocks} type={question.type} />
 
             <div className="text-center text-sm font-black uppercase tracking-wider text-brand-secondary">
               Select the appropriate triage action:
@@ -195,7 +195,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
         ) : question.type === 'reflection' ? (
           /* 3. REFLECTION QUESTION TYPE */
           <form onSubmit={handleReflectionSubmit} className="space-y-6">
-            <ScenarioCard scenario={question.scenario} type={question.type} />
+            <ScenarioCard scenario={question.scenario} blocks={question.blocks} type={question.type} />
 
             {/* Quick Suggestion Chips */}
             <div>
@@ -250,7 +250,7 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
         ) : (
           /* 4. STANDARD MULTIPLE CHOICE & SLACK SCENARIO */
           <div className="space-y-6">
-            <ScenarioCard scenario={question.scenario} type={question.type} />
+            <ScenarioCard scenario={question.scenario} blocks={question.blocks} type={question.type} />
 
             {/* Question Options Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

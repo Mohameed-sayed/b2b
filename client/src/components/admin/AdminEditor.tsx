@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Game, Question, QuestionOption, QuestionType } from '../../types/game';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
+import { BlockEditor } from './BlockEditor';
 import { sound } from '../../utils/audio';
 import { socketService } from '../../services/socket';
 import {
@@ -167,6 +168,17 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
     );
   };
 
+  const updateScenario = (blocks: Question['blocks'], scenario: string) => {
+    setGames((prev) =>
+      prev.map((g) =>
+        g.id !== selectedGameId ? g : {
+          ...g,
+          questions: g.questions.map((q) => (q.id === selectedQuestionId ? { ...q, blocks, scenario } : q)),
+        }
+      )
+    );
+  };
+
   // Update Option
   const updateOptionText = (optId: string, text: string) => {
     if (!activeQuestion) return;
@@ -242,7 +254,11 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
       id: newQId,
       type: 'multiple-choice',
       title: 'New Workshop Scenario',
-      scenario: 'Enter situation details here...',
+      scenario: 'Enter situation details here...\n\nWhat do you do?',
+      blocks: [
+        { type: 'story', text: 'Enter situation details here...' },
+        { type: 'prompt', text: 'What do you do?' },
+      ],
       options: [
         { id: 'A', text: 'Option A' },
         { id: 'B', text: 'Option B' },
@@ -596,12 +612,7 @@ export const AdminEditor: React.FC<AdminEditorProps> = ({ onBackToHost }) => {
                 <label className="block text-xs font-bold uppercase tracking-wider text-brand-secondary mb-1.5">
                   Scenario Description & Workplace Context
                 </label>
-                <textarea
-                  rows={4}
-                  value={activeQuestion.scenario}
-                  onChange={(e) => updateQuestionField('scenario', e.target.value)}
-                  className="w-full rounded-xl bg-brand-light border border-slate-300 p-3.5 text-sm text-brand-dark font-medium leading-relaxed focus:border-brand-accent focus:outline-none"
-                />
+                <BlockEditor scenario={activeQuestion.scenario} blocks={activeQuestion.blocks} questionType={activeQuestion.type} onChange={updateScenario} />
               </div>
 
               {/* Options & Correct Answer */}

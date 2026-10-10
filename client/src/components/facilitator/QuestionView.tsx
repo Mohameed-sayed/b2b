@@ -97,7 +97,7 @@ export const QuestionView: React.FC<QuestionViewProps> = ({
           {question.title}
         </h2>
 
-        <ScenarioCard scenario={question.scenario} type={question.type} />
+        <ScenarioCard scenario={question.scenario} blocks={question.blocks} type={question.type} />
 
         {/* Question Options Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
