@@ -79,6 +79,16 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
     }
   }, [roomCode]);
 
+  // After a reconnect, an already-answered question must stay locked on the server's pick
+  const resumeQuestion = (myAnswer?: string | null) => {
+    if (myAnswer) {
+      setSelectedAnswer(myAnswer);
+      setSubState('answered');
+    } else {
+      setSubState('question');
+    }
+  };
+
   // Initialize socket & attach ALL game event listeners
   useEffect(() => {
     const socket = socketService.connect();
@@ -98,6 +108,8 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
           if (res?.success && res.participant) {
             console.log('[Participant] Auto-reconnected successfully to room:', code);
             setParticipant(res.participant);
+            socketService.saveParticipantSession(code, res.participant.id, res.participant.name,
+              res.participant.avatar, res.participant.team, res.participant.token);
             if (res.room?.teamMode !== undefined) {
               setTeamMode(res.room.teamMode);
             } else if (res.room?.mode !== undefined) {
@@ -114,7 +126,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
                 setQuestionIndex(res.questionIndex ?? 0);
                 setTotalQuestions(res.totalQuestions ?? 1);
                 setTimeRemaining(res.timeRemaining ?? 30);
-                setSubState('question');
+                resumeQuestion(res.myAnswer);
               }
             }
           }
@@ -174,7 +186,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
                 setTotalQuestions(res.totalQuestions ?? 1);
                 setTimeRemaining(res.timeRemaining ?? 30);
                 if (res.room?.isPaused !== undefined) setIsPaused(res.room.isPaused);
-                setSubState('question');
+                resumeQuestion(res.myAnswer);
               } else {
                 setSubState('waiting');
               }
@@ -214,6 +226,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
     // ── Join success (broadcast event from server) ─────────────
     const onRoomJoined = (data: any) => {
       setParticipant(data.participant);
+      if (data.room?.code) setRoomCode(data.room.code);
       socketService.saveParticipantSession(
         data.room.code,
         data.participant.id,
@@ -300,6 +313,9 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
     const onQuestionTick = (data: any) => {
       setTimeRemaining(data.timeRemaining);
     };
+
+    // host revealed votes (or timer ran out): answering is closed on the server
+    const onAnswersClosed = () => setTimeRemaining(0);
 
     // ── Answer revealed: host clicked REVEAL ───────────────────
     // Server sends BOTH 'participant:score-updated' and 'question:revealed'
@@ -390,6 +406,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
     socket.on('teams:shuffled', onTeamsShuffled);
     socket.on('question:started', onQuestionStarted);
     socket.on('question:tick', onQuestionTick);
+    socket.on('players-answers:revealed', onAnswersClosed);
     socket.on('question:revealed', onQuestionRevealed);
     socket.on('answer:revealed', onQuestionRevealed);          // server emits both names
     socket.on('participant:score-updated', onScoreUpdated);
@@ -407,6 +424,7 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
       socket.off('teams:shuffled', onTeamsShuffled);
       socket.off('question:started', onQuestionStarted);
       socket.off('question:tick', onQuestionTick);
+      socket.off('players-answers:revealed', onAnswersClosed);
       socket.off('question:revealed', onQuestionRevealed);
       socket.off('answer:revealed', onQuestionRevealed);
       socket.off('participant:score-updated', onScoreUpdated);
@@ -461,8 +479,10 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
           } else if (res.room?.mode !== undefined) {
             setTeamMode(res.room.mode === 'team');
           }
+          // server may route a stale typed code to the active room; use the real one
+          if (res.room?.code) setRoomCode(res.room.code);
           socketService.saveParticipantSession(
-            cleanCode,
+            res.room?.code || cleanCode,
             res.participant.id,
             res.participant.name,
             res.participant.avatar,
@@ -515,7 +535,10 @@ export const ParticipantView: React.FC<ParticipantViewProps> = ({ initialCode = 
       timeRemaining,
       timeTaken: (currentQuestion.timeLimit || 30) - timeRemaining,
     }).catch(() => undefined).then((res) => {
-      if (res?.success) return;
+      if (res?.success) {
+        if (res.alreadyAnswered && res.answer?.optionId) setSelectedAnswer(res.answer.optionId); // server kept first pick
+        return;
+      }
       if (res?.error === 'Question is not currently active') {
         setSubmitError("Time's up: your answer arrived too late and was not counted.");
         return;

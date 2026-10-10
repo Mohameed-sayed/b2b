@@ -283,6 +283,8 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
           setTeamMode(data.room.mode === 'team');
         }
         if (data.room.selectedTeamCount !== undefined) setSelectedTeamCount(data.room.selectedTeamCount);
+        // resync vote count; answers can land while the host socket was reconnecting
+        if (data.room.submissions) setAnsweredCount(Object.keys(data.room.submissions).length);
         if (data.room.participants) {
           const participantsValue = data.room.participants;
           setParticipants(

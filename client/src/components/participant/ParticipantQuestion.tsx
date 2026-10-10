@@ -36,7 +36,11 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
   const [reflectionText, setReflectionText] = useState<string>('');
 
+  // server rejects answers once time is up or the game is paused
+  const locked = timeRemaining <= 0 || !!isPaused;
+
   const handleSelectOption = (optionId: string) => {
+    if (locked) return;
     sound.playPop();
     setSelectedOption(optionId);
     onSubmitAnswer(optionId);
@@ -83,6 +87,11 @@ export const ParticipantQuestion: React.FC<ParticipantQuestionProps> = ({
             totalTime={question.timeLimit}
             isPaused={isPaused}
           />
+          {locked && question.type !== 'reflection' && (
+            <p role="status" className="mt-3 text-center text-sm font-bold text-red-600">
+              {isPaused ? 'Paused: answers open again when the host resumes.' : "Time's up! Waiting for the host to reveal."}
+            </p>
+          )}
         </div>
       </div>
 

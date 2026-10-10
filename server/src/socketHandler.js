@@ -1,4 +1,5 @@
 import { gameEngine, ROOM_STATES, TEAMS, formatClientRoom, formatPlayerRoom, sanitizeQuestion, sanitizeLeaderboards, isCorrectOption } from './gameEngine.js';
+import crypto from 'crypto';
 import { db } from './storage/db.js';
 
 // Active question interval timers per room: roomCode -> timerId
@@ -282,6 +283,7 @@ export function setupSocketHandlers(io) {
 
         const participant = room.participants[participantId];
         claimSeat(targetCode, participant, token);
+        participant.token ||= crypto.randomBytes(16).toString('hex'); // seats created before tokens existed
         gameEngine.saveRoomToDb(room);
 
         const clientRoom = formatPlayerRoom(room);
@@ -304,6 +306,8 @@ export function setupSocketHandlers(io) {
           currentQuestion,
           questionIndex: room.currentQuestionIndex,
           totalQuestions: room.game?.questions?.length || 1,
+          // own pick for the current question, so a reconnect doesn't reopen an answered question
+          myAnswer: room.answers?.[room.currentQuestionIndex]?.[participant.id]?.optionId ?? null,
           timeRemaining: room.currentTimeRemaining !== undefined ? room.currentTimeRemaining : (room.questionTimeLimit || 30)
         };
 
@@ -427,7 +431,8 @@ export function setupSocketHandlers(io) {
     // SUBMIT ANSWER (Supports game:submit-answer & participant:submit_answer)
     // ==========================================
     const handleSubmitAnswer = ({ roomCode, code, answer, optionId, participantId, token } = {}, callback) => {
-      const targetCode = (roomCode || code || socket.roomCode || '').toUpperCase().trim();
+      // bound room wins: a player routed to the active room may still hold a stale typed code
+      const targetCode = (socket.roomCode || roomCode || code || '').toUpperCase().trim();
       const optId = optionId || answer;
 
       try {
@@ -465,7 +470,7 @@ export function setupSocketHandlers(io) {
           success: true,
           optionId: optId,
           alreadyAnswered: result.alreadyAnswered || false,
-          answer: result.answer
+          answer: { optionId: result.answer.optionId } // grading stays hidden until reveal
         };
 
         if (typeof callback === 'function') callback(response);
@@ -701,7 +706,7 @@ export function setupSocketHandlers(io) {
     const handleSubmitReflection = ({ roomCode, code, behaviorText, text, category }, callback) => {
       if (Date.now() - lastReflectionAt < 1000) return callback?.({ success: false, error: 'Too fast' });
       lastReflectionAt = Date.now();
-      const targetCode = (roomCode || code || socket.roomCode || '').toUpperCase().trim();
+      const targetCode = (socket.roomCode || roomCode || code || '').toUpperCase().trim();
       const pid = socket.participantId;
       const refText = String(behaviorText || text || '').slice(0, 500);
 
