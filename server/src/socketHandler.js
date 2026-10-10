@@ -22,6 +22,16 @@ function broadcastRoom(io, room) {
     { room: formatPlayerRoom(room) });
 }
 
+// Coalesce bursts (e.g. 100 joins) into one host room:updated per 250ms.
+const hostUpdateTimers = new Map();
+function hostRoomUpdate(io, room) {
+  if (hostUpdateTimers.has(room.code)) return;
+  hostUpdateTimers.set(room.code, setTimeout(() => {
+    hostUpdateTimers.delete(room.code);
+    io.to(`${room.code}:host`).emit('room:updated', { room: formatClientRoom(room, room.hostSocketId) });
+  }, 250));
+}
+
 function startRoomTimer(io, roomCode, timeLimit) {
   stopRoomTimer(roomCode);
   let remaining = timeLimit;
@@ -239,23 +249,13 @@ export function setupSocketHandlers(io) {
 
         // Direct response to the participant socket
         socket.emit('room:joined', { participant, room: clientRoom });
-        socket.emit('participant:join_success', response);
 
-        // Broadcast to all sockets in the room (including host)
-        io.to(targetCode).emit('room:participant-joined', {
+        // Only the host tracks the roster
+        io.to(`${targetCode}:host`).emit('room:participant-joined', {
           participant,
           count: Object.values(updatedRoom.participants).length
         });
-
-        io.to(`${targetCode}:host`).emit('participant:joined', {
-          participant,
-          isReconnect,
-          totalParticipants: Object.values(updatedRoom.participants).length,
-          participantsList: Object.values(updatedRoom.participants)
-        });
-
-        // Also update full room state to host
-        io.to(`${targetCode}:host`).emit('room:updated', { room: formatClientRoom(updatedRoom, updatedRoom.hostSocketId) });
+        hostRoomUpdate(io, updatedRoom);
 
         if (typeof callback === 'function') {
           callback(response);
@@ -329,11 +329,11 @@ export function setupSocketHandlers(io) {
         if (typeof callback === 'function') callback(response);
 
         // Broadcast to host and room that participant is back online!
-        io.to(targetCode).emit('room:participant-reconnected', {
+        io.to(`${targetCode}:host`).emit('room:participant-reconnected', {
           participant: clientRoom.participants[participant.id],
           count: Object.values(room.participants).filter(p => p.isOnline).length
         });
-        broadcastRoom(io, room);
+        hostRoomUpdate(io, room);
       } catch (err) {
         console.error('Reconnect error:', err);
         if (typeof callback === 'function') callback({ success: false, error: err.message });
@@ -486,7 +486,6 @@ export function setupSocketHandlers(io) {
           totalParticipants
         });
 
-        io.to(`${targetCode}:host`).emit('distribution:update', result.distribution);
 
         const response = {
           success: true,
@@ -618,7 +617,6 @@ export function setupSocketHandlers(io) {
         }
 
         io.to(targetCode).emit('question:revealed', payload);
-        io.to(targetCode).emit('answer:revealed', payload);
 
         if (typeof callback === 'function') callback({ success: true, stats, leaderboards });
       } catch (err) {
@@ -654,7 +652,6 @@ export function setupSocketHandlers(io) {
         };
 
         io.to(targetCode).emit('leaderboard:updated', payload);
-        io.to(targetCode).emit('leaderboard:update', payload);
         broadcastRoom(io, room);
 
         if (typeof callback === 'function') callback({ success: true, leaderboards });
@@ -922,15 +919,11 @@ export function setupSocketHandlers(io) {
         for (const item of updatedRooms) {
           if (item.participant) {
             const onlineCount = Object.values(item.room.participants).filter(p => p.isOnline).length;
-            io.to(item.room.code).emit('room:participant-offline', {
+            io.to(`${item.room.code}:host`).emit('room:participant-offline', {
               participantId: item.participant.id,
               count: onlineCount
             });
-            io.to(item.room.code).emit('room:participant-left', {
-              participantId: item.participant.id,
-              count: onlineCount
-            });
-            broadcastRoom(io, item.room);
+            hostRoomUpdate(io, item.room);
           }
         }
       } catch (err) {

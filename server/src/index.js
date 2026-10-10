@@ -67,7 +67,7 @@ const io = new Server(server, {
   transports: ['polling', 'websocket'],
   allowUpgrades: true,
   connectTimeout: 45000,
-  maxHttpBufferSize: 1e7
+  maxHttpBufferSize: 1e5
 });
 
 // Attach real-time handlers

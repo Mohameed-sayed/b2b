@@ -121,6 +121,8 @@ export const TEAMS = [
   { id: 'Team Delta', name: 'Team Delta', color: '#8B5CF6', badge: '🐉' }
 ];
 
+const ROOM_TTL_MS = 24 * 60 * 60 * 1000;
+
 const DEFAULT_AVATARS = ['🚀', '⚡', '💡', '🎯', '🔥', '🌟', '🧠', '🛠️', '💻', '🎨'];
 
 /**
@@ -138,6 +140,12 @@ class GameEngine {
       const persistedRooms = db.getRooms();
       for (const [code, room] of Object.entries(persistedRooms)) {
         if (room && room.code) {
+          if (Date.now() - (room.updatedAt || room.createdAt || 0) > ROOM_TTL_MS) {
+            db.deleteRoom(code); // stale room from a previous day
+            continue;
+          }
+          room.game = room.game || db.getGameById(room.gameId);
+          if (!room.game) continue;
           // Reset socket IDs and online flags on server boot
           if (room.participants) {
             for (const pid of Object.keys(room.participants)) {
@@ -299,7 +307,7 @@ class GameEngine {
       room = this.createRoom({ code: roomCode });
     }
 
-    const cleanName = (name || '').trim() || 'Anonymous Player';
+    const cleanName = String(name || '').trim().slice(0, 40) || 'Anonymous Player';
     const pid = participantId || crypto.randomUUID();
 
     // Check if participant already exists (reconnection scenario)
@@ -308,7 +316,7 @@ class GameEngine {
       existing.socketId = socketId;
       existing.isOnline = true;
       existing.lastActive = Date.now();
-      if (name && name.trim()) existing.name = name.trim();
+      if (name && name.trim()) existing.name = String(name).trim().slice(0, 40);
       if (avatar) existing.avatar = avatar;
       room.updatedAt = Date.now();
       this.saveRoomToDb(room);
