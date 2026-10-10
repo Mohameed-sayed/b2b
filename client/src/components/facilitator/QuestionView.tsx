@@ -2,9 +2,10 @@ import React, { useEffect } from 'react';
 import { Question, Participant } from '../../types/game';
 import { TimerBar } from '../common/TimerBar';
 import { Badge } from '../common/Badge';
+import { ScenarioCard } from '../common/ScenarioCard';
 import { Button } from '../common/Button';
 import { sound } from '../../utils/audio';
-import { Eye, Users, AlertCircle, MessageSquare, CheckCheck } from 'lucide-react';
+import { Users } from 'lucide-react';
 
 interface QuestionViewProps {
   question: Question;
@@ -96,92 +97,7 @@ export const QuestionView: React.FC<QuestionViewProps> = ({
           {question.title}
         </h2>
 
-        {/* Scenario Card */}
-        {question.type === 'slack-scenario' ? (
-          <div className="rounded-3xl bg-[#1a1d21] border border-[#35373b] overflow-hidden shadow-2xl mb-8">
-            <div className="bg-[#1a1d21] px-6 py-4 border-b border-[#35373b] flex items-center gap-3">
-              <span className="text-slate-400 font-bold text-xl">#</span>
-              <span className="text-slate-200 font-bold text-lg tracking-wide">b2b-support</span>
-            </div>
-            <div className="p-6 md:p-8 space-y-6 bg-[#1a1d21] text-base max-h-96 overflow-y-auto">
-              {question.scenario.split(/\\n\\n|\n\n/).map((msg, i) => {
-                const isTutor = msg.startsWith('Tutor:');
-                const content = msg.replace(/^(Mentor|Tutor):\s*/, '').replace(/\\n/g, '\n').replace(/â€”/g, '—').replace(/â€™/g, "'").replace(/\uFFFD/g, '—');
-                const sender = isTutor ? 'Ahmed' : 'Mentor';
-                const time = `10:${12 + i} AM`; 
-                return (
-                  <div key={i} className="flex items-start gap-4">
-                    <div className={`w-12 h-12 rounded flex items-center justify-center text-xl font-bold text-white ${isTutor ? 'bg-blue-600' : 'bg-emerald-700'}`}>
-                      {sender[0]}
-                    </div>
-                    <div className="flex-1 space-y-1 min-w-0">
-                      <div className="flex items-baseline gap-3">
-                        <span className="font-bold text-slate-200 text-lg">{sender}</span>
-                        <span className="text-xs text-slate-500">{time}</span>
-                      </div>
-                      <div className="text-slate-300 leading-relaxed whitespace-pre-wrap break-words">{content}</div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        ) : question.type === 'voting' ? (
-          <div className="rounded-3xl bg-[#efeae2] border border-slate-200 overflow-hidden shadow-2xl mb-8 max-w-2xl mx-auto">
-            {/* WhatsApp Header */}
-            <div className="bg-[#008069] px-4 py-3 flex items-center gap-3 shadow-sm relative z-10">
-              <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center text-lg font-bold text-slate-700">
-                M
-              </div>
-              <div>
-                <div className="text-sm font-bold text-white leading-none">
-                  Mentor
-                </div>
-                <div className="text-xs text-emerald-100 mt-1">online</div>
-              </div>
-            </div>
-
-            {/* Chat Canvas with Wallpaper look */}
-            <div className="p-6 space-y-4 bg-[#efeae2] text-sm max-h-[50vh] overflow-y-auto">
-              {question.scenario.split(/\\n\\n|\n\n/).map((block, idx) => {
-                const lowerBlock = block.trim().toLowerCase();
-                const isMentor = lowerBlock.startsWith('mentor:');
-                const isTutor = lowerBlock.startsWith('tutor:') || lowerBlock.startsWith('instructor:');
-                
-                if (!block.trim()) return null;
-
-                if (isMentor) {
-                  const text = block.trim().replace(/^(Mentor|Tutor|Instructor):\s*/i, '');
-                  return (
-                    <div key={idx} className="bg-white text-slate-800 p-4 rounded-2xl rounded-tl-none max-w-[85%] shadow-sm space-y-1 relative">
-                      <p dir="auto" className="whitespace-pre-wrap text-base leading-relaxed font-medium">{text}</p>
-                    </div>
-                  );
-                } else if (isTutor) {
-                  const text = block.trim().replace(/^(Mentor|Tutor|Instructor):\s*/i, '');
-                  return (
-                    <div key={idx} className="ml-auto bg-[#d9fdd3] text-slate-800 p-4 rounded-2xl rounded-tr-none max-w-[85%] shadow-sm space-y-1 relative">
-                      <p dir="auto" className="whitespace-pre-wrap text-base leading-relaxed font-medium">{text}</p>
-                      <div className="flex items-center justify-end gap-1 text-xs text-slate-500 mt-1">
-                        <CheckCheck className="w-4 h-4 text-blue-500" />
-                      </div>
-                    </div>
-                  );
-                } else {
-                  return (
-                    <div key={idx} className="text-center text-xs font-bold text-slate-500 bg-[#e1d8c9] px-3 py-1.5 rounded-lg mx-auto w-fit max-w-[90%]">
-                      {block.trim()}
-                    </div>
-                  );
-                }
-              })}
-            </div>
-          </div>
-        ) : (
-          <div className="p-6 md:p-8 rounded-3xl bg-brand-white border-2 border-slate-300/60 shadow-2xl text-brand-dark text-lg md:text-xl font-medium leading-relaxed whitespace-pre-line mb-8">
-            {question.scenario}
-          </div>
-        )}
+        <ScenarioCard scenario={question.scenario} type={question.type} />
 
         {/* Question Options Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
