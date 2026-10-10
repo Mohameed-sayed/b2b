@@ -222,6 +222,7 @@ export interface ClientToServerEvents {
   'reflection:submit': (data: { roomCode: string; participantId: string; behaviorText?: string; text?: string; category?: string }) => void;
   'game:toggle-team-mode': (data: { code: string }) => void;
   'game:shuffle-teams': (data: { code: string; teamCount?: number }, callback?: (res: { success: boolean; room?: Room; error?: string }) => void) => void;
+  'team:move': (data: { code: string; participantId: string; team: string }) => void;
   'participant:react': (data: { roomCode: string; emoji: string; participantName?: string; participantId?: string }) => void;
 }
 

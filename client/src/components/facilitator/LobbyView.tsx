@@ -3,6 +3,7 @@ import { QRCodeSVG } from 'qrcode.react';
 import { Game, Participant } from '../../types/game';
 import { Button } from '../common/Button';
 import { Badge } from '../common/Badge';
+import { TeamBoard } from './TeamBoard';
 import { Users, Play, Copy, Check, Sparkles, BookOpen, Layers, RotateCcw, Shuffle } from 'lucide-react';
 
 interface LobbyViewProps {
@@ -17,6 +18,7 @@ interface LobbyViewProps {
   onStartGame: () => void;
   onToggleTeamMode: () => void;
   onShuffleTeams?: (teamCount: number) => void;
+  onMovePlayer?: (participantId: string, team: string) => void;
   onResetRoom?: () => void;
 }
 
@@ -32,6 +34,7 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
   onStartGame,
   onToggleTeamMode,
   onShuffleTeams,
+  onMovePlayer,
   onResetRoom,
 }) => {
   const [copied, setCopied] = useState(false);
@@ -326,7 +329,9 @@ export const LobbyView: React.FC<LobbyViewProps> = ({
                   Show the QR code on your shared screen. As participants enter their name, they will appear here instantly!
                 </p>
               </div>
-            ) : (
+            ) : teamMode && onMovePlayer ? (
+              <TeamBoard participants={participants} teamCount={teamCount} onMove={onMovePlayer} />
+              ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3 max-h-64 overflow-y-auto pr-1">
                 {participants.map((p) => {
                   const teamBadges: Record<string, { badge: string; color: string }> = {

@@ -413,6 +413,11 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
     }
   };
 
+  const handleMovePlayer = (participantId: string, team: string) => {
+    setParticipants((prev) => prev.map((p) => (p.id === participantId ? { ...p, team } : p)));
+    socketService.getSocket().emit('team:move', { code: roomCode, participantId, team });
+  };
+
   const handleRevealPlayersAnswers = () => {
     const socket = socketService.getSocket();
     if (socket.connected) {
@@ -601,6 +606,7 @@ export const FacilitatorView: React.FC<FacilitatorViewProps> = ({ initialRoomCod
           onStartGame={handleStartGame}
           onToggleTeamMode={handleToggleTeamMode}
           onShuffleTeams={handleShuffleTeams}
+          onMovePlayer={handleMovePlayer}
           onResetRoom={handleResetRoom}
         />
       )}

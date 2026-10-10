@@ -1,4 +1,4 @@
-import { gameEngine, ROOM_STATES, formatClientRoom, formatPlayerRoom, sanitizeQuestion, sanitizeLeaderboards } from './gameEngine.js';
+import { gameEngine, ROOM_STATES, TEAMS, formatClientRoom, formatPlayerRoom, sanitizeQuestion, sanitizeLeaderboards } from './gameEngine.js';
 import { db } from './storage/db.js';
 
 // Active question interval timers per room: roomCode -> timerId
@@ -802,6 +802,18 @@ export function setupSocketHandlers(io) {
     };
 
     socket.on('game:shuffle-teams', handleShuffleTeams);
+
+    socket.on('team:move', ({ code, participantId, team } = {}) => {
+      const targetCode = (code || socket.roomCode || '').toUpperCase().trim();
+      if (!authHost(targetCode)) return;
+      const room = gameEngine.getRoom(targetCode);
+      const p = room?.participants?.[participantId];
+      if (!p || !TEAMS.some((t) => t.name === team)) return;
+      p.team = team;
+      room.updatedAt = Date.now();
+      gameEngine.saveRoomToDb(room);
+      broadcastRoom(io, room);
+    });
 
     socket.on('game:pause-toggle', ({ code }) => {
       const targetCode = (code || socket.roomCode || '').toUpperCase().trim();
